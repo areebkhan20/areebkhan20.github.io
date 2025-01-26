@@ -1,0 +1,190 @@
+.titleawards{
+    position: relative;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    color: rgb(255, 255, 255);
+    font-size: 3.0em;
+}
+
+.awards {
+    position: relative;
+    max-width: 1480px; /* Limit the width for better centering */
+    margin: 0 auto; /* Center the awards section */
+    padding: 20px;
+}
+
+.awards .container1 {
+    position: relative;
+    display: flex;
+    justify-content: center; /* Center the cards */
+    flex-wrap: wrap; /* Allow cards to wrap if they don't fit in one row */
+    gap: 30px; /* Add space between the cards */
+    margin: 0 auto; /* Center the container */
+}
+
+.awards .container1 .card {
+    position: relative;
+    width: 320px;
+    height: 450px;
+    background: #1d1736;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.3);
+    transition: transform 0.5s ease-in-out;
+}
+
+.awards .container1 .card:hover {
+    transform: translateY(-10%);
+}
+
+.awards .container1 .card:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #483a83;
+    clip-path: circle(150px at 80% 20%);
+    transition: 0.5s ease-in-out;
+}
+
+.awards .container1 .card:hover:before {
+    clip-path: circle(300px at 80% -20%);
+}
+
+.awards .container1 .card:after{
+    content: 'Honors';
+    position: absolute;
+    opacity: 0.2;
+    top: 30%;
+    left: -2%;
+    font-size: 5.7em;
+    font-weight: 800;
+    font-style: italic;
+    color: rgb(255, 255, 255);
+    
+}
+
+.awards .container1 .card .imgbox{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10000;
+    width: 100%;
+    height: 150px;
+    transition: 0.5s;
+}
+
+.awards .container1 .card:hover .imgbox{
+    top: -5%;
+    transform: translateY(0%);
+    transform: scale(0.9);
+}
+
+.awards .container1 .card .imgbox img{
+    position: absolute;
+    top: 20%;
+    left: 17%;
+    width: 200px;
+}
+
+.awards .container1 .card .contentbox{
+    position: absolute;
+    bottom: -2.5%;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: 1s;
+    z-index: 10;
+}
+
+.awards .container1 .card:hover .contentbox{
+    height: 280px;
+}
+
+.awards .container1 .card .contentbox h2{
+    position: relative;
+    font-size: 20pt;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 10px;
+    color: #fff;
+
+}
+
+.awards .container1 .card .contentbox .eventnme{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: px 10px;
+    transition: 0.5s;
+
+}
+
+.awards .container1 .card .contentbox .eventnme h3{
+    color: #fff;
+    font-weight: 300;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.awards .container1 .card .contentbox .year{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0px 10px;
+    transition: 0.5s;
+
+}
+
+.awards .container1 .card .contentbox .year h3{
+    color: #fff;
+    letter-spacing: 1px;
+    font-size: 14px;
+}
+
+.awards .container1 .card .contentbox .desc{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 10px;
+    transition: 0.5s;
+
+}
+
+.awards .container1 .card .contentbox .desc h4{
+    color: #fff;
+    letter-spacing: 1px;
+    font-weight: 400;
+    font-size: 12px;
+}
+
+.awards .container1 .card .contentbox a{
+    display: inline-block;
+    padding: 10px 20px;
+    background: #fff;
+    border-radius: 4px;
+    margin-top: 10px;
+    font-size: 16px;
+    text-decoration: none;
+    font-weight: 600;
+    color: #111;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: 0.5s;
+}
+
+.awards .container1 .card:hover .contentbox a{
+    opacity: 1;
+    transform: translateY(0px);
+    transition-delay: 0.75s;
+}
+
+.awards h2{
+    margin-bottom: 10px;;
+    
+}
+
