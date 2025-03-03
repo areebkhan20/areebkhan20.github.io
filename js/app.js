@@ -1,28 +1,61 @@
+// Global variables for parallax effect
 const parallax_el = document.querySelectorAll(".parallax");
 const main = document.querySelector("main");
 
 let xValue = 0, yValue = 0;
-
 let rotateDegree = 0;
+let timeline; // Make timeline globally accessible
 
+// Set main content height based on screen size
+if(window.innerWidth >= 768){
+    if (main) main.style.maxHeight = `${window.innerWidth * 0.6}px`;
+} else {
+    if (main) main.style.maxHeight = `${window.innerWidth * 1.6}px`;
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Set initial body opacity to 1 for the loading screen
+    document.body.style.opacity = 1;
+    
+    // Set main content opacity to 0 (will be shown after loader)
+    const mainContent = document.querySelector("main");
+    if (mainContent) {
+        mainContent.style.opacity = 0;
+    }
+    
+    // Only call this once
+    splitTextIntoSpans(".logo p");
+    
+    // Start the loader animation
+    startLoader();
+    
+    // Set up hamburger menu
+    setupHamburgerMenu();
+});
+
+// Parallax effect update function
 function update(cursorposition) {
     parallax_el.forEach((el) => {
+        if (el.closest('header')) return;  // Exclude navbar from transformations
         let isInLeft = parseFloat(getComputedStyle(el).left) < window.innerWidth / 2 ? 1 : -1;
-        let zValue = (cursorposition - parseFloat(getComputedStyle(el).left)) * isInLeft * 0.1;
-
+        let zValue = (cursorposition - parseFloat(getComputedStyle(el).left)) * isInLeft * 0.05;
+    
         let speedx = el.dataset.speedx;
         let speedy = el.dataset.speedy;
         let speedz = el.dataset.speedz;
         let rotateSpeed = el.dataset.rotation;
-
-        el.style.transform = `rotateY(${rotateDegree * rotateSpeed}deg) translateX(calc(-50% + ${-xValue * speedx}px)) translateY(calc(-50% + ${yValue * speedy}px)) perspective(2300px) translateZ(${zValue * speedz}px)`;
+    
+        el.style.transform = `rotateY(${rotateDegree * rotateSpeed}deg) 
+                              translateX(calc(-50% + ${-xValue * speedx}px)) 
+                              translateY(calc(-50% + ${yValue * speedy}px)) 
+                              perspective(2300px) 
+                              translateZ(${Math.min(zValue * speedz, 50)}px)`;
     });
 }
 
-update(0);
-
+// Mouse move event for parallax effect
 window.addEventListener("mousemove", (e) => {
-    if (timeline.isActive()) return;
+    if (timeline && timeline.isActive()) return;
 
     xValue = e.clientX - window.innerWidth / 2;
     yValue = e.clientY - window.innerHeight / 2;
@@ -32,92 +65,261 @@ window.addEventListener("mousemove", (e) => {
     update(e.clientX);
 });
 
-if(window.innerWidth >= 725){
-    main.style.maxHeight = `${window.innerWidth * 0.6}px`;
-} else {
-    main.style.maxHeight = `${window.innerWidth * 1.6}px`;
-}
-
-// GSAP ANIMATION
-
-// Create a GSAP timeline
-const timeline = gsap.timeline();
-
-Array.from(parallax_el)
-    .filter(el => !el.classList.contains("lname") && !el.classList.contains("fname"))
-    .forEach(el => {
-        // Ensure the element has a data-distance attribute
-        const distance = el.dataset.distance || 0;
-        const originalTop = getComputedStyle(el).top;
-
-        // Animate each element
-        timeline.fromTo(el, {
-            top: `${el.offsetHeight / 2 + parseFloat(distance)}px`,
-        }, {
-            top: originalTop,
-            duration: 0.2,
-            ease: "power3.out",
+// Hamburger menu setup
+function setupHamburgerMenu() {
+    const hamburger = document.querySelector('.hamburger');
+    const menu = document.querySelector('.menu');
+    
+    // Check if elements exist before adding event listeners
+    if (hamburger && menu) {
+        hamburger.addEventListener('click', function() {
+            menu.classList.toggle('active');
         });
-    });
-
-// Get computed styles
-const fnameElement = document.querySelector(".fname");
-const lnameElement = document.querySelector(".lname");
-
-// Check if elements are found
-if (!fnameElement || !lnameElement) {
-    console.error("Elements with class .fname or .lname not found.");
-} else {
-    const fntop = getComputedStyle(fnameElement).top;
-    const lntop = getComputedStyle(lnameElement).top;
-
-    console.log("fntop:", fntop);
-    console.log("lntop:", lntop);
-
-    const timeline = gsap.timeline();
-
-    // Ensure gsap is defined
-    if (!timeline) {
-        console.error("GSAP timeline is not defined.");
+        
+        // Close menu when clicking on a link
+        const menuLinks = document.querySelectorAll('.menu a');
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                menu.classList.remove('active');
+            });
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const isClickInsideMenu = menu.contains(event.target);
+            const isClickOnHamburger = hamburger.contains(event.target);
+            
+            if (!isClickInsideMenu && !isClickOnHamburger && menu.classList.contains('active')) {
+                menu.classList.remove('active');
+            }
+        });
     } else {
-        timeline.fromTo(
-            "body", 
-            {
-                opacity: 0,
-            },
-            {
-                duration: 2,
-                opacity: 1,
-            },
-            "0.5"
-        ).fromTo(
-            ".lname", 
-            {
-                top: window.innerHeight - fnameElement.getBoundingClientRect().top,
-                opacity: 0,
-            },
-            {
-                top: lntop,
-                duration: 1,
-                opacity: 1,
-            },
-            "0.5"
-        ).fromTo(
-            ".fname",
-            {
-                top: "-150px",
-                opacity: 0,
-            },
-            {
-                top: fntop,
-                duration: 1,
-                opacity: 1,
-            },
-            "1"
-        );
+        console.warn('Hamburger menu or navigation elements not found');
     }
 }
 
+// Text splitting function for animation
+function splitTextIntoSpans(selector) {
+    var element = document.querySelector(selector);
+    if (element) {
+        var text = element.innerText;
+        var splitText = text.split("").map((char) => `<span>${char}</span>`).join("");
+        element.innerHTML = splitText;
+        
+        // Make sure all spans are visible initially
+        var spans = element.querySelectorAll("span");
+        spans.forEach(span => {
+            span.style.display = "inline-block";
+            span.style.position = "relative";
+            span.style.color = "#ffffff";
+            
+            // For logo spans specifically
+            if (element.closest(".logo")) {
+                span.style.top = "200px"; // Match CSS initial position
+            }
+        });
+    }
+}
+
+// Loading counter animation
+function startLoader() {
+    var counterElement = document.querySelector(".counter p");
+    
+    // If counter element doesn't exist, check if we need to create loading structure
+    if (!counterElement) {
+        console.warn("Counter element not found, checking if overlay exists");
+        
+        // Check if overlay exists
+        let overlay = document.querySelector(".overlay");
+        
+        // If no overlay, create the loading structure
+        if (!overlay) {
+            console.log("Creating loading structure");
+            const loadingHTML = `
+                <div class="overlay">
+                    <div class="overlay-content">
+                        <div class="counter"><p>0</p></div>
+                        <div class="logo"><p>VOIDSCAPE</p></div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('afterbegin', loadingHTML);
+            
+            // Re-get the counter element
+            counterElement = document.querySelector(".counter p");
+            
+            // Also call splitTextIntoSpans for the logo again
+            splitTextIntoSpans(".logo p");
+        }
+    }
+    
+    if (!counterElement) {
+        console.error("Counter element still not found after attempts to create it");
+        return;
+    }
+    
+    var currentValue = 0;
+    
+    function updateCounter() {
+        if (currentValue === 100) {
+            animateText();
+            return;
+        }
+        
+        currentValue += Math.floor(Math.random() * 10) + 1;
+        currentValue = currentValue > 100 ? 100 : currentValue;
+        
+        // Create spans for counter digits
+        counterElement.innerHTML = currentValue.toString().split("").map((char) => 
+            `<span style="position:relative; display:inline-block; color:#ffffff;">${char}</span>`).join("") + 
+            `<span style="position:relative; display:inline-block; color:#ffffff;">%</span>`;
+        
+        var delay = Math.floor(Math.random() * 200) + 100;
+        setTimeout(updateCounter, delay);
+    }
+    
+    // Start the counter
+    updateCounter();
+}
+
+// Text animation after loading counter reaches 100%
+function animateText() {
+    setTimeout(() => {
+        // Ensure counter elements are visible before animating
+        document.querySelectorAll(".counter p span").forEach(span => {
+            span.style.position = "relative";
+            span.style.display = "inline-block";
+            span.style.color = "#ffffff";
+        });
+        
+        gsap.to(".counter p span", {
+            top: "-400px",
+            stagger: 0.1,
+            ease: "power3.inOut",
+            duration: 1,
+        });
+        
+        gsap.to(".loading", {
+            opacity: 0,
+            ease: "power3.inOut",
+            duration: 1,
+            delay: 4,
+        });
+
+        
+        
+        // Ensure logo spans are visible
+        document.querySelectorAll(".logo p span").forEach(span => {
+            span.style.position = "relative";
+            span.style.display = "inline-block";
+            span.style.color = "#ffffff";
+        });
+        
+        gsap.to(".logo p span", {
+            top: 0,
+            stagger: 0.1,
+            ease: "power3.inOut",
+            duration: 1,
+        });
+        
+        gsap.to(".logo p span", {
+            top: "-400px",
+            stagger: 0.1,
+            ease: "power3.inOut",
+            duration: 1,
+            delay: 3,
+            onComplete: startParallaxAnimation // Start parallax animation when text is completely gone
+        });
+        
+        gsap.to(".overlay", {
+            opacity: 0,
+            ease: "power3.inOut",
+            duration: 1,
+            delay: 4
+        });
+    }, 300);
+}
+
+// Function to start parallax animation after loader is complete
+function startParallaxAnimation() {
+    // Fade in the main content
+    const mainContent = document.querySelector("main");
+    if (mainContent) {
+        gsap.to(mainContent, {
+            opacity: 1,
+            duration: 1,
+            ease: "power2.inOut",
+            onComplete: function() {
+                // Initialize the parallax effect
+                update(window.innerWidth / 2); // Initial update with center position
+            }
+        });
+    }
+    
+    // Create a GSAP timeline for initial animations
+    timeline = gsap.timeline();
+
+    // Animate parallax elements
+    Array.from(parallax_el)
+        .filter(el => !el.classList.contains("lname") && !el.classList.contains("fname"))
+        .forEach(el => {
+            // Get original position from computed style
+            const originalTop = getComputedStyle(el).top;
+
+            // Animate each element
+            timeline.fromTo(el, {
+                opacity: 0
+            }, {
+                opacity: 1,
+                duration: 0.3,
+                ease: "power3.out",
+            }, "<0.1"); // Stagger slightly
+        });
+
+    // Get name elements
+    const fnameElement = document.querySelector(".fname");
+    const lnameElement = document.querySelector(".lname");
+
+    // Check if elements are found
+    if (!fnameElement || !lnameElement) {
+        console.error("Elements with class .fname or .lname not found.");
+        return;
+    }
+
+    const fntop = getComputedStyle(fnameElement).top;
+    const lntop = getComputedStyle(lnameElement).top;
+
+    // Name animation timeline - with a slight delay after the body fade-in
+    const nameTimeline = gsap.timeline({
+        delay: 0.3
+    });
+
+    nameTimeline.fromTo(
+        ".lname", 
+        {
+            top: window.innerHeight - fnameElement.getBoundingClientRect().top,
+            opacity: 0,
+        },
+        {
+            top: lntop,
+            duration: 1,
+            opacity: 1,
+        },
+        "0"
+    ).fromTo(
+        ".fname",
+        {
+            top: "-150px",
+            opacity: 0,
+        },
+        {
+            top: fntop,
+            duration: 1,
+            opacity: 1,
+        },
+        "0.5"
+    );
+}
 const bgImg = document.querySelector("body");
 
 function isInView(element) {
@@ -131,6 +333,7 @@ let isScrolling = false;
 document.addEventListener("scroll", () => {
     if (!isScrolling) {
         isScrolling = true;
+        
 
         requestAnimationFrame(() => {
             if (isInView(bgImg)) {
@@ -306,7 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
     sr.reveal('.projectstitle', {origin: left, delay: 200});
     sr.reveal('.projects__card', {delay: 400, interval: 100});
     sr.reveal('.banner');
-    sr.reveal('.formcontainer', {origin:bottom, delay: 100, interval: 100});
+    sr.reveal('.formcontainer', { delay: 100, interval: 100});
 });
   
 

@@ -10,57 +10,207 @@
 body{
     font-family: "Poppins", sans-serif;
     background-color: #050815;
+    justify-content: center;
+    width: 100vw;
+    overflow-x: hidden; /* Prevent horizontal scrolling only */
+    overflow-y: auto;
+    
+
 
 }
 
-.hamburger{
+.hamburger {
     width: 20px;
+    cursor: pointer;
+    z-index: 1000;
+    display: none; /* Hide hamburger by default on desktop */
 }
 
-header{
-    position: absolute;
+header {
+    position: fixed; /* Keep fixed position */
     width: 100%;
-    z-index: 9999;
+    z-index: 10003; /* Very high z-index to stay above parallax elements */
+    transform: none !important; /* This is crucial */
+    transform-style: flat !important;
+    backface-visibility: visible !important;
     padding: 0.9rem 0;
     top: 0;
     left: 0;
-
 }
 
 header nav {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 15px 2rem;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    border-bottom: 1px solid #fff;
 }
 
-header ul{
+header ul {
     display: flex;
     list-style: none;
     align-items: center;
-
 }
 
-header ul a{
+header ul a {
     text-decoration: none;
     color: #fff;
     padding: 0 1.5rem;
     text-transform: uppercase;
     font-size: 0.83rem;
     font-weight: 300;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.search a {
-    font-size: 1.05rem;
-    padding: 0 3rem;
+/* Mobile styles */
+@media screen and (max-width: 768px) {
+    body{
+        width: 768px;
+        overflow-x: hidden;
+    }
+    main{
+        width: 768px;
+    }
+    .hamburger {
+        display: block; /* Show hamburger on mobile */
+        margin-top: 10px;
+        transform: scale(3);
+    }
+
+    header nav {
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: none;
+    }
+    
+    header ul {
+        position: absolute;
+        flex-direction: column;
+        background-color: #1d1736;
+        width: 100%;
+        top: 70px;
+        left: 0;
+        padding: 1rem 0;
+        height: 0;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        opacity: 0;
+    }
+    
+    /* When menu is active */
+    header ul.active {
+        height: auto;
+        opacity: 1;
+        padding: 1rem 0;
+    }
+    
+    header ul li {
+        margin: 1rem 0;
+        width: 100%;
+        text-align: center;
+    }
+    
+    header ul a {
+        display: block;
+        padding: 0.5rem 0;
+    }
+}
+
+.loading{
+    width: 100%;
+    height: 100%;
+    z-index: 10001;
+    background: #050815;
+    position: absolute;
+}
+.img-class{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.overlay{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--color-accent);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10002;
+}
+
+.overlay-content{
+    width: 40%;
+
+}
+
+/*.images{
+    position: relative;
+    height: 550px;
+}
+
+.img-holder {
+    position: relative;
+    width: 80%;
+    height: 100%;
+    margin: 0 auto;
+    z-index: 100;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+.img-holder img{
+    position: absolute;
+    top: 0;
+    left: -100%;
+
+}*/
+
+.text{
+    position:relative;
+    margin: 1em 0;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+.counter, .logo {
+    font-size: 100px;
+    text-align: center;
+    /*text-transform: uppercase;*/
+}
+
+.counter p {
+    line-height:100%;
+}
+
+.counter p span,
+.logo p span{
+    position: relative;
+    z-index: -2;
+    color: #ffffff;
+}
+
+.logo{
+    position: absolute;
+    top: 0%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.logo p {
+    line-height: 100%;
+}
+
+.logo p span{
+    position: relative;
+    top: 200px
 }
 
 main{
     position: relative;
-    height: 100vh;
-    width: 100vw;
     overflow: hidden;
     transform: scale(1);
     transform-origin: center;
@@ -198,7 +348,7 @@ main{
     
 }
 
-@media (max-width: 725px){
+@media (max-width: 768px){
     .fname{
         width: 200px;
         top:calc(50% - 50px);
@@ -206,18 +356,7 @@ main{
     .lname{
         width: 200px;
     }
-    header nav{
-        padding: 0 1rem;
-    }
-    header ul a{
-        font-size: 0.73rem;
-        padding: 0 0.9rem;
-    }
 
-    .search a{
-        font-size: 0.85rem;
-        padding: 0 1.8rem;
-    }
 
     .plane{
         width: 100px;
@@ -436,6 +575,14 @@ main::before{
     z-index: 1;
 }
 
+.titleawards{
+    position: relative;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    color: rgb(255, 255, 255);
+    font-size: 3.0em;
+}
 
 
 /*Expereince*/
@@ -468,6 +615,7 @@ main::before{
 .experience__card h2{
     color: #fff;
     font-size: 30px;
+    text-align: center;
 }
 
 .experience__data{
@@ -511,8 +659,9 @@ main::before{
 }
 
 .projects__container {
-    display: grid;
-    grid-template-columns: auto auto auto auto;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 auto;
     justify-content: center;
     column-gap: 30px;
     row-gap: 30px;

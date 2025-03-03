@@ -13,7 +13,8 @@
     <header>
         <nav>
             <img src="img2/Hamburger.png" alt="menu" class="hamburger">
-            <ul>
+            <ul class="menu">
+
                 <li>
                     <a href="#sec">About me</a>
                 </li>
@@ -27,20 +28,42 @@
                     <a href="#Projects">Projects</a>
                 </li>
                 <li>
-                    <a href="#banner">Candid Chronicles</a>
+                    <a href="#banner">Life in Frames</a>
                 </li>
                 <li>
                     <a href="#formcontainer">Contact Me</a>
                 </li>
-                <li class="search">
-                    <a href="#">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </a>
-                </li>
+
             </ul>
         </nav>
         
     </header>
+    <div class="overlay">
+        <div class="overlay-content">
+            <!--<div class="images">
+                <div class="img-holder">
+                    <img class="img-class" src="headshot.png" alt="">
+                    <img class="img-class" src="headshot.png" alt="">
+                    <img class="img-class" src="headshot.png" alt="">
+                    <img class="img-class" src="headshot.png" alt="">
+                    <img class="img-class" src="headshot.png" alt="">
+                    <img class="img-class" src="headshot.png" alt="">
+                    <img class="img-class" src="headshot.png" alt="">
+                    <img class="img-class" src="headshot.png" alt="">
+                    <img class="img-class" src="headshot.png" alt="">
+                    <img class="img-class" src="headshot.png" alt="">
+                </div>
+            </div>-->
+            <div class="text">
+                <div class="counter"><p>100%</p></div>
+                <div class="logo"><p>Hi!</p></div>
+            </div>
+        </div>
+    </div>
+    <div class="loading"></div>
+    
+    
+    
     <main>
         <img src="img2/bg.png" data-speedx="0.3" data-speedy="0.2" data-speedz="0" data-rotation="0" data-distance="-200" class="parallax bg-img">
         <img src="img2/Mist back.png" data-speedx="0.25" data-speedy="0.15" data-speedz="0" data-rotation="0" data-distance="850" class="parallax mistB">
@@ -61,6 +84,8 @@
     <script src="js/app.js"></script>
     <!--Scroll Reveal-->
     <script src="/js/scrollreveal.min.js"></script>
+
+    
 
     <div class="sec" id="sec">
         <div class="textam">
@@ -90,6 +115,190 @@
             <img src="skills/xml.png" class="icon">
         </div>
     
+    </div>
+
+    <div class="projectstitle" id="Projects"><h2>Projects</h2></div>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+
+    <div class="projects section" id="projects">
+        <div class="projects__container">
+            <article class="projects__card">
+                <a href="#" target="_blank" class="projects__image">
+                    <img src="Projects/1.png" alt="image" class="projects__img">
+                </a>
+
+                <div class="projects__data">
+                    <h3 class="projects__name">TerraTracker</h3>
+                    <p class="projects__description">
+                        Robot dog for disaster response.
+                    </p>
+
+                    <div class="projects__skills">
+                        <img src="skills/python.png" alt="JavaScript" class="projects__skill">
+                        <img src="skills/c++.png" alt="HTML" class="projects__skill">
+                    </div>
+
+                    <a href="#" target="_blank" class="projects__button">
+                        <i class="ri-link"></i>
+                        <span>Visit Project</span>
+                    </a>
+                </div>
+            </article>
+            <article class="projects__card">
+                <a href="#" target="_blank" class="projects__image">
+                    <img src="Projects/2.png" alt="image" class="projects__img">
+                </a>
+
+                <div class="projects__data">
+                    <h3 class="projects__name">AVID</h3>
+                    <p class="projects__description">
+                        Drone to help visually impaired through music.
+                    </p>
+
+                    <div class="projects__skills">
+                        <img src="skills/python.png" alt="JavaScript" class="projects__skill">
+                        <img src="skills/c.png" alt="HTML" class="projects__skill">
+                    </div>
+
+                    <a href="#" target="_blank" class="projects__button">
+                        <i class="ri-link"></i>
+                        <span>Visit Project</span>
+                    </a>
+                </div>
+            </article>
+            <article class="projects__card">
+                <a href="#" target="_blank" class="projects__image">
+                    <img src="Projects/3.png" alt="image" class="projects__img">
+                </a>
+
+                <div class="projects__data">
+                    <h3 class="projects__name">Connectly</h3>
+                    <p class="projects__description">
+                        Social media app to connect families and store memories.
+                    </p>
+
+                    <div class="projects__skills">
+                        <img src="skills/java.png" alt="JavaScript" class="projects__skill">
+                        <img src="skills/xml.png" alt="HTML" class="projects__skill">
+                    </div>
+
+                    <a href="#" target="_blank" class="projects__button">
+                        <i class="ri-link"></i>
+                        <span>Visit Project</span>
+                    </a>
+                </div>
+            </article>
+            <article class="projects__card">
+                <a href="#" target="_blank" class="projects__image">
+                    <img src="Projects/4.png" alt="image" class="projects__img">
+                </a>
+
+                <div class="projects__data">
+                    <h3 class="projects__name">Plant Journal</h3>
+                    <p class="projects__description">
+                        Plant journal to keep track of garden.
+                    </p>
+
+                    <div class="projects__skills">
+                        <img src="skills/javascript.png" alt="JavaScript" class="projects__skill">
+                        <img src="skills/html.png" alt="HTML" class="projects__skill">
+                        <img src="skills/css.png" alt="CSS" class="projects__skill">
+                        <img src="skills/React.png" alt="CSS" class="projects__skill">
+                    </div>
+
+                    <a href="#" target="_blank" class="projects__button">
+                        <i class="ri-link"></i>
+                        <span>Visit Project</span>
+                    </a>
+                </div>
+            </article>
+            <article class="projects__card">
+                <a href="#" target="_blank" class="projects__image">
+                    <img src="Projects/5.png" alt="image" class="projects__img">
+                </a>
+
+                <div class="projects__data">
+                    <h3 class="projects__name">Federated Learning</h3>
+                    <p class="projects__description">
+                        Optimized Federated Learning aggregation algorithms. 
+                    </p>
+
+                    <div class="projects__skills">
+                        <img src="skills/python.png" alt="JavaScript" class="projects__skill">
+                    </div>
+
+                    <a href="#" target="_blank" class="projects__button">
+                        <i class="ri-link"></i>
+                        <span>Visit Project</span>
+                    </a>
+                </div>
+            </article>
+            <article class="projects__card">
+                <a href="#" target="_blank" class="projects__image">
+                    <img src="Projects/6.png" alt="image" class="projects__img">
+                </a>
+
+                <div class="projects__data">
+                    <h3 class="projects__name">SauRON</h3>
+                    <p class="projects__description">
+                        Smart surveillance with robotic swarms framework.
+                    </p>
+
+                    <div class="projects__skills">
+                        <img src="skills/python.png" alt="JavaScript" class="projects__skill">
+                    </div>
+
+                    <a href="#" target="_blank" class="projects__button">
+                        <i class="ri-link"></i>
+                        <span>Visit Project</span>
+                    </a>
+                </div>
+            </article>
+            <article class="projects__card">
+                <a href="#" target="_blank" class="projects__image">
+                    <img src="Projects/7.png" alt="image" class="projects__img">
+                </a>
+
+                <div class="projects__data">
+                    <h3 class="projects__name">In/e motion</h3>
+                    <p class="projects__description">
+                        Interactive art based on body movements.
+                    </p>
+
+                    <div class="projects__skills">
+                        <img src="skills/csharp.png" alt="JavaScript" class="projects__skill">
+                    </div>
+
+                    <a href="#" target="_blank" class="projects__button">
+                        <i class="ri-link"></i>
+                        <span>Visit Project</span>
+                    </a>
+                </div>
+            </article>
+            <article class="projects__card">
+                <a href="#" target="_blank" class="projects__image">
+                    <img src="Projects/8.png" alt="image" class="projects__img">
+                </a>
+
+                <div class="projects__data">
+                    <h3 class="projects__name">Portfolio Website</h3>
+                    <p class="projects__description">
+                        Portfolio website from scratch with coding.
+                    </p>
+
+                    <div class="projects__skills">
+                        <img src="skills/javascript.png" alt="JavaScript" class="projects__skill">
+                        <img src="skills/html.png" alt="HTML" class="projects__skill">
+                        <img src="skills/css.png" alt="CSS" class="projects__skill">
+                    </div>
+
+                    <a href="#" target="_blank" class="projects__button">
+                        <i class="ri-link"></i>
+                        <span>Visit Project</span>
+                    </a>
+                </div>
+            </article>
+        </div>
     </div>
     
     
@@ -343,189 +552,7 @@
             
         </div>
     </section>
-    <div class="projectstitle" id="Projects"><h2>Projects</h2></div>
-    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
-
-    <div class="projects section" id="projects">
-        <div class="projects__container">
-            <article class="projects__card">
-                <a href="#" target="_blank" class="projects__image">
-                    <img src="Projects/1.png" alt="image" class="projects__img">
-                </a>
-
-                <div class="projects__data">
-                    <h3 class="projects__name">TerraTracker</h3>
-                    <p class="projects__description">
-                        Robot dog for disaster response.
-                    </p>
-
-                    <div class="projects__skills">
-                        <img src="skills/python.png" alt="JavaScript" class="projects__skill">
-                        <img src="skills/c++.png" alt="HTML" class="projects__skill">
-                    </div>
-
-                    <a href="#" target="_blank" class="projects__button">
-                        <i class="ri-link"></i>
-                        <span>Visit Project</span>
-                    </a>
-                </div>
-            </article>
-            <article class="projects__card">
-                <a href="#" target="_blank" class="projects__image">
-                    <img src="Projects/2.png" alt="image" class="projects__img">
-                </a>
-
-                <div class="projects__data">
-                    <h3 class="projects__name">AVID</h3>
-                    <p class="projects__description">
-                        Drone to help visually impaired through music.
-                    </p>
-
-                    <div class="projects__skills">
-                        <img src="skills/python.png" alt="JavaScript" class="projects__skill">
-                        <img src="skills/c.png" alt="HTML" class="projects__skill">
-                    </div>
-
-                    <a href="#" target="_blank" class="projects__button">
-                        <i class="ri-link"></i>
-                        <span>Visit Project</span>
-                    </a>
-                </div>
-            </article>
-            <article class="projects__card">
-                <a href="#" target="_blank" class="projects__image">
-                    <img src="Projects/3.png" alt="image" class="projects__img">
-                </a>
-
-                <div class="projects__data">
-                    <h3 class="projects__name">Connectly</h3>
-                    <p class="projects__description">
-                        Social media app to connect families and store memories.
-                    </p>
-
-                    <div class="projects__skills">
-                        <img src="skills/java.png" alt="JavaScript" class="projects__skill">
-                        <img src="skills/xml.png" alt="HTML" class="projects__skill">
-                    </div>
-
-                    <a href="#" target="_blank" class="projects__button">
-                        <i class="ri-link"></i>
-                        <span>Visit Project</span>
-                    </a>
-                </div>
-            </article>
-            <article class="projects__card">
-                <a href="#" target="_blank" class="projects__image">
-                    <img src="Projects/4.png" alt="image" class="projects__img">
-                </a>
-
-                <div class="projects__data">
-                    <h3 class="projects__name">Plant Journal</h3>
-                    <p class="projects__description">
-                        Plant journal to keep track of garden.
-                    </p>
-
-                    <div class="projects__skills">
-                        <img src="skills/javascript.png" alt="JavaScript" class="projects__skill">
-                        <img src="skills/html.png" alt="HTML" class="projects__skill">
-                        <img src="skills/css.png" alt="CSS" class="projects__skill">
-                        <img src="skills/React.png" alt="CSS" class="projects__skill">
-                    </div>
-
-                    <a href="#" target="_blank" class="projects__button">
-                        <i class="ri-link"></i>
-                        <span>Visit Project</span>
-                    </a>
-                </div>
-            </article>
-            <article class="projects__card">
-                <a href="#" target="_blank" class="projects__image">
-                    <img src="Projects/5.png" alt="image" class="projects__img">
-                </a>
-
-                <div class="projects__data">
-                    <h3 class="projects__name">Federated Learning</h3>
-                    <p class="projects__description">
-                        Optimized Federated Learning aggregation algorithms. 
-                    </p>
-
-                    <div class="projects__skills">
-                        <img src="skills/python.png" alt="JavaScript" class="projects__skill">
-                    </div>
-
-                    <a href="#" target="_blank" class="projects__button">
-                        <i class="ri-link"></i>
-                        <span>Visit Project</span>
-                    </a>
-                </div>
-            </article>
-            <article class="projects__card">
-                <a href="#" target="_blank" class="projects__image">
-                    <img src="Projects/6.png" alt="image" class="projects__img">
-                </a>
-
-                <div class="projects__data">
-                    <h3 class="projects__name">SauRON</h3>
-                    <p class="projects__description">
-                        Smart surveillance with robotic swarms framework.
-                    </p>
-
-                    <div class="projects__skills">
-                        <img src="skills/python.png" alt="JavaScript" class="projects__skill">
-                    </div>
-
-                    <a href="#" target="_blank" class="projects__button">
-                        <i class="ri-link"></i>
-                        <span>Visit Project</span>
-                    </a>
-                </div>
-            </article>
-            <article class="projects__card">
-                <a href="#" target="_blank" class="projects__image">
-                    <img src="Projects/7.png" alt="image" class="projects__img">
-                </a>
-
-                <div class="projects__data">
-                    <h3 class="projects__name">In/e motion</h3>
-                    <p class="projects__description">
-                        Interactive art based on body movements.
-                    </p>
-
-                    <div class="projects__skills">
-                        <img src="skills/csharp.png" alt="JavaScript" class="projects__skill">
-                    </div>
-
-                    <a href="#" target="_blank" class="projects__button">
-                        <i class="ri-link"></i>
-                        <span>Visit Project</span>
-                    </a>
-                </div>
-            </article>
-            <article class="projects__card">
-                <a href="#" target="_blank" class="projects__image">
-                    <img src="Projects/8.png" alt="image" class="projects__img">
-                </a>
-
-                <div class="projects__data">
-                    <h3 class="projects__name">Portfolio Website</h3>
-                    <p class="projects__description">
-                        Portfolio website from scratch with coding.
-                    </p>
-
-                    <div class="projects__skills">
-                        <img src="skills/javascript.png" alt="JavaScript" class="projects__skill">
-                        <img src="skills/html.png" alt="HTML" class="projects__skill">
-                        <img src="skills/css.png" alt="CSS" class="projects__skill">
-                    </div>
-
-                    <a href="#" target="_blank" class="projects__button">
-                        <i class="ri-link"></i>
-                        <span>Visit Project</span>
-                    </a>
-                </div>
-            </article>
-        </div>
-    </div>
+    
 
     
     <!--<div class="elfsight-app-72bb2b25-fde6-4312-be06-7010061907a2" id="linkedin" data-elfsight-app-lazy></div>-->    
@@ -546,7 +573,7 @@
             </div>
 
             <div class="content">
-                <h1 data-content="Candid Chronicles">Candid Chronicles</h1>
+                <h1 data-content="Life in Frames">Life in Frames</h1>
                 <div class="model"></div>
             </div>
         </div>
