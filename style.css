@@ -22,14 +22,14 @@ body{
 .hamburger {
     width: 20px;
     cursor: pointer;
-    z-index: 1000;
+    z-index: 10001;
     display: none; /* Hide hamburger by default on desktop */
 }
 
 header {
     position: fixed; /* Keep fixed position */
     width: 100%;
-    z-index: 10003; /* Very high z-index to stay above parallax elements */
+    z-index: 10005; /* Very high z-index to stay above parallax elements */
     transform: none !important; /* This is crucial */
     transform-style: flat !important;
     backface-visibility: visible !important;
@@ -66,65 +66,228 @@ header ul a {
 
 /* Mobile styles */
 @media screen and (max-width: 768px) {
-    body{
-        width: 768px;
+    /* General improvements */
+    body {
+        width: 100%;
         overflow-x: hidden;
     }
-    main{
-        width: 768px;
+    
+    main {
+        width: 100%;
+        overflow-x: hidden;
     }
+    
+    /* Header & Navigation improvements */
     .hamburger {
-        display: block; /* Show hamburger on mobile */
+        display: block;
         margin-top: 10px;
-        transform: scale(3);
+        transform: scale(1.5);
+        position: relative;
+        z-index: 10002;
     }
 
     header nav {
         justify-content: space-between;
         align-items: center;
         border-bottom: none;
+        padding: 15px 1rem; /* Reduced side padding */
     }
     
     header ul {
-        position: absolute;
+        position: fixed; /* Changed from absolute to fixed */
         flex-direction: column;
         background-color: #1d1736;
         width: 100%;
-        top: 70px;
+        top: 0;
         left: 0;
-        padding: 1rem 0;
-        height: 0;
+        height: 100vh; /* Full height */
+        padding: 70px 0 1rem; /* Added top padding for the header */
         overflow: hidden;
         transition: all 0.3s ease;
         opacity: 0;
+        visibility: hidden; /* Added for better accessibility */
+        z-index: 10001;
     }
     
     /* When menu is active */
     header ul.active {
-        height: auto;
+        height: 100vh;
         opacity: 1;
-        padding: 1rem 0;
+        visibility: visible;
+        padding: 80px 0 1rem;
     }
     
     header ul li {
-        margin: 1rem 0;
+        margin: 1.5rem 0; /* Increased margin for better touch targets */
         width: 100%;
         text-align: center;
     }
     
     header ul a {
         display: block;
-        padding: 0.5rem 0;
+        padding: 0.8rem 0; /* Increased padding for better touch targets */
+        font-size: 1rem; /* Slightly larger for better readability */
+    }
+    
+    /* Main content sections */
+    .sec {
+        padding: 30px 15px; /* Reduced padding */
+        margin-top: 60px; /* Reduced top margin */
+    }
+    
+    .sec p {
+        font-size: 0.9rem; /* Smaller font size */
+        line-height: 1.6; /* Reduced line height */
+    }
+    
+    /* Headings */
+    .experiencetitle, .projectstitle, .titleawards {
+        font-size: 10px; /* Smaller font size */
+        text-align: center;
+    }
+    
+    .wavy span {
+        font-size: 2rem; /* Smaller font size */
+    }
+    
+    /* Parallax elements - simplified for mobile */
+    .fname {
+        width: 180px;
+        top: calc(50% - 40px);
+    }
+    
+    .lname {
+        width: 180px;
+        top: calc(50% + 20px);
+    }
+    
+    .plane {
+        width: 80px;
+        top: calc(50% - 180px);
+    }
+    
+    .rbuild, .empbuild, .lbuild {
+        width: 200px; /* Reduced size */
+        transform: translateX(-50%); /* Center horizontally */
+        left: 50%;
+    }
+    
+    .rbuild {
+        top: calc(50% + 180px);
+    }
+    
+    .empbuild {
+        top: calc(50% + 130px);
+    }
+    
+    .lbuild {
+        top: calc(50% + 340px);
+    }
+    
+    /* Skills section */
+    .skills {
+        gap: 25px; /* Reduced gap */
+        padding: 10px; /* Reduced padding */
+    }
+    
+    .icon {
+        height: 60px; /* Smaller icons */
+    }
+    
+    /* Banner content */
+    .banner .content h1 {
+        font-size: 7em; /* Much smaller font size */
+        line-height: 0.9em;
+    }
+    
+    .banner .content .model {
+        background-size: auto 100%; /* Adjusted background size */
+    }
+    
+    .banner .slider {
+        width: 150px; /* Smaller slider */
+        height: 200px;
+    }
+    
+    /* Experience cards */
+    .experience__data {
+        padding: 1rem; /* Reduced padding */
+    }
+    
+    .experience__data h3 {
+        font-size: 1.2rem; /* Smaller font */
+    }
+    
+    .experience__description {
+        font-size: 0.9rem; /* Smaller font */
+    }
+    
+    /* Projects section */
+    .projects__container {
+        column-gap: 15px; /* Reduced gap */
+        row-gap: 15px;
+    }
+    
+    .projects__card {
+        max-width: 95%; /* Wider cards on mobile */
+        max-height: none; /* Remove max height */
+    }
+    
+    .projects__img {
+        max-width: 100%; /* Full width images */
+    }
+    
+    /* Contact section */
+    .contact-card {
+        flex-direction: column; /* Stack elements vertically */
+        padding: 20px 15px;
+    }
+    
+    .contactleft, .contactright {
+        flex-basis: 100%; /* Full width */
+        margin: 0 0 20px 0; /* Add bottom margin, remove side margins */
+    }
+    
+    .contactleft h2 {
+        font-size: 1.5rem; /* Smaller heading */
+        text-align: center;
+    }
+    
+    .contactleft p {
+        font-size: 0.9rem; /* Larger text for better readability */
+        text-align: center;
+    }
+    
+    .socialicons {
+        text-align: center; /* Center social icons */
+    }
+    
+    .contactright {
+        text-align: center;
+    }
+    
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn {
+        /* These properties ensure the button is properly centered on mobile */
+        display: block;
+        width: fit-content;
+        margin: 15px auto;
     }
 }
 
 .loading{
     width: 100%;
     height: 100%;
-    z-index: 10001;
+    z-index: 10002;
     background: #050815;
     position: absolute;
 }
+
 .img-class{
     width: 100%;
     height: 100%;
@@ -141,14 +304,21 @@ header ul a {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 10002;
+    z-index: 10003;
 }
 
-.overlay-content{
-    width: 40%;
-
+.overlay-content {
+    width: 90%;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
+@media screen and (max-width: 768px) {
+    .overlay-content{
+        width: 90%; /* Better than 100% to have some margins */
+        margin: 0 auto; /* Ensures horizontal centering */
+    }
+}
 /*.images{
     position: relative;
     height: 550px;
@@ -332,7 +502,7 @@ main{
 
 
 
-@media (max-width: 1100px){
+@media screen and (max-width: 1200px){
     .fname{
         width: 320px;
         top:calc(50% - 80px);
@@ -345,6 +515,7 @@ main{
         width: 100px;
         
     }
+    
     
 }
 
@@ -361,6 +532,11 @@ main{
     .plane{
         width: 100px;
         
+    }
+
+    .contactleft p{
+        color: #fff;
+        font-size: 10px;
     }
     
 
@@ -404,7 +580,7 @@ main{
     position:relative;
     display: inline-block;
     color: black;
-    font-size: 3.0em;
+    font-size: 2.5rem;
     animation: animate 5s ease-in-out infinite;
     animation-delay: calc(0.1s * var(--i));
 }
@@ -578,22 +754,22 @@ main::before{
 .titleawards{
     position: relative;
     margin-bottom: 20px;
+    margin-top: 20px;
     display: flex;
     justify-content: center;
     color: rgb(255, 255, 255);
-    font-size: 3.0em;
+    font-size: 2.5rem;
 }
 
 
 /*Expereince*/
 .experiencetitle{
     position: relative;
-    margin-left: 50px;
     margin-bottom: 20px;
     display: flex;
     justify-content: center;
     color: rgb(255, 255, 255);
-    font-size: 3.0em;
+    font-size: 2.5rem;
 }
 
 .experience__container{
@@ -650,12 +826,11 @@ main::before{
 /* Projects*/ 
 .projectstitle{
     position: relative;
-    margin-left: 50px;
     margin-bottom: 20px;
     display: flex;
     justify-content: center;
     color: rgb(255, 255, 255);
-    font-size: 3.0em;
+    font-size: 2.5rem;
 }
 
 .projects__container {
@@ -802,11 +977,11 @@ main::before{
 
 .contactleft p{
     color: #fff;
-    font-size: 15px;
+    font-size: 12px;
 }
 .contactleft p i{
     color: #483a83;
-    margin-right: 15px;
+    margin-right: 12px;
 }
 
 .socialicons a{
@@ -821,22 +996,27 @@ main::before{
     transform: translateY(-5px);
 }
 
-.contactright{
+/* Option 1: Using text-align center on the parent */
+.contactright {
     flex-basis: 60%;
     margin-right: 5%;
+    text-align: center; /* Center inline-block elements */
 }
-.btn{
-    display: inline-block;
+
+/* Option 2: Alternative approach using display: block on the button */
+.btn {
+    display: block; /* Change from inline-block to block */
     background-color: #fff;
     border: 0;
     outline: none;
     background: #ffffff;
     padding: 15px 60px;
-    margin: 15px auto;
+    margin: 15px auto; /* Auto margins work with block display */
     color: #1d1736;
     font-size: 18px;
     border-radius: 6px;
     cursor: pointer;
+    width: fit-content; /* Prevent the button from taking full width */
 }
 .btn:hover{
     transform: scale(1.2);
@@ -845,6 +1025,7 @@ main::before{
 form input, textarea{
     width: 100%;
     border: 0;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     outline: none;
     background: #ffffff;
     padding: 15px;

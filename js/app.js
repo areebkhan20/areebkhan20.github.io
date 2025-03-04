@@ -201,9 +201,11 @@ function animateText() {
         
         gsap.to(".loading", {
             opacity: 0,
+            pointerEvents: "none", // This prevents click capturing when invisible
+            zIndex: -1, // Move it below other content
             ease: "power3.inOut",
             duration: 1,
-            delay: 4,
+            delay: 3,
         });
 
         
@@ -220,6 +222,7 @@ function animateText() {
             stagger: 0.1,
             ease: "power3.inOut",
             duration: 1,
+            onComplete: startParallaxAnimation // Start parallax animation when text is completely gone
         });
         
         gsap.to(".logo p span", {
@@ -227,15 +230,14 @@ function animateText() {
             stagger: 0.1,
             ease: "power3.inOut",
             duration: 1,
-            delay: 3,
-            onComplete: startParallaxAnimation // Start parallax animation when text is completely gone
+            delay: 2,
         });
         
         gsap.to(".overlay", {
             opacity: 0,
             ease: "power3.inOut",
             duration: 1,
-            delay: 4
+            delay: 3
         });
     }, 300);
 }
@@ -304,6 +306,7 @@ function startParallaxAnimation() {
             top: lntop,
             duration: 1,
             opacity: 1,
+            delay: 2,
         },
         "0"
     ).fromTo(
@@ -316,6 +319,7 @@ function startParallaxAnimation() {
             top: fntop,
             duration: 1,
             opacity: 1,
+            delay: 2,
         },
         "0.5"
     );
@@ -512,7 +516,6 @@ document.addEventListener('DOMContentLoaded', () => {
     sr.reveal('.formcontainer', { delay: 100, interval: 100});
 });
   
-
 
 
 
