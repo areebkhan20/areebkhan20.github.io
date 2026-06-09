@@ -375,21 +375,8 @@ function right() {
 
 function setAnimationScroll() {
     gsap.registerPlugin(ScrollTrigger);
-
-    // Smooth (non-pinned) background-tone shift as the user moves through
-    // the experience / projects / awards block — subtle "deep city night" feel.
-    gsap.timeline({
-        scrollTrigger: {
-            trigger: ".experiencetitle",
-            start: "top bottom",
-            endTrigger: ".titleawards",
-            end: "bottom center",
-            scrub: 1
-        }
-    })
-    .to("body", { backgroundColor: "#0a0a1f", ease: "none" })
-    .to("body", { backgroundColor: "#0d0a24", ease: "none" })
-    .to("body", { backgroundColor: "#050815", ease: "none" });
+    // Background tone is now handled by a static, smooth CSS gradient on <body>
+    // (see body background-image) so the whole page blends top-to-bottom.
 }
 
 
@@ -405,36 +392,15 @@ setAnimationScroll();
     document.addEventListener('DOMContentLoaded', () => {
         if (window.gsap) gsap.registerPlugin(ScrollTrigger);
 
-        /* ---- 1. Animated stat counters (count up on scroll into view) ---- */
-        const statObserver = new IntersectionObserver((entries) => {
+        /* ---- 1. Reveal Areas-of-Interest cards on scroll into view ---- */
+        const cardObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (!entry.isIntersecting) return;
                 entry.target.classList.add('is-visible');
-                const numEl = entry.target.querySelector('.stat__num');
-                if (numEl && !numEl.dataset.done) {
-                    numEl.dataset.done = '1';
-                    animateCount(numEl);
-                }
-                statObserver.unobserve(entry.target);
+                cardObserver.unobserve(entry.target);
             });
-        }, { threshold: 0.35 });
-        document.querySelectorAll('.stat').forEach(el => statObserver.observe(el));
-
-        function animateCount(el) {
-            const target = parseFloat(el.dataset.count) || 0;
-            const decimals = parseInt(el.dataset.decimals || '0', 10);
-            const suffix = el.dataset.suffix || '';
-            if (reduce) { el.textContent = target.toFixed(decimals) + suffix; return; }
-            const duration = 1600;
-            const start = performance.now();
-            (function tick(now) {
-                const p = Math.min((now - start) / duration, 1);
-                const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
-                el.textContent = (target * eased).toFixed(decimals) + suffix;
-                if (p < 1) requestAnimationFrame(tick);
-                else el.textContent = target.toFixed(decimals) + suffix;
-            })(start);
-        }
+        }, { threshold: 0.3 });
+        document.querySelectorAll('.interest-card').forEach(el => cardObserver.observe(el));
 
         if (reduce || !window.gsap) return;
 
@@ -514,7 +480,7 @@ setAnimationScroll();
         const circles = document.querySelectorAll('.circle');
         if (circles.length) {
             const setActive = on => circles.forEach(c => c.classList.toggle('cursor-active', on));
-            document.querySelectorAll('a, button, .icon, .frame, .projects__card, .stat, .experience__data, .education__card')
+            document.querySelectorAll('a, button, .icon, .frame, .projects__card, .interest-card, .experience__data, .education__card')
                 .forEach(el => {
                     el.addEventListener('mouseenter', () => setActive(true));
                     el.addEventListener('mouseleave', () => setActive(false));
