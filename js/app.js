@@ -324,31 +324,6 @@ function startParallaxAnimation() {
         "0.5"
     );
 }
-const bgImg = document.querySelector("body");
-
-function isInView(element) {
-    const rect = element.getBoundingClientRect();
-    const offset = 150; // Adjust as needed
-    return rect.top < window.innerHeight - offset && rect.bottom > offset;
-}
-
-let isScrolling = false;
-
-document.addEventListener("scroll", () => {
-    if (!isScrolling) {
-        isScrolling = true;
-        
-
-        requestAnimationFrame(() => {
-            if (isInView(bgImg)) {
-                bgImg.style.animation = "bg-img-animation linear forwards";
-            }
-            isScrolling = false;
-        });
-    }
-});
-
-
 document.addEventListener("DOMContentLoaded", () => {
     const sec = document.getElementById("sec");
 
@@ -401,43 +376,154 @@ function right() {
 function setAnimationScroll() {
     gsap.registerPlugin(ScrollTrigger);
 
-    let runAnimation = gsap.timeline({
+    // Smooth (non-pinned) background-tone shift as the user moves through
+    // the experience / projects / awards block — subtle "deep city night" feel.
+    gsap.timeline({
         scrollTrigger: {
-            trigger: ".titleawards",
-            start: "10% top",
-            end: "100%",
-            markers: false,
-            scrub: true,
-            pin: true
+            trigger: ".experiencetitle",
+            start: "top bottom",
+            endTrigger: ".titleawards",
+            end: "bottom center",
+            scrub: 1
         }
-    });
-
-    runAnimation
-        .to("body", {
-            duration: 2,
-            backgroundColor: "#131127",
-        })
-        .to("body", {
-            duration: 2,
-            backgroundColor: "#2c244d",
-        })
-        .to("body", {
-            duration: 2,
-            backgroundColor: "#251e39",
-        })
-        .to("body", {
-            duration: 2,
-            backgroundColor: "#312c45",
-        })
-        .to("body", {
-            duration: 2,
-            backgroundColor: "#050815",
-        });
+    })
+    .to("body", { backgroundColor: "#0a0a1f", ease: "none" })
+    .to("body", { backgroundColor: "#0d0a24", ease: "none" })
+    .to("body", { backgroundColor: "#050815", ease: "none" });
 }
 
 
 
 setAnimationScroll();
+
+// ============================================================
+//  INTERACTIVITY & SCROLL EFFECTS (redesign)
+// ============================================================
+(function () {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.gsap) gsap.registerPlugin(ScrollTrigger);
+
+        /* ---- 1. Animated stat counters (count up on scroll into view) ---- */
+        const statObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('is-visible');
+                const numEl = entry.target.querySelector('.stat__num');
+                if (numEl && !numEl.dataset.done) {
+                    numEl.dataset.done = '1';
+                    animateCount(numEl);
+                }
+                statObserver.unobserve(entry.target);
+            });
+        }, { threshold: 0.35 });
+        document.querySelectorAll('.stat').forEach(el => statObserver.observe(el));
+
+        function animateCount(el) {
+            const target = parseFloat(el.dataset.count) || 0;
+            const decimals = parseInt(el.dataset.decimals || '0', 10);
+            const suffix = el.dataset.suffix || '';
+            if (reduce) { el.textContent = target.toFixed(decimals) + suffix; return; }
+            const duration = 1600;
+            const start = performance.now();
+            (function tick(now) {
+                const p = Math.min((now - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+                el.textContent = (target * eased).toFixed(decimals) + suffix;
+                if (p < 1) requestAnimationFrame(tick);
+                else el.textContent = target.toFixed(decimals) + suffix;
+            })(start);
+        }
+
+        if (reduce || !window.gsap) return;
+
+        /* ---- 2. Experience timeline scroll-fill + node activation ---- */
+        const expContainer = document.querySelector('.experience__container');
+        if (expContainer) {
+            const fill = document.createElement('div');
+            fill.className = 'timeline-fill';
+            expContainer.appendChild(fill);
+            gsap.to(fill, {
+                height: '100%',
+                ease: 'none',
+                scrollTrigger: { trigger: expContainer, start: 'top 70%', end: 'bottom 75%', scrub: 0.5 }
+            });
+            document.querySelectorAll('.experience__card').forEach(card => {
+                ScrollTrigger.create({
+                    trigger: card,
+                    start: 'top 65%',
+                    end: 'bottom 65%',
+                    onToggle: self => card.classList.toggle('node-on', self.isActive)
+                });
+            });
+        }
+
+        /* ---- 3. Drifting aurora glow blobs ---- */
+        document.querySelectorAll('.aurora').forEach(el => {
+            const speed = parseFloat(el.dataset.aurora) || 0.1;
+            gsap.to(el, {
+                y: speed * 650,
+                ease: 'none',
+                scrollTrigger: { trigger: document.body, start: 'top top', end: 'bottom bottom', scrub: 1.2 }
+            });
+        });
+
+        /* ---- 4. Subtle parallax on section headings ---- */
+        gsap.utils.toArray('.experiencetitle h2, .projectstitle h2, .titleawards h2, .educationtitle h2')
+            .forEach(h => {
+                gsap.fromTo(h, { y: 30 }, {
+                    y: -30, ease: 'none',
+                    scrollTrigger: { trigger: h, start: 'top bottom', end: 'bottom top', scrub: true }
+                });
+            });
+
+        /* ---- 5. Hero scroll cue fades out as you leave the hero ---- */
+        const cue = document.querySelector('.scroll-cue');
+        if (cue) {
+            gsap.to(cue, {
+                opacity: 0, ease: 'none',
+                scrollTrigger: { trigger: 'main', start: 'top top', end: '40% top', scrub: true }
+            });
+        }
+
+        /* ---- 6. 3D tilt on project cards ---- */
+        document.querySelectorAll('.projects__card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const r = card.getBoundingClientRect();
+                const px = (e.clientX - r.left) / r.width - 0.5;
+                const py = (e.clientY - r.top) / r.height - 0.5;
+                card.style.transform =
+                    `rotateY(${px * 12}deg) rotateX(${-py * 12}deg) translateY(-8px)`;
+            });
+            card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+        });
+
+        /* ---- 7. Magnetic buttons / icons ---- */
+        document.querySelectorAll('.btn, .projects__button, .socialicons a, .cert__badge').forEach(btn => {
+            btn.addEventListener('mousemove', e => {
+                const r = btn.getBoundingClientRect();
+                const x = e.clientX - r.left - r.width / 2;
+                const y = e.clientY - r.top - r.height / 2;
+                btn.style.setProperty('transform', `translate(${x * 0.3}px, ${y * 0.45}px)`, 'important');
+            });
+            btn.addEventListener('mouseleave', () => { btn.style.setProperty('transform', '', ''); });
+        });
+
+        /* ---- 8. Custom cursor reacts to interactive targets ---- */
+        const circles = document.querySelectorAll('.circle');
+        if (circles.length) {
+            const setActive = on => circles.forEach(c => c.classList.toggle('cursor-active', on));
+            document.querySelectorAll('a, button, .icon, .frame, .projects__card, .stat, .experience__data, .education__card')
+                .forEach(el => {
+                    el.addEventListener('mouseenter', () => setActive(true));
+                    el.addEventListener('mouseleave', () => setActive(false));
+                });
+        }
+
+        ScrollTrigger.refresh();
+    });
+})();
 
 /*const track = document.getElementById("image-track");
 
@@ -460,35 +546,45 @@ window.onmousemove = e => {
 
 
 document.addEventListener("DOMContentLoaded", function () {
-    const coords = { x: 0, y: 0 };
     const circles = document.querySelectorAll(".circle");
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let cursorMoved = false;
 
     circles.forEach(function (circle) {
-        circle.x = 0;
-        circle.y = 0;
+        circle.x = mouseX;
+        circle.y = mouseY;
     });
 
     window.addEventListener("mousemove", function (e) {
-        coords.x = e.clientX + window.scrollX;
-        coords.y = e.clientY + window.scrollY;
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+
+        if (!cursorMoved) {
+            cursorMoved = true;
+            circles.forEach(c => {
+                c.x = mouseX;
+                c.y = mouseY;
+                c.classList.add("cursor-visible");
+            });
+        }
     });
 
     function animateCircles() {
-        let x = coords.x;
-        let y = coords.y;
+        let x = mouseX;
+        let y = mouseY;
 
         circles.forEach(function (circle, index) {
-            circle.style.left = x - 12 + "px";
-            circle.style.top = y - 12 + "px";
-
-            circle.style.scale = (10 - index) / 10;
+            circle.style.left = x - 8 + "px";
+            circle.style.top  = y - 8 + "px";
+            circle.style.scale = (circles.length - index) / circles.length;
 
             circle.x = x;
             circle.y = y;
 
             const nextCircle = circles[index + 1] || circles[0];
-            x += (nextCircle.x - x) * 0.3;
-            y += (nextCircle.y - y) * 0.3;
+            x += (nextCircle.x - x) * 0.25;
+            y += (nextCircle.y - y) * 0.25;
         });
 
         requestAnimationFrame(animateCircles);
@@ -496,24 +592,77 @@ document.addEventListener("DOMContentLoaded", function () {
 
     animateCircles();
 
+    // Nav scroll glass effect
+    const header = document.querySelector("header");
+    window.addEventListener("scroll", () => {
+        if (window.scrollY > 80) {
+            header.classList.add("nav-scrolled");
+        } else {
+            header.classList.remove("nav-scrolled");
+        }
+    }, { passive: true });
+
+    // Scroll progress bar
+    const progressBar = document.getElementById("scroll-progress");
+    if (progressBar) {
+        window.addEventListener("scroll", () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            progressBar.style.width = (scrollTop / docHeight * 100) + "%";
+        }, { passive: true });
+    }
 });
 
+// ============================================================
+//  SCROLL REVEAL SYSTEM — different effect per section
+// ============================================================
 document.addEventListener('DOMContentLoaded', () => {
-    const sr = ScrollReveal({
-      origin: 'top',
-      distance: '60px',
-      duration: 2500,
-      delay: 300
-    });
-  
-    sr.reveal('.titleawards', {origin: left, delay: 200});
-    sr.reveal('.awards .container1', {delay: 400, interval: 100});
-    sr.reveal('.experiencetitle', {origin: right, delay: 200});
-    sr.reveal('.experience__card', {delay: 400, interval: 100});
-    sr.reveal('.projectstitle', {origin: left, delay: 200});
-    sr.reveal('.projects__card', {delay: 400, interval: 100});
-    sr.reveal('.banner');
-    sr.reveal('.formcontainer', { delay: 100, interval: 100});
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12, rootMargin: '0px 0px -7% 0px' });
+
+    const tag = (el, effect, delay = 0) => {
+        if (!el) return;
+        el.setAttribute('data-reveal', effect);
+        if (delay) el.style.transitionDelay = delay + 's';
+        revealObserver.observe(el);
+    };
+
+    // Section titles — fade up
+    document.querySelectorAll('.experiencetitle, .educationtitle, .projectstitle, .titleawards')
+        .forEach(el => tag(el, 'fade-up'));
+
+    // Experience cards — alternating slide from sides (timeline reveal)
+    document.querySelectorAll('.experience__card')
+        .forEach((el, i) => tag(el, i % 2 ? 'slide-right' : 'slide-left'));
+
+    // Education cards — 3D flip
+    document.querySelectorAll('.education__card')
+        .forEach((el, i) => tag(el, 'flip', i * 0.12));
+
+    // Certification badges — zoom in
+    document.querySelectorAll('.cert__badge')
+        .forEach((el, i) => tag(el, 'zoom', i * 0.1));
+
+    // Project cards — blur-in with stagger
+    document.querySelectorAll('.projects__card')
+        .forEach((el, i) => tag(el, 'blur-in', (i % 4) * 0.1));
+
+    // Award cards — fade up with stagger
+    document.querySelectorAll('.awards .card')
+        .forEach((el, i) => tag(el, 'fade-up', (i % 4) * 0.1));
+
+    // Life-in-frames header — fade up
+    document.querySelectorAll('.life__header[data-reveal]')
+        .forEach(el => revealObserver.observe(el));
+
+    // Contact card — zoom in
+    tag(document.querySelector('.contact-card'), 'fade-up');
 });
   
 

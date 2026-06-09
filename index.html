@@ -10,7 +10,13 @@
 
 </head>
 <body>
-    
+    <div id="scroll-progress"></div>
+
+    <!-- drifting ambient glow blobs (subtle scroll parallax) -->
+    <div class="aurora aurora--1" data-aurora="0.12" aria-hidden="true"></div>
+    <div class="aurora aurora--2" data-aurora="-0.18" aria-hidden="true"></div>
+    <div class="aurora aurora--3" data-aurora="0.08" aria-hidden="true"></div>
+
     <header>
         <nav>
             <img src="img2/Hamburger.png" alt="menu" class="hamburger">
@@ -20,13 +26,16 @@
                     <a href="#sec">About me</a>
                 </li>
                 <li>
-                    <a href="#awds">Awards</a>
-                </li>
-                <li>
                     <a href="#Experience">Experience</a>
                 </li>
                 <li>
+                    <a href="#education">Education</a>
+                </li>
+                <li>
                     <a href="#Projects">Projects</a>
+                </li>
+                <li>
+                    <a href="#awds">Awards</a>
                 </li>
                 <li>
                     <a href="#banner">Life in Frames</a>
@@ -75,8 +84,11 @@
         <img src="img2/Left building.png" data-speedx="0.07" data-speedy="0.03" data-speedz="0.1" data-rotation="0.09" data-distance="1900" class="parallax lbuild">
         <img src="img2/Plane.png" data-speedx="0.32" data-speedy="0.28" data-speedz="0.05" data-rotation="0.18" data-distance="2100" class="parallax plane">
         <img src="img2/Mist inf.png" data-speedx="0.065" data-speedy="0.065" data-speedz="0" data-rotation="0" data-distance="2500" class="parallax mistI">
-        
-        
+
+        <a href="#sec" class="scroll-cue" aria-label="Scroll to content">
+            <span class="mouse"></span>
+            <span>Scroll</span>
+        </a>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
@@ -100,7 +112,7 @@
                 <span style="--i:7;"><h2>m</h2></span>
                 <span style="--i:8;"><h2>e</h2></span>
             </div>
-            <p class="sec_para">Hello! I’m Areeb Khan, a Senior at the University of Texas at Arlington pursuing a degree in Computer Science with a minor in Business Administration. My academic interests span Artificial Intelligence, data science, web development, and exploring the artistic side of computer science. Beyond academics, I proudly serve as the Vice President of Student Government, representing over 45,000 students, and as the President of the Engineering Student Council, where I work to foster collaboration, leadership, and innovation within the UTA community.  </p>   
+            <p class="sec_para">Hello! I’m Areeb Khan — an AI and software engineer based in Arlington, TX. I’m currently pursuing my MS in Computer Science at UT Arlington (GPA 4.0) while serving as a Graduate Archer Fellow researching AI policy in Washington, DC, and as an AI Systems Intern at the Embassy of Pakistan building secure, privacy-focused AI infrastructure. My work spans machine learning research, cloud-native systems, computer vision, LLM applications, cybersecurity, and full-stack development. I’ve led projects in retail analytics, autonomous systems, accessibility technology, and secure AI infrastructure — and I’m passionate about responsible, impactful AI.</p>
         </div>
         <div class="skills">
             <img src="skills/c.png" class="icon">
@@ -118,7 +130,138 @@
     
     </div>
 
-    <div class="projectstitle" id="Projects"><h2>Projects</h2></div>
+    <section class="stats" aria-label="Highlights">
+        <div class="stat" data-reveal="fade-up">
+            <div class="stat__num" data-count="4.0" data-decimals="1">0</div>
+            <div class="stat__label">Graduate GPA</div>
+        </div>
+        <div class="stat" data-reveal="fade-up" style="transition-delay:.1s">
+            <div class="stat__num" data-count="8" data-suffix="+">0</div>
+            <div class="stat__label">Projects Built</div>
+        </div>
+        <div class="stat" data-reveal="fade-up" style="transition-delay:.2s">
+            <div class="stat__num" data-count="8">0</div>
+            <div class="stat__label">Awards Won</div>
+        </div>
+        <div class="stat" data-reveal="fade-up" style="transition-delay:.3s">
+            <div class="stat__num" data-count="45" data-suffix="K">0</div>
+            <div class="stat__label">Students Represented</div>
+        </div>
+    </section>
+
+    <div class="skyline-divider" aria-hidden="true"></div>
+
+    <div class="experiencetitle" id="Experience"><span class="eyebrow">// 01 — Career</span><h2>Experience</h2></div>
+    <section class="experience section" id="experience">
+        <div class="experience__container container__ grid">
+            <article class="experience__card">
+                <h2>Embassy of Pakistan — Washington, DC</h2>
+                <div class="experience__data">
+                    <h3>AI Systems Intern</h3>
+                    <span class="experience__date">June 2026 – Present</span>
+                    <p class="experience__description">
+                        • Developing secure, privacy-focused AI tools to support internal workflows while protecting confidential and sensitive data.<br>
+                        • Researching and prototyping LLM-powered systems designed around data minimization, access control, secure retrieval, and confidential information handling.<br>
+                        • Evaluating local and private LLM deployment approaches, RAG, secure prompt engineering, and role-based access control for sensitive environments.<br>
+                        • Applying cybersecurity principles including least-privilege access, encryption, audit logging, IAM, network segmentation, and secure system design.
+                    </p>
+                </div>
+            </article>
+            <article class="experience__card">
+                <h2>UT System Archer Fellowship Program — Washington, DC</h2>
+                <div class="experience__data">
+                    <h3>Graduate Archer Fellow, AI Policy Researcher</h3>
+                    <span class="experience__date">May 2026 – Present</span>
+                    <p class="experience__description">
+                        • Conducting research on AI methodologies for sustainable development, responsible innovation, and policy-oriented AI governance.<br>
+                        • Studying the environmental impacts of AI infrastructure, including data centers, energy consumption, compute efficiency, and large-scale model deployment.<br>
+                        • Engaging with policy stakeholders, congressional staff, researchers, and public-sector leaders on AI, sustainability, and technology policy.<br>
+                        • Translating technical AI concepts into policy research focused on sustainable AI development and governance strategy.
+                    </p>
+                </div>
+            </article>
+            <article class="experience__card">
+                <h2>University of Texas at Arlington</h2>
+                <div class="experience__data">
+                    <h3>Graduate Assistant, Student Governance</h3>
+                    <span class="experience__date">May 2025 – May 2026</span>
+                    <p class="experience__description">
+                        • Developed and maintained data-driven systems supporting student governance operations and reporting.<br>
+                        • Automated workflows and improved operational efficiency through scripting and structured data processes.<br>
+                        • Collaborated with university leadership and stakeholders on scalable organizational initiatives.
+                    </p>
+                </div>
+            </article>
+            <article class="experience__card">
+                <h2>University of Texas at Arlington — Machine Learning Lab</h2>
+                <div class="experience__data">
+                    <h3>Machine Learning Researcher</h3>
+                    <span class="experience__date">Sep 2022 – May 2025</span>
+                    <p class="experience__description">
+                        • Conducted research in computer vision, autonomous systems, reinforcement learning, and AI-assisted accessibility technologies.<br>
+                        • Built machine learning pipelines involving object detection, tracking, image processing, and multimodal AI systems.<br>
+                        • Developed real-time AI systems using TensorFlow, PyTorch, OpenCV, and YOLO architectures.<br>
+                        • Presented research at UTA Innovation Day (3rd Place 2023, Judges' Choice 2024) and the UTA Student Computing Research Festival (Best Presentation 2024).
+                    </p>
+                </div>
+            </article>
+            <article class="experience__card">
+                <h2>Student Government — UT Arlington</h2>
+                <div class="experience__data">
+                    <h3>Student Body Vice President</h3>
+                    <span class="experience__date">May 2024 – May 2025</span>
+                    <p class="experience__description">
+                        • Represented approximately 45,000 students in university governance and policy discussions.<br>
+                        • Led initiatives involving cross-functional collaboration, stakeholder communication, and operational planning.<br>
+                        • Helped expand the Maverick Discount Program through partnerships with 30+ local businesses.<br>
+                        • Executed the most successful recruitment campaign post-COVID and increased campus involvement.
+                    </p>
+                </div>
+            </article>
+            <article class="experience__card">
+                <h2>Engineering Student Council — UT Arlington</h2>
+                <div class="experience__data">
+                    <h3>President</h3>
+                    <span class="experience__date">April 2024 – April 2025</span>
+                    <p class="experience__description">
+                        • Represented ~10,000 engineering students as umbrella for all engineering organizations.<br>
+                        • Organized regional engineering leadership conferences and coordinated industry engagement initiatives.<br>
+                        • Increased membership tenfold, restructured the organization, and organized the largest-attended event in years (~1,800 attendees).
+                    </p>
+                </div>
+            </article>
+            <article class="experience__card">
+                <h2>Vandergriff Hall at UTA</h2>
+                <div class="experience__data">
+                    <h3>Resident Assistant</h3>
+                    <span class="experience__date">May 2022 – April 2024</span>
+                    <p class="experience__description">
+                        • Supervised a community of ~500 residents, organizing educational and recreational programs.<br>
+                        • Counseled peers on academic, personal, and professional concerns.
+                    </p>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <div class="educationtitle" id="education"><span class="eyebrow">// 02 — Background</span><h2>Education</h2></div>
+    <div class="education__container">
+        <div class="education__card">
+            <h3>University of Texas at Arlington</h3>
+            <p class="edu__degree">MS Computer Science</p>
+            <span class="edu__date">Expected Summer 2026</span>
+        </div>
+        <div class="education__card">
+            <h3>University of Texas at Arlington</h3>
+            <p class="edu__degree">BS Computer Science, Magna Cum Laude</p>
+            <span class="edu__date">Graduated 2025</span>
+        </div>
+    </div>
+    <div class="certifications__container">
+        <div class="cert__badge">🏅 AWS Certified Solutions Architect – Associate</div>
+    </div>
+
+    <div class="projectstitle" id="Projects"><span class="eyebrow">// 03 — Selected Work</span><h2>Projects</h2></div>
     <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 
     <div class="projects section" id="projects">
@@ -127,19 +270,14 @@
                 <a href="#" target="_blank" class="projects__image">
                     <img src="Projects/1.png" alt="image" class="projects__img">
                 </a>
-
                 <div class="projects__data">
-                    <h3 class="projects__name">TerraTracker</h3>
-                    <p class="projects__description">
-                        Robot dog for disaster response.
-                    </p>
-
+                    <h3 class="projects__name">QueueVision / Octivis</h3>
+                    <p class="projects__description">AWS-powered retail analytics platform with computer vision for customer behavior, queue activity, and in-store engagement.</p>
                     <div class="projects__skills">
-                        <img src="skills/python.png" alt="JavaScript" class="projects__skill">
-                        <img src="skills/c++.png" alt="HTML" class="projects__skill">
-                        <img src="skills/omniverse.png" alt="HTML" class="projects__skill">
+                        <img src="skills/python.png" alt="Python" class="projects__skill">
+                        <img src="skills/javascript.png" alt="JS" class="projects__skill">
+                        <img src="skills/React.png" alt="React" class="projects__skill">
                     </div>
-
                     <a href="#" target="_blank" class="projects__button">
                         <i class="ri-link"></i>
                         <span>Visit Project</span>
@@ -150,18 +288,13 @@
                 <a href="#" target="_blank" class="projects__image">
                     <img src="Projects/2.png" alt="image" class="projects__img">
                 </a>
-
                 <div class="projects__data">
-                    <h3 class="projects__name">AVID</h3>
-                    <p class="projects__description">
-                        Drone to help visually impaired through music.
-                    </p>
-
+                    <h3 class="projects__name">QuickDrop</h3>
+                    <p class="projects__description">Session-based secure file transfer platform handling 500 MB payloads in ~50s, supporting 10,000+ concurrent Firestore sessions.</p>
                     <div class="projects__skills">
-                        <img src="skills/python.png" alt="JavaScript" class="projects__skill">
-                        <img src="skills/c.png" alt="HTML" class="projects__skill">
+                        <img src="skills/python.png" alt="Python" class="projects__skill">
+                        <img src="skills/javascript.png" alt="JS" class="projects__skill">
                     </div>
-
                     <a href="#" target="_blank" class="projects__button">
                         <i class="ri-link"></i>
                         <span>Visit Project</span>
@@ -172,19 +305,12 @@
                 <a href="#" target="_blank" class="projects__image">
                     <img src="Projects/3.png" alt="image" class="projects__img">
                 </a>
-
                 <div class="projects__data">
-                    <h3 class="projects__name">Connectly</h3>
-                    <p class="projects__description">
-                        Social media app to connect families and store memories.
-                    </p>
-
+                    <h3 class="projects__name">Financial LLM Assistant</h3>
+                    <p class="projects__description">RAG system using LLaMA 3, LangChain, and FAISS to query SEC 10-K filings and generate context-aware financial responses.</p>
                     <div class="projects__skills">
-                        <img src="skills/java.png" alt="JavaScript" class="projects__skill">
-                        <img src="skills/xml.png" alt="HTML" class="projects__skill">
-                        <img src="skills/android.png" alt="HTML" class="projects__skill">
+                        <img src="skills/python.png" alt="Python" class="projects__skill">
                     </div>
-
                     <a href="#" target="_blank" class="projects__button">
                         <i class="ri-link"></i>
                         <span>Visit Project</span>
@@ -195,20 +321,14 @@
                 <a href="#" target="_blank" class="projects__image">
                     <img src="Projects/4.png" alt="image" class="projects__img">
                 </a>
-
                 <div class="projects__data">
-                    <h3 class="projects__name">Plant Journal</h3>
-                    <p class="projects__description">
-                        Plant journal to keep track of garden.
-                    </p>
-
+                    <h3 class="projects__name">Campus Resource Platform</h3>
+                    <p class="projects__description">Full-stack web platform for student organizations, events, announcements, and AI-assisted campus support with role-based systems.</p>
                     <div class="projects__skills">
-                        <img src="skills/javascript.png" alt="JavaScript" class="projects__skill">
-                        <img src="skills/html.png" alt="HTML" class="projects__skill">
-                        <img src="skills/css.png" alt="CSS" class="projects__skill">
-                        <img src="skills/React.png" alt="CSS" class="projects__skill">
+                        <img src="skills/React.png" alt="React" class="projects__skill">
+                        <img src="skills/javascript.png" alt="JS" class="projects__skill">
+                        <img src="skills/sqlite.png" alt="MySQL" class="projects__skill">
                     </div>
-
                     <a href="#" target="_blank" class="projects__button">
                         <i class="ri-link"></i>
                         <span>Visit Project</span>
@@ -219,18 +339,15 @@
                 <a href="#" target="_blank" class="projects__image">
                     <img src="Projects/5.png" alt="image" class="projects__img">
                 </a>
-
                 <div class="projects__data">
-                    <h3 class="projects__name">Federated Learning</h3>
-                    <p class="projects__description">
-                        Optimized Federated Learning aggregation algorithms. 
-                    </p>
-
+                    <h3 class="projects__name">Disaster Response Robot Dog</h3>
+                    <p class="projects__description">Autonomous robotic dog for disaster response with reinforcement learning locomotion and 3D audio localization. Judges' Choice 2024.</p>
                     <div class="projects__skills">
-                        <img src="skills/python.png" alt="JavaScript" class="projects__skill">
+                        <img src="skills/python.png" alt="Python" class="projects__skill">
+                        <img src="skills/c++.png" alt="C++" class="projects__skill">
+                        <img src="skills/omniverse.png" alt="Omniverse" class="projects__skill">
                     </div>
-
-                    <a href="#" target="_blank" class="projects__button">
+                    <a href="https://uta.engineering/innovationday/project-2024.php?p=16" target="_blank" class="projects__button">
                         <i class="ri-link"></i>
                         <span>Visit Project</span>
                     </a>
@@ -240,19 +357,14 @@
                 <a href="#" target="_blank" class="projects__image">
                     <img src="Projects/6.png" alt="image" class="projects__img">
                 </a>
-
                 <div class="projects__data">
-                    <h3 class="projects__name">SauRON</h3>
-                    <p class="projects__description">
-                        Smart surveillance with robotic swarms framework.
-                    </p>
-
+                    <h3 class="projects__name">AVID — Autonomous Drone</h3>
+                    <p class="projects__description">Drone assisting visually impaired users via computer vision, ArUco markers, and real-time MIDI/audio cues. 3rd Place Innovation Day 2023.</p>
                     <div class="projects__skills">
-                        <img src="skills/python.png" alt="JavaScript" class="projects__skill">
-                        <img src="skills/gazebo.png" alt="JavaScript" class="projects__skill">
+                        <img src="skills/python.png" alt="Python" class="projects__skill">
+                        <img src="skills/c.png" alt="C" class="projects__skill">
                     </div>
-
-                    <a href="#" target="_blank" class="projects__button">
+                    <a href="https://uta.engineering/innovationday/project-2023.php?p=69" target="_blank" class="projects__button">
                         <i class="ri-link"></i>
                         <span>Visit Project</span>
                     </a>
@@ -262,18 +374,13 @@
                 <a href="#" target="_blank" class="projects__image">
                     <img src="Projects/7.png" alt="image" class="projects__img">
                 </a>
-
                 <div class="projects__data">
-                    <h3 class="projects__name">In/e motion</h3>
-                    <p class="projects__description">
-                        Interactive art based on body movements.
-                    </p>
-
+                    <h3 class="projects__name">In/E Motion</h3>
+                    <p class="projects__description">Interactive Unity platform for the UTA Theater Department where performer movements trigger real-time visual effects. Built with Agile Scrum.</p>
                     <div class="projects__skills">
-                        <img src="skills/csharp.png" alt="JavaScript" class="projects__skill">
-                        <img src="skills/unity.png" alt="JavaScript" class="projects__skill">
+                        <img src="skills/csharp.png" alt="C#" class="projects__skill">
+                        <img src="skills/unity.png" alt="Unity" class="projects__skill">
                     </div>
-
                     <a href="#" target="_blank" class="projects__button">
                         <i class="ri-link"></i>
                         <span>Visit Project</span>
@@ -284,19 +391,13 @@
                 <a href="#" target="_blank" class="projects__image">
                     <img src="Projects/8.png" alt="image" class="projects__img">
                 </a>
-
                 <div class="projects__data">
-                    <h3 class="projects__name">Portfolio Website</h3>
-                    <p class="projects__description">
-                        Portfolio website from scratch with coding.
-                    </p>
-
+                    <h3 class="projects__name">SauRON — Smart Surveillance</h3>
+                    <p class="projects__description">Surveillance optimization system with camera coverage analysis and environment-aware spatial visibility algorithms for indoor environments.</p>
                     <div class="projects__skills">
-                        <img src="skills/javascript.png" alt="JavaScript" class="projects__skill">
-                        <img src="skills/html.png" alt="HTML" class="projects__skill">
-                        <img src="skills/css.png" alt="CSS" class="projects__skill">
+                        <img src="skills/python.png" alt="Python" class="projects__skill">
+                        <img src="skills/gazebo.png" alt="Gazebo" class="projects__skill">
                     </div>
-
                     <a href="#" target="_blank" class="projects__button">
                         <i class="ri-link"></i>
                         <span>Visit Project</span>
@@ -307,7 +408,7 @@
     </div>
     
     
-    <div class="titleawards" id="awds"><h2>Awards</h2></div>
+    <div class="titleawards" id="awds"><span class="eyebrow">// 04 — Recognition</span><h2>Awards</h2></div>
     <div class="awards" >
         <div class="container1">
             <div class="card">
@@ -457,151 +558,50 @@
         </div>
         
     </div>
-    <div class="experiencetitle" id="Experience"><h2>Experience</h2></div>
-    <section class="experience section" id="experience">
-        <div class="experience__container container__ grid">
-            <article class="experience__card">
-                <h2>Student Government</h2>
+    <section class="lifeinsight" id="banner">
+        <div class="life__header" data-reveal="fade-up">
+            <span class="life__eyebrow">// Off the clock</span>
+            <h2 class="life__title">Life in Frames</h2>
+            <p class="life__sub">Beyond the code &mdash; moments, places &amp; the people along the way.</p>
+        </div>
 
-                <div class="experience__data">
-                    <h3>Vice President</h3>
-                    <span class="experience__date">04/24 - Present</span>
-                    <p class="experience__description">
-                        •	Represent over 45,000 students to university administration and draft and recommend potential policies.<br>
-                        •	Oversee an organization of 90+ members, managing internal processes and member engagement.<br>
-                        •	Appoint student representatives to university committees and plan campus-wide events.<br>
-                        •	Achievements: Executed the most successful recruitment campaign post-COVID and increased <br>Student Government's campus involvement.
+        <div class="marquee">
+            <div class="marquee__track marquee__track--left">
+                <figure class="frame"><img src="Glimpse/1.jpg" alt="" loading="lazy"><span class="frame__tag">01</span></figure>
+                <figure class="frame"><img src="Glimpse/2.JPEG" alt="" loading="lazy"><span class="frame__tag">02</span></figure>
+                <figure class="frame"><img src="Glimpse/3.jpg" alt="" loading="lazy"><span class="frame__tag">03</span></figure>
+                <figure class="frame"><img src="Glimpse/4.PNG" alt="" loading="lazy"><span class="frame__tag">04</span></figure>
+                <figure class="frame"><img src="Glimpse/5.jpg" alt="" loading="lazy"><span class="frame__tag">05</span></figure>
+                <!-- duplicate for seamless loop -->
+                <figure class="frame"><img src="Glimpse/1.jpg" alt="" loading="lazy"><span class="frame__tag">01</span></figure>
+                <figure class="frame"><img src="Glimpse/2.JPEG" alt="" loading="lazy"><span class="frame__tag">02</span></figure>
+                <figure class="frame"><img src="Glimpse/3.jpg" alt="" loading="lazy"><span class="frame__tag">03</span></figure>
+                <figure class="frame"><img src="Glimpse/4.PNG" alt="" loading="lazy"><span class="frame__tag">04</span></figure>
+                <figure class="frame"><img src="Glimpse/5.jpg" alt="" loading="lazy"><span class="frame__tag">05</span></figure>
+            </div>
+        </div>
 
-                    </p>
-                </div>
-            </article>
-            <article class="experience__card">
-                <h2>University of Texas Student Advisory Council</h2>
-
-                <div class="experience__data">
-                    <h3>Student Representative for UT Arlington</h3>
-                    <span class="experience__date">08/24 - Present</span>
-                    <p class="experience__description">
-                        •	Represent the interests of over 45,000 students at UT Arlington within the UT System.<br>
-                        •	Collaborate with student leaders from 14 institutions to research, develop, and present impactful <br>recommendations to the UT System Board of Regents, influencing policies affecting over 240,000 <br>students system-wide.<br>
-                        •	Strategize and exchange innovative ideas to enhance the student experience, bringing actionable <br>insights back to UT Arlington for university improvement.<br>
-
-
-                    </p>
-                </div>
-            </article>
-            <article class="experience__card">
-                <h2>Engineering Student Council</h2>
-
-                <div class="experience__data">
-                    <h3>President</h3>
-                    <span class="experience__date">05/24 - Present</span>
-                    <p class="experience__description">
-                        •	Represent ~10,000 engineering students and serve as an umbrella for all engineering organizations.<br>
-                        •	Implement initiatives focusing on professional, career, and personal development.<br>
-                        •	Collaborate and plan initiatives with other engineering organizations.<br>
-                        •	Achievements: Increased membership tenfold, restructured the organization, and organized the <br>largest-attended event in years (~1,800 attendees).
-
-                    </p>
-                </div>
-            </article>
-            <article class="experience__card">
-                <h2>East Regional Conference</h2>
-
-                <div class="experience__data">
-                    <h3>Lead Conference Coordinator and Host</h3>
-                    <span class="experience__date">05/24 - 10/24</span>
-                    <p class="experience__description">
-                        •	Secured and hosted the bid for the East Regional Conference.<br>
-                        •	Led planning teams, logistics, and coordinated with 10 universities across multiple states.<br>
-                        •	Arranged professional company tours (e.g., American Airlines, Herzog).<br>
-                        
-                    </p>
-                </div>
-            </article>
-            <article class="experience__card">
-                <h2>National Assosiation of Engineering Student Councils</h2>
-
-                <div class="experience__data">
-                    <h3>Regional Ambassador</h3>
-                    <span class="experience__date">03/24 - 12/24</span>
-                    <p class="experience__description">
-                        •	Lead the Central Region’s leadership team and coordinated regional efforts.<br>
-                    </p>
-                </div>
-            </article>
-            <article class="experience__card">
-                <h2>Vandergriff Hall at UTA</h2>
-
-                <div class="experience__data">
-                    <h3>Resident Assistant</h3>
-                    <span class="experience__date">05/22 - 04/24</span>
-                    <p class="experience__description">
-                        •	Supervised a community of ~500 residents, organizing educational and recreational programs.<br>
-                        •	Counseled peers on academic, personal, and professional concerns.<br>
-                        
-                    </p>
-                </div>
-            </article>
-            <article class="experience__card">
-                <h2>UTA Libraries</h2>
-
-                <div class="experience__data">
-                    <h3>Digital Publishing Student Assistant</h3>
-                    <span class="experience__date">09/21 - 05/22</span>
-                    <p class="experience__description">
-                        •	Designed university journals (e.g., PALARA, Fast Capitalism) using Open Journal Systems <br>and Adobe Creative Suite.
-                    </p>
-                </div>
-            </article>
-            
+        <div class="marquee">
+            <div class="marquee__track marquee__track--right">
+                <figure class="frame"><img src="Glimpse/6.JPEG" alt="" loading="lazy"><span class="frame__tag">06</span></figure>
+                <figure class="frame"><img src="Glimpse/7.JPG" alt="" loading="lazy"><span class="frame__tag">07</span></figure>
+                <figure class="frame"><img src="Glimpse/8.jpg" alt="" loading="lazy"><span class="frame__tag">08</span></figure>
+                <figure class="frame"><img src="Glimpse/9.JPG" alt="" loading="lazy"><span class="frame__tag">09</span></figure>
+                <figure class="frame"><img src="Glimpse/10.jpg" alt="" loading="lazy"><span class="frame__tag">10</span></figure>
+                <!-- duplicate for seamless loop -->
+                <figure class="frame"><img src="Glimpse/6.JPEG" alt="" loading="lazy"><span class="frame__tag">06</span></figure>
+                <figure class="frame"><img src="Glimpse/7.JPG" alt="" loading="lazy"><span class="frame__tag">07</span></figure>
+                <figure class="frame"><img src="Glimpse/8.jpg" alt="" loading="lazy"><span class="frame__tag">08</span></figure>
+                <figure class="frame"><img src="Glimpse/9.JPG" alt="" loading="lazy"><span class="frame__tag">09</span></figure>
+                <figure class="frame"><img src="Glimpse/10.jpg" alt="" loading="lazy"><span class="frame__tag">10</span></figure>
+            </div>
         </div>
     </section>
-    
-
-    
-    <!--<div class="elfsight-app-72bb2b25-fde6-4312-be06-7010061907a2" id="linkedin" data-elfsight-app-lazy></div>-->    
-    <div class="lifeinsight">
-        
-        <div class="banner" id="banner">
-            <div class="slider" style="--quantity: 10">
-                <div class="item" style="--position: 1"><img src="Glimpse/1.jpg" alt=""></div>
-                <div class="item" style="--position: 2"><img src="Glimpse/2.JPEG" alt=""></div>
-                <div class="item" style="--position: 3"><img src="Glimpse/3.jpg" alt=""></div>
-                <div class="item" style="--position: 4"><img src="Glimpse/4.PNG" alt=""></div>
-                <div class="item" style="--position: 5"><img src="Glimpse/5.jpg" alt=""></div>
-                <div class="item" style="--position: 6"><img src="Glimpse/6.JPEG" alt=""></div>
-                <div class="item" style="--position: 7"><img src="Glimpse/7.JPG" alt=""></div>
-                <div class="item" style="--position: 8"><img src="Glimpse/8.jpg" alt=""></div>
-                <div class="item" style="--position: 9"><img src="Glimpse/9.JPG" alt=""></div>
-                <div class="item" style="--position: 10"><img src="Glimpse/10.jpg" alt=""></div>
-            </div>
-
-            <div class="content">
-                <h1 data-content="Life in Frames">Life in Frames</h1>
-                <div class="model"></div>
-            </div>
-        </div>
-
-        
-        
-        <!--
-        <div id="image-track" data-mouse-down-at="0" data-prev-percentage="0">
-            <img class="image" src= "Glimpse/8.jpg" draggable="false" />
-            <img class="image" src= "Glimpse/6.JPEG" draggable="false" />
-            <img class="image" src= "Glimpse/3.jpg" draggable="false" />
-            <img class="image" src= "Glimpse/4.PNG" draggable="false" />
-            <img class="image" src= "Glimpse/5.jpg" draggable="false" />
-            <img class="image" src= "Glimpse/2.JPEG" draggable="false" />
-            <img class="image" src= "Glimpse/7.JPG" draggable="false" />
-            <img class="image" src= "Glimpse/1.jpg" draggable="false" />
-            <img class="image" src= "Glimpse/9.JPG" draggable="false" />
-            <img class="image" src= "Glimpse/10.jpg" draggable="false" />
-        </div>-->
-    </div>
 
 
 
+
+    <div class="skyline-divider" aria-hidden="true"></div>
 
     <!--<div class="contacttitle"><h2>Contact Me</h2></div>-->
     <div class="formcontainer" id="formcontainer">
