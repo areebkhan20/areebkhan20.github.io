@@ -85,10 +85,14 @@
         <img src="img2/Plane.png" data-speedx="0.32" data-speedy="0.28" data-speedz="0.05" data-rotation="0.18" data-distance="2100" class="parallax plane">
         <img src="img2/Mist inf.png" data-speedx="0.065" data-speedy="0.065" data-speedz="0" data-rotation="0" data-distance="2500" class="parallax mistI">
 
-        <a href="#sec" class="scroll-cue" aria-label="Scroll to content">
-            <span class="mouse"></span>
-            <span>Scroll</span>
-        </a>
+        <div class="hero-intro">
+            <p class="hero-intro__role">AI · Cloud · Software Engineer</p>
+            <p class="hero-intro__tag">I build intelligent, cloud-native software, end to end.</p>
+            <div class="hero-intro__cta">
+                <a href="#Projects" class="hero-btn hero-btn--primary">View Work</a>
+                <a href="#formcontainer" class="hero-btn hero-btn--ghost">Get in Touch</a>
+            </div>
+        </div>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
@@ -115,17 +119,33 @@
             <p class="sec_para">Hello! I’m Areeb Khan, an AI and software engineer based in Arlington, TX. I’m currently pursuing my MS in Computer Science at UT Arlington while serving as a Graduate Archer Fellow researching AI policy in Washington, DC, and as an AI Systems Intern at the Embassy of Pakistan building secure, privacy-focused AI infrastructure. My work spans machine learning research, cloud-native systems, computer vision, LLM applications, cybersecurity, and full-stack development. I’ve led projects in retail analytics, autonomous systems, accessibility technology, and secure AI infrastructure, and I’m passionate about responsible, impactful AI.</p>
         </div>
         <div class="skills">
-            <img src="skills/c.png" class="icon">
-            <img src="skills/c++.png" class="icon">
-            <img src="skills/csharp.png" class="icon">
-            <img src="skills/python.png" class="icon">
-            <img src="skills/html.png" class="icon">
-            <img src="skills/css.png" class="icon">
-            <img src="skills/javascript.png" class="icon">
-            <img src="skills/React.png" class="icon">
-            <img src="skills/java.png" class="icon">
-            <img src="skills/sqlite.png" class="icon">
-            <img src="skills/xml.png" class="icon">
+            <div class="skillgroup">
+                <span class="skillgroup__label">Languages</span>
+                <div class="skillgroup__icons">
+                    <img src="skills/python.png" class="icon" alt="Python">
+                    <img src="skills/java.png" class="icon" alt="Java">
+                    <img src="skills/c++.png" class="icon" alt="C++">
+                    <img src="skills/c.png" class="icon" alt="C">
+                    <img src="skills/csharp.png" class="icon" alt="C#">
+                    <img src="skills/javascript.png" class="icon" alt="JavaScript">
+                </div>
+            </div>
+            <div class="skillgroup">
+                <span class="skillgroup__label">Web &amp; Frontend</span>
+                <div class="skillgroup__icons">
+                    <img src="skills/html.png" class="icon" alt="HTML">
+                    <img src="skills/css.png" class="icon" alt="CSS">
+                    <img src="skills/React.png" class="icon" alt="React">
+                </div>
+            </div>
+            <div class="skillgroup">
+                <span class="skillgroup__label">Data &amp; Tools</span>
+                <div class="skillgroup__icons">
+                    <img src="skills/sqlite.png" class="icon" alt="SQLite">
+                    <img src="skills/github.png" class="icon" alt="GitHub">
+                    <img src="skills/xml.png" class="icon" alt="XML">
+                </div>
+            </div>
         </div>
     
     </div>
@@ -150,14 +170,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m8 9-3 3 3 3M16 9l3 3-3 3M14 6l-4 12"/></svg>
             </span>
             <h3 class="interest-card__title">Software Engineering</h3>
-            <p class="interest-card__desc">Full-stack development with clean, maintainable architecture.</p>
-        </div>
-        <div class="interest-card" data-reveal="fade-up" style="transition-delay:.3s">
-            <span class="interest-card__icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18v12H3z"/><path d="M12 16v4M8 20h8M7 12l3-3 2 2 4-4"/></svg>
-            </span>
-            <h3 class="interest-card__title">Sales Engineering</h3>
-            <p class="interest-card__desc">Translating complex technology into clear, business-driven value.</p>
+            <p class="interest-card__desc">Full-stack products shipped end to end with clean architecture.</p>
         </div>
     </section>
 
@@ -167,7 +180,7 @@
     <section class="experience section" id="experience">
         <div class="experience__container container__ grid">
             <article class="experience__card">
-                <h2>Embassy of Pakistan — Washington, DC</h2>
+                <h2>Embassy of Pakistan, Washington, DC</h2>
                 <div class="experience__data">
                     <h3>AI Systems Intern</h3>
                     <span class="experience__date">June 2026 – Present</span>
@@ -180,7 +193,7 @@
                 </div>
             </article>
             <article class="experience__card">
-                <h2>UT System Archer Fellowship Program — Washington, DC</h2>
+                <h2>UT System Archer Fellowship Program, Washington, DC</h2>
                 <div class="experience__data">
                     <h3>Graduate Archer Fellow, AI Policy Researcher</h3>
                     <span class="experience__date">May 2026 – Present</span>
@@ -205,7 +218,7 @@
                 </div>
             </article>
             <article class="experience__card">
-                <h2>University of Texas at Arlington — Machine Learning Lab</h2>
+                <h2>University of Texas at Arlington, Machine Learning Lab</h2>
                 <div class="experience__data">
                     <h3>Machine Learning Researcher</h3>
                     <span class="experience__date">Sep 2022 – May 2025</span>
@@ -218,7 +231,7 @@
                 </div>
             </article>
             <article class="experience__card">
-                <h2>Student Government — UT Arlington</h2>
+                <h2>Student Government, UT Arlington</h2>
                 <div class="experience__data">
                     <h3>Student Body Vice President</h3>
                     <span class="experience__date">May 2024 – May 2025</span>
@@ -231,7 +244,7 @@
                 </div>
             </article>
             <article class="experience__card">
-                <h2>Engineering Student Council — UT Arlington</h2>
+                <h2>Engineering Student Council, UT Arlington</h2>
                 <div class="experience__data">
                     <h3>President</h3>
                     <span class="experience__date">April 2024 – April 2025</span>
@@ -279,141 +292,137 @@
     <div class="projects section" id="projects">
         <div class="projects__container">
             <article class="projects__card">
-                <a href="#" target="_blank" class="projects__image">
-                    <img src="Projects/1.png" alt="image" class="projects__img">
-                </a>
+                <figure class="projects__image">
+                    <img src="Projects/1.png" alt="QueueVision retail analytics dashboard" class="projects__img" loading="lazy">
+                </figure>
                 <div class="projects__data">
+                    <div class="projects__tags">
+                        <span class="ptag" data-track="cloud">Cloud</span>
+                        <span class="ptag" data-track="ai">AI/ML</span>
+                    </div>
                     <h3 class="projects__name">QueueVision / Octivis</h3>
-                    <p class="projects__description">AWS-powered retail analytics platform with computer vision for customer behavior, queue activity, and in-store engagement.</p>
+                    <p class="projects__description">Computer-vision retail analytics on AWS that turns live camera feeds into real-time queue and engagement insights for store operations.</p>
                     <div class="projects__skills">
                         <img src="skills/python.png" alt="Python" class="projects__skill">
-                        <img src="skills/javascript.png" alt="JS" class="projects__skill">
+                        <img src="skills/javascript.png" alt="JavaScript" class="projects__skill">
                         <img src="skills/React.png" alt="React" class="projects__skill">
                     </div>
-                    <a href="#" target="_blank" class="projects__button">
-                        <i class="ri-link"></i>
-                        <span>Visit Project</span>
-                    </a>
                 </div>
             </article>
             <article class="projects__card">
-                <a href="#" target="_blank" class="projects__image">
-                    <img src="Projects/2.png" alt="image" class="projects__img">
-                </a>
+                <figure class="projects__image">
+                    <img src="Projects/2.png" alt="QuickDrop secure file transfer interface" class="projects__img" loading="lazy">
+                </figure>
                 <div class="projects__data">
+                    <div class="projects__tags">
+                        <span class="ptag" data-track="cloud">Cloud</span>
+                        <span class="ptag" data-track="swe">Software</span>
+                    </div>
                     <h3 class="projects__name">QuickDrop</h3>
-                    <p class="projects__description">Session-based secure file transfer platform handling 500 MB payloads in ~50s, supporting 10,000+ concurrent Firestore sessions.</p>
+                    <p class="projects__description">Secure session-based file transfer moving 500 MB in about 50s and scaling to 10,000+ concurrent Firestore sessions.</p>
                     <div class="projects__skills">
                         <img src="skills/python.png" alt="Python" class="projects__skill">
-                        <img src="skills/javascript.png" alt="JS" class="projects__skill">
+                        <img src="skills/javascript.png" alt="JavaScript" class="projects__skill">
                     </div>
-                    <a href="#" target="_blank" class="projects__button">
-                        <i class="ri-link"></i>
-                        <span>Visit Project</span>
-                    </a>
                 </div>
             </article>
             <article class="projects__card">
-                <a href="#" target="_blank" class="projects__image">
-                    <img src="Projects/3.png" alt="image" class="projects__img">
-                </a>
+                <figure class="projects__image">
+                    <img src="Projects/3.png" alt="Financial LLM assistant query interface" class="projects__img" loading="lazy">
+                </figure>
                 <div class="projects__data">
+                    <div class="projects__tags">
+                        <span class="ptag" data-track="ai">AI/ML</span>
+                    </div>
                     <h3 class="projects__name">Financial LLM Assistant</h3>
-                    <p class="projects__description">RAG system using LLaMA 3, LangChain, and FAISS to query SEC 10-K filings and generate context-aware financial responses.</p>
+                    <p class="projects__description">RAG assistant over SEC 10-K filings using LLaMA 3, LangChain and FAISS to return grounded, context-aware financial answers.</p>
                     <div class="projects__skills">
                         <img src="skills/python.png" alt="Python" class="projects__skill">
                     </div>
-                    <a href="#" target="_blank" class="projects__button">
-                        <i class="ri-link"></i>
-                        <span>Visit Project</span>
-                    </a>
                 </div>
             </article>
             <article class="projects__card">
-                <a href="#" target="_blank" class="projects__image">
-                    <img src="Projects/4.png" alt="image" class="projects__img">
-                </a>
+                <figure class="projects__image">
+                    <img src="Projects/4.png" alt="Campus resource platform screenshot" class="projects__img" loading="lazy">
+                </figure>
                 <div class="projects__data">
+                    <div class="projects__tags">
+                        <span class="ptag" data-track="swe">Software</span>
+                    </div>
                     <h3 class="projects__name">Campus Resource Platform</h3>
-                    <p class="projects__description">Full-stack web platform for student organizations, events, announcements, and AI-assisted campus support with role-based systems.</p>
+                    <p class="projects__description">Full-stack campus platform for organizations, events and announcements with role-based access and AI-assisted support.</p>
                     <div class="projects__skills">
                         <img src="skills/React.png" alt="React" class="projects__skill">
-                        <img src="skills/javascript.png" alt="JS" class="projects__skill">
-                        <img src="skills/sqlite.png" alt="MySQL" class="projects__skill">
+                        <img src="skills/javascript.png" alt="JavaScript" class="projects__skill">
+                        <img src="skills/sqlite.png" alt="SQL" class="projects__skill">
                     </div>
-                    <a href="#" target="_blank" class="projects__button">
-                        <i class="ri-link"></i>
-                        <span>Visit Project</span>
-                    </a>
                 </div>
             </article>
             <article class="projects__card">
-                <a href="#" target="_blank" class="projects__image">
-                    <img src="Projects/5.png" alt="image" class="projects__img">
-                </a>
+                <figure class="projects__image">
+                    <img src="Projects/5.png" alt="Disaster response robot dog" class="projects__img" loading="lazy">
+                </figure>
                 <div class="projects__data">
+                    <div class="projects__tags">
+                        <span class="ptag" data-track="ai">AI/ML</span>
+                        <span class="ptag" data-track="award">Judges' Choice '24</span>
+                    </div>
                     <h3 class="projects__name">Disaster Response Robot Dog</h3>
-                    <p class="projects__description">Autonomous robotic dog for disaster response with reinforcement learning locomotion and 3D audio localization. Judges' Choice 2024.</p>
+                    <p class="projects__description">Autonomous search-and-rescue robot dog with reinforcement-learning locomotion and 3D audio localization.</p>
                     <div class="projects__skills">
                         <img src="skills/python.png" alt="Python" class="projects__skill">
                         <img src="skills/c++.png" alt="C++" class="projects__skill">
-                        <img src="skills/omniverse.png" alt="Omniverse" class="projects__skill">
+                        <img src="skills/omniverse.png" alt="NVIDIA Omniverse" class="projects__skill">
                     </div>
-                    <a href="https://uta.engineering/innovationday/project-2024.php?p=16" target="_blank" class="projects__button">
-                        <i class="ri-link"></i>
-                        <span>Visit Project</span>
-                    </a>
                 </div>
             </article>
             <article class="projects__card">
-                <a href="#" target="_blank" class="projects__image">
-                    <img src="Projects/6.png" alt="image" class="projects__img">
-                </a>
+                <figure class="projects__image">
+                    <img src="Projects/6.png" alt="AVID autonomous assistive drone" class="projects__img" loading="lazy">
+                </figure>
                 <div class="projects__data">
-                    <h3 class="projects__name">AVID — Autonomous Drone</h3>
-                    <p class="projects__description">Drone assisting visually impaired users via computer vision, ArUco markers, and real-time MIDI/audio cues. 3rd Place Innovation Day 2023.</p>
+                    <div class="projects__tags">
+                        <span class="ptag" data-track="ai">AI/ML</span>
+                        <span class="ptag" data-track="award">3rd Place '23</span>
+                    </div>
+                    <h3 class="projects__name">AVID: Autonomous Drone</h3>
+                    <p class="projects__description">Drone guiding visually impaired users via computer vision, ArUco markers and real-time audio cues.</p>
                     <div class="projects__skills">
                         <img src="skills/python.png" alt="Python" class="projects__skill">
                         <img src="skills/c.png" alt="C" class="projects__skill">
                     </div>
-                    <a href="https://uta.engineering/innovationday/project-2023.php?p=69" target="_blank" class="projects__button">
-                        <i class="ri-link"></i>
-                        <span>Visit Project</span>
-                    </a>
                 </div>
             </article>
             <article class="projects__card">
-                <a href="#" target="_blank" class="projects__image">
-                    <img src="Projects/7.png" alt="image" class="projects__img">
-                </a>
+                <figure class="projects__image">
+                    <img src="Projects/7.png" alt="In/E Motion interactive stage visuals" class="projects__img" loading="lazy">
+                </figure>
                 <div class="projects__data">
+                    <div class="projects__tags">
+                        <span class="ptag" data-track="swe">Software</span>
+                    </div>
                     <h3 class="projects__name">In/E Motion</h3>
-                    <p class="projects__description">Interactive Unity platform for the UTA Theater Department where performer movements trigger real-time visual effects. Built with Agile Scrum.</p>
+                    <p class="projects__description">Interactive Unity stage system for UTA Theater where performers' movements trigger live visuals, shipped via Agile Scrum.</p>
                     <div class="projects__skills">
                         <img src="skills/csharp.png" alt="C#" class="projects__skill">
                         <img src="skills/unity.png" alt="Unity" class="projects__skill">
                     </div>
-                    <a href="#" target="_blank" class="projects__button">
-                        <i class="ri-link"></i>
-                        <span>Visit Project</span>
-                    </a>
                 </div>
             </article>
             <article class="projects__card">
-                <a href="#" target="_blank" class="projects__image">
-                    <img src="Projects/8.png" alt="image" class="projects__img">
-                </a>
+                <figure class="projects__image">
+                    <img src="Projects/8.png" alt="SauRON surveillance coverage visualization" class="projects__img" loading="lazy">
+                </figure>
                 <div class="projects__data">
-                    <h3 class="projects__name">SauRON — Smart Surveillance</h3>
-                    <p class="projects__description">Surveillance optimization system with camera coverage analysis and environment-aware spatial visibility algorithms for indoor environments.</p>
+                    <div class="projects__tags">
+                        <span class="ptag" data-track="ai">AI/ML</span>
+                    </div>
+                    <h3 class="projects__name">SauRON: Smart Surveillance</h3>
+                    <p class="projects__description">Surveillance-optimization engine computing camera coverage and environment-aware visibility for indoor spaces.</p>
                     <div class="projects__skills">
                         <img src="skills/python.png" alt="Python" class="projects__skill">
                         <img src="skills/gazebo.png" alt="Gazebo" class="projects__skill">
                     </div>
-                    <a href="#" target="_blank" class="projects__button">
-                        <i class="ri-link"></i>
-                        <span>Visit Project</span>
-                    </a>
                 </div>
             </article>
         </div>
@@ -574,7 +583,7 @@
         <div class="life__header" data-reveal="fade-up">
             <span class="life__eyebrow">// Off the clock</span>
             <h2 class="life__title">Life in Frames</h2>
-            <p class="life__sub">Beyond the code &mdash; moments, places &amp; the people along the way.</p>
+            <p class="life__sub">Beyond the code: moments, places &amp; the people along the way.</p>
         </div>
 
         <div class="marquee">

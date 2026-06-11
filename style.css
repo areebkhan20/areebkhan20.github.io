@@ -1225,10 +1225,10 @@ html {
 }
 
 .circle{
-    height: 18px;
-    width: 18px;
+    height: 12px;
+    width: 12px;
     border-radius: 50%;
-    background-color: #ffffff;
+    background-color: var(--brand-soft);
     position: fixed;
     top: 0;
     left: 0;
@@ -1236,11 +1236,17 @@ html {
     will-change: transform;
     z-index: 99999;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease, background-color 0.3s ease;
+    mix-blend-mode: screen;
 }
 
 .circle.cursor-visible {
-    opacity: 1;
+    opacity: 0.45;
+}
+
+/* a touch device has no precise cursor — hide the trail entirely */
+@media (hover: none), (pointer: coarse) {
+    .customcursor { display: none; }
 }
 
 /* =====================
@@ -2011,6 +2017,75 @@ main {
    REDESIGN ADDITIONS — interactivity & scroll effects
    ============================================================ */
 
+/* ---- Hero value proposition + CTAs ---- */
+.hero-intro {
+    position: absolute;
+    left: 50%;
+    bottom: 8%;
+    transform: translateX(-50%);
+    z-index: 600;
+    width: min(92vw, 760px);
+    text-align: center;
+    pointer-events: none; /* let parallax read mouse; links re-enable below */
+}
+.hero-intro__role {
+    font-family: 'Courier New', monospace;
+    font-size: clamp(0.72rem, 1.4vw, 0.9rem);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--brand-soft);
+    margin-bottom: 0.7rem;
+    text-shadow: 0 2px 14px rgba(0,0,0,0.8);
+}
+.hero-intro__tag {
+    font-size: clamp(1.05rem, 2.6vw, 1.7rem);
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.3;
+    margin-bottom: 1.4rem;
+    text-shadow: 0 2px 22px rgba(0,0,0,0.85);
+}
+.hero-intro__cta {
+    display: flex;
+    gap: 0.9rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.hero-btn {
+    pointer-events: auto;
+    display: inline-block;
+    padding: 0.7rem 1.6rem;
+    border-radius: 2rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-decoration: none;
+    transition: transform 0.3s var(--ease-out), box-shadow 0.3s ease, background 0.3s ease, color 0.3s ease;
+}
+.hero-btn--primary {
+    background: linear-gradient(135deg, var(--brand-deep), var(--brand));
+    color: #fff;
+    box-shadow: 0 8px 28px rgba(108,92,231,0.45);
+}
+.hero-btn--primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 38px rgba(108,92,231,0.6);
+}
+.hero-btn--ghost {
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.45);
+    background: rgba(5,8,21,0.35);
+    backdrop-filter: blur(6px);
+}
+.hero-btn--ghost:hover {
+    transform: translateY(-3px);
+    border-color: var(--brand-soft);
+    color: var(--brand-soft);
+}
+@media screen and (max-width: 768px) {
+    .hero-intro { bottom: 12%; }
+}
+
 /* ---- Hero scroll cue ---- */
 .scroll-cue {
     position: absolute;
@@ -2068,12 +2143,12 @@ main {
 /* ---- Areas of Interest cards ---- */
 .interests {
     position: relative;
-    max-width: 1050px;
+    max-width: 920px;
     margin: 1rem auto 3rem;
     padding: 2.5rem 1.5rem;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.25rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
 }
 .interest-card {
     position: relative;
@@ -2133,7 +2208,7 @@ main {
     line-height: 1.55;
 }
 @media screen and (max-width: 768px) {
-    .interests { grid-template-columns: repeat(2, 1fr); gap: 0.9rem; padding: 1.5rem 1rem; margin-bottom: 2.5rem; }
+    .interests { grid-template-columns: 1fr; gap: 0.9rem; padding: 1.5rem 1rem; margin-bottom: 2.5rem; }
 }
 
 /* ---- Skill icon polish + reveal ---- */
@@ -2145,6 +2220,71 @@ main {
     transform: translateY(-8px) scale(1.18) rotate(-3deg);
     filter: drop-shadow(0 10px 22px rgba(108,92,231,0.55));
 }
+
+/* ---- Skills grouped by category ---- */
+.skills {
+    align-items: flex-start;
+    gap: 2.5rem 3rem;
+}
+.skillgroup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+}
+.skillgroup:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: -1.5rem;
+    top: 10%;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(108,92,231,0.35), transparent);
+}
+.skillgroup__label {
+    font-family: 'Courier New', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--brand-soft);
+    opacity: 0.85;
+}
+.skillgroup__icons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1.6rem;
+    max-width: 380px;
+}
+@media screen and (max-width: 768px) {
+    .skillgroup:not(:last-child)::after { display: none; }
+    .skills { gap: 2rem; }
+    .skillgroup__icons { gap: 1.2rem; }
+}
+
+/* ---- Project track tags ---- */
+.projects__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.85rem 0 0.15rem;
+}
+.ptag {
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 2rem;
+    border: 1px solid transparent;
+    line-height: 1;
+}
+.ptag[data-track="ai"]    { color: #c4bcff; background: rgba(108,92,231,0.16); border-color: rgba(108,92,231,0.4); }
+.ptag[data-track="cloud"] { color: #8fd6ff; background: rgba(56,160,230,0.14); border-color: rgba(56,160,230,0.4); }
+.ptag[data-track="swe"]   { color: #8df0c0; background: rgba(34,197,140,0.14); border-color: rgba(34,197,140,0.4); }
+.ptag[data-track="award"] { color: #ffd98a; background: rgba(255,193,80,0.13); border-color: rgba(255,193,80,0.4); }
 
 /* ---- 3D tilt on project cards ---- */
 .projects__container { perspective: 1200px; }
