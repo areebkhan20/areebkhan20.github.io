@@ -1183,6 +1183,24 @@ html {
     scroll-behavior: smooth;
 }
 
+/* Lenis smooth scroll (native anchor smoothing must yield to it) */
+html.lenis,
+html.lenis body {
+    height: auto;
+}
+
+.lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+    overflow: hidden;
+}
+
 /* Improved parallax transition */
 .parallax{
     will-change: transform;
@@ -1724,6 +1742,7 @@ form input::placeholder, textarea::placeholder {
     margin-top: 4rem;
     padding: 4rem 0 5rem;
     overflow: hidden;
+    background: #09080d;
 }
 
 .life__header {
@@ -4110,7 +4129,7 @@ html.is-loading body {
 }
 
 .octivis-case__header,
-.octivis-case__toolbar,
+.octivis-case__stories,
 .octivis-case__link {
     width: min(1240px, calc(100% - 3rem));
     margin-inline: auto;
@@ -4154,93 +4173,26 @@ html.is-loading body {
     line-height: 1.7;
 }
 
-.octivis-case__toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.25rem 0;
-}
-
-.octivis-case__count {
-    color: rgba(244, 241, 236, 0.45);
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
-}
-
-.octivis-case__count b {
-    color: #f4f1ec;
-    font-weight: 650;
-}
-
-.octivis-case__controls {
-    display: flex;
-    gap: 0.55rem;
-}
-
-.octivis-case__controls button {
-    width: 46px;
-    height: 46px;
-    border: 1px solid rgba(244, 241, 236, 0.28);
-    border-radius: 50%;
-    color: #f4f1ec;
-    background: transparent;
-    cursor: pointer;
-    transition: color 0.25s ease, background 0.25s ease, opacity 0.25s ease;
-}
-
-.octivis-case__controls button:hover:not(:disabled) {
-    color: #0c0a10;
-    background: #f4f1ec;
-}
-
-.octivis-case__controls button:disabled {
-    opacity: 0.25;
-    cursor: default;
-}
-
-.octivis-case__viewport {
-    width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-    overscroll-behavior-inline: contain;
-}
-
-.octivis-case__viewport::-webkit-scrollbar {
-    display: none;
-}
-
-.octivis-case__viewport:focus-visible {
-    outline: 1px solid #ff8fe6;
-    outline-offset: -1px;
-}
-
-.octivis-case__track {
-    display: flex;
-    gap: clamp(1.25rem, 2.4vw, 2.5rem);
-    width: max-content;
-    padding-inline: max(1.5rem, calc((100vw - 1240px) / 2));
+.octivis-case__stories {
+    margin-top: 1.5rem;
+    border-top: 1px dashed rgba(244, 241, 236, 0.24);
 }
 
 .octivis-story {
     display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
-    width: min(78vw, 1080px);
-    min-height: 560px;
-    overflow: hidden;
-    scroll-snap-align: start;
-    border: 1px solid rgba(244, 241, 236, 0.16);
-    border-radius: 10px;
-    background: #15121a;
+    grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.6fr);
+    gap: clamp(2rem, 5vw, 5.5rem);
+    padding-block: clamp(2.75rem, 5vw, 4.5rem);
+    border-bottom: 1px dashed rgba(244, 241, 236, 0.24);
 }
 
 .octivis-story__media {
     min-width: 0;
-    min-height: 420px;
     margin: 0;
     overflow: hidden;
-    background: #ece9e2;
+    border-radius: 6px;
+    aspect-ratio: 16 / 10;
+    background: #15121a;
 }
 
 .octivis-story__media img {
@@ -4255,6 +4207,17 @@ html.is-loading body {
     transform: scale(1.025);
 }
 
+/* Scroll parallax mode: JS drives the transform, so no transition or hover zoom. */
+.octivis-parallax .octivis-story__media img {
+    transition: none;
+    will-change: transform;
+    transform: scale(1.16);
+}
+
+.octivis-story__media--light {
+    background: #ece9e2;
+}
+
 .octivis-story__media--light img {
     object-fit: contain;
     padding: clamp(1rem, 3vw, 3rem);
@@ -4263,7 +4226,7 @@ html.is-loading body {
 .octivis-story__body {
     display: flex;
     flex-direction: column;
-    padding: clamp(1.7rem, 3.6vw, 3.4rem);
+    padding-block: 0.4rem;
 }
 
 .octivis-story__body > span {
@@ -4275,12 +4238,12 @@ html.is-loading body {
 }
 
 .octivis-story__body h3 {
-    margin: auto 0 1rem;
+    margin: 1rem 0 1rem;
     color: #f4f1ec;
-    font-size: clamp(1.8rem, 3vw, 3.25rem);
+    font-size: clamp(1.8rem, 2.6vw, 2.7rem);
     font-weight: 620;
-    line-height: 0.98;
-    letter-spacing: -0.05em;
+    line-height: 1.02;
+    letter-spacing: -0.045em;
 }
 
 .octivis-story__body p {
@@ -4290,11 +4253,13 @@ html.is-loading body {
 }
 
 .octivis-story__body strong {
-    margin-top: 1.7rem;
-    padding-top: 1rem;
-    border-top: 1px solid rgba(244, 241, 236, 0.14);
+    align-self: flex-start;
+    margin-top: auto;
+    padding: 0.6rem 0.85rem;
+    border-radius: 5px;
+    background: rgba(244, 241, 236, 0.09);
     color: #ff8fe6;
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.04em;
 }
@@ -4334,21 +4299,11 @@ html.is-loading body {
 
     .octivis-story {
         grid-template-columns: 1fr;
-        width: min(86vw, 620px);
-        min-height: 0;
+        gap: 1.6rem;
     }
 
-    .octivis-story__media {
-        min-height: 0;
-        height: clamp(250px, 58vw, 390px);
-    }
-
-    .octivis-story__body {
-        min-height: 330px;
-    }
-
-    .octivis-story__body h3 {
-        margin-top: auto;
+    .octivis-story__body strong {
+        margin-top: 1.6rem;
     }
 }
 

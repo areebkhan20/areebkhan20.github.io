@@ -1,12 +1,14 @@
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+let lenis = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
     document.body.classList.add('is-ready');
+    setupSmoothScroll();
     setupNavigation();
     setupReveals();
     setupHeroParallax();
-    setupOctivisCarousel();
+    setupOctivisParallax();
 
     if (!reduceMotion.matches && window.gsap && window.ScrollTrigger) {
         gsap.registerPlugin(ScrollTrigger);
@@ -21,6 +23,43 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     window.ScrollTrigger?.refresh();
 });
+
+function setupSmoothScroll() {
+    if (reduceMotion.matches || typeof Lenis === 'undefined') return;
+
+    lenis = new Lenis({
+        lerp: 0.1,
+        wheelMultiplier: 1,
+        smoothWheel: true
+    });
+    window.lenis = lenis;
+
+    if (window.gsap && window.ScrollTrigger) {
+        gsap.registerPlugin(ScrollTrigger);
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add(time => lenis.raf(time * 1000));
+        gsap.ticker.lagSmoothing(0);
+        // pin spacers change the page height after Lenis measures it
+        ScrollTrigger.addEventListener('refresh', () => lenis?.resize());
+    } else {
+        const raf = time => {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        };
+        requestAnimationFrame(raf);
+    }
+}
+
+function smoothScrollTo(target, options = {}) {
+    if (lenis) {
+        lenis.scrollTo(target, { duration: 1.1, ...options });
+        return;
+    }
+    const top = typeof target === 'number'
+        ? target
+        : target.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+}
 
 function setupLoader() {
     const loader = document.querySelector('.site-loader');
@@ -85,18 +124,26 @@ function setupNavigation() {
         });
     }
 
-    document.querySelectorAll('a[href="#sec"]').forEach(link => {
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
         link.addEventListener('click', event => {
-            const story = document.querySelector('.hero-work-story.story-hydrated');
-            if (!story) return;
+            const hash = link.getAttribute('href');
+            if (!hash || hash === '#') return;
 
+            if (hash === '#sec') {
+                const story = document.querySelector('.hero-work-story.story-hydrated');
+                if (story) {
+                    event.preventDefault();
+                    const storyTop = story.getBoundingClientRect().top + window.scrollY;
+                    const storyTravel = Math.max(0, story.offsetHeight - window.innerHeight);
+                    smoothScrollTo(storyTop + storyTravel * 0.82);
+                    return;
+                }
+            }
+
+            const target = document.querySelector(hash);
+            if (!target) return;
             event.preventDefault();
-            const storyTop = story.getBoundingClientRect().top + window.scrollY;
-            const storyTravel = Math.max(0, story.offsetHeight - window.innerHeight);
-            window.scrollTo({
-                top: storyTop + storyTravel * 0.82,
-                behavior: reduceMotion.matches ? 'auto' : 'smooth'
-            });
+            smoothScrollTo(target);
         });
     });
 
@@ -143,69 +190,37 @@ function setupReveals() {
     targets.forEach(element => observer.observe(element));
 }
 
-function setupOctivisCarousel() {
-    const viewport = document.querySelector('.octivis-case__viewport');
-    const track = viewport?.querySelector('.octivis-case__track');
-    const cards = viewport ? [...viewport.querySelectorAll('.octivis-story')] : [];
-    const previous = document.querySelector('[data-octivis-prev]');
-    const next = document.querySelector('[data-octivis-next]');
-    const count = document.querySelector('.octivis-case__count b');
-    if (!viewport || !track || !cards.length || !previous || !next || !count) return;
+function setupOctivisParallax() {
+    if (reduceMotion.matches) return;
 
-    let activeIndex = 0;
-    let ticking = false;
+    const section = document.querySelector('.octivis-case');
+    const images = section ? [...section.querySelectorAll('.octivis-story__media img')] : [];
+    if (!section || !images.length) return;
 
-    const updateUI = index => {
-        activeIndex = Math.max(0, Math.min(cards.length - 1, index));
-        count.textContent = String(activeIndex + 1).padStart(2, '0');
-        previous.disabled = activeIndex === 0;
-        next.disabled = activeIndex === cards.length - 1;
-    };
+    section.classList.add('octivis-parallax');
+    let frame = 0;
 
-    const goTo = index => {
-        const targetIndex = Math.max(0, Math.min(cards.length - 1, index));
-        const viewportRect = viewport.getBoundingClientRect();
-        const cardRect = cards[targetIndex].getBoundingClientRect();
-        const inset = parseFloat(getComputedStyle(track).paddingLeft) || 0;
-        viewport.scrollTo({
-            left: viewport.scrollLeft + cardRect.left - viewportRect.left - inset,
-            behavior: reduceMotion.matches ? 'auto' : 'smooth'
+    const render = () => {
+        frame = 0;
+        const viewHeight = window.innerHeight;
+
+        images.forEach(image => {
+            const rect = image.parentElement.getBoundingClientRect();
+            if (rect.bottom < -120 || rect.top > viewHeight + 120) return;
+
+            // -1..1 progress of the frame's centre through the viewport
+            const progressY = ((rect.top + rect.height / 2) - viewHeight / 2) / ((viewHeight + rect.height) / 2);
+            image.style.transform = `translate3d(0, ${progressY * -6}%, 0) scale(1.16)`;
         });
-        updateUI(targetIndex);
     };
 
-    const findClosestCard = () => {
-        const viewportRect = viewport.getBoundingClientRect();
-        const inset = parseFloat(getComputedStyle(track).paddingLeft) || 0;
-        const targetX = viewportRect.left + inset;
-        let closestIndex = 0;
-        let closestDistance = Infinity;
-
-        cards.forEach((card, index) => {
-            const distance = Math.abs(card.getBoundingClientRect().left - targetX);
-            if (distance >= closestDistance) return;
-            closestDistance = distance;
-            closestIndex = index;
-        });
-
-        updateUI(closestIndex);
-        ticking = false;
+    const requestRender = () => {
+        if (!frame) frame = requestAnimationFrame(render);
     };
 
-    previous.addEventListener('click', () => goTo(activeIndex - 1));
-    next.addEventListener('click', () => goTo(activeIndex + 1));
-    viewport.addEventListener('keydown', event => {
-        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
-        event.preventDefault();
-        goTo(activeIndex + (event.key === 'ArrowRight' ? 1 : -1));
-    });
-    viewport.addEventListener('scroll', () => {
-        if (ticking) return;
-        ticking = true;
-        requestAnimationFrame(findClosestCard);
-    }, { passive: true });
-
-    updateUI(0);
+    window.addEventListener('scroll', requestRender, { passive: true });
+    window.addEventListener('resize', requestRender, { passive: true });
+    render();
 }
 
 function setupHeroEntrance() {
@@ -382,19 +397,15 @@ function setupRecognitionStory() {
 
     section.classList.add('recog-hydrated');
     const frames = gsap.utils.toArray('.recog .recog-frame');
-    const awards = frames;
-    const topFrames = awards.slice(0, 2);
-    const bottomFrames = awards.slice(2, 4);
     const heading = section.querySelector('.recog__heading');
 
-    gsap.set(frames, { xPercent: -50, yPercent: -50 });
-    gsap.set(awards, {
-        y: () => -window.innerHeight * 0.82,
+    gsap.set(frames, {
+        xPercent: -50,
+        yPercent: -50,
+        y: 64,
         opacity: 0,
-        rotation: (_, target) => Number(target.dataset.rot0 || -24)
+        rotation: (_, target) => Number(target.dataset.rot || 0)
     });
-    gsap.set(topFrames, { zIndex: 3 });
-    gsap.set(bottomFrames, { zIndex: 2 });
     gsap.set(heading, { opacity: 0, y: 24 });
 
     const timeline = gsap.timeline({
@@ -409,89 +420,23 @@ function setupRecognitionStory() {
         }
     });
 
-    timeline.to(heading, { opacity: 1, y: 0, duration: 0.22, ease: 'none' }, 0);
-
-    bottomFrames.forEach((frame, index) => {
-        const restingRotation = Number(frame.dataset.rot || 0);
-        const start = 0.12 + index * 0.13;
-        timeline
-            .to(frame, {
-                y: 20,
-                opacity: 1,
-                rotation: restingRotation * 1.18,
-                duration: 0.36,
-                ease: 'power3.in'
-            }, start)
-            .to(frame, {
-                y: -8,
-                rotation: restingRotation * 0.88,
-                duration: 0.11,
-                ease: 'power2.out'
-            }, start + 0.36)
-            .to(frame, {
-                y: 0,
-                rotation: restingRotation,
-                duration: 0.14,
-                ease: 'bounce.out'
-            }, start + 0.47);
-    });
-
-    topFrames.forEach((frame, index) => {
-        const base = bottomFrames[index];
-        if (!base) return;
-        const restingRotation = Number(frame.dataset.rot || 0);
-        const baseRotation = Number(base.dataset.rot || 0);
-        const impact = 0.74 + index * 0.17;
-
-        timeline
-            .to(frame, {
-                y: 12,
-                opacity: 1,
-                rotation: restingRotation * 1.15,
-                duration: 0.38,
-                ease: 'power3.in'
-            }, impact)
-            .to(base, {
-                y: 29,
-                rotation: baseRotation + (index === 0 ? 2.5 : -2.5),
-                duration: 0.08,
-                ease: 'power2.out'
-            }, impact + 0.38)
-            .to(frame, {
-                y: -10,
-                rotation: restingRotation * 0.84,
-                duration: 0.12,
-                ease: 'power2.out'
-            }, impact + 0.38)
-            .to(base, {
-                y: -6,
-                rotation: baseRotation * 0.92,
-                duration: 0.11,
-                ease: 'power2.out'
-            }, impact + 0.46)
-            .to(frame, {
-                y: 0,
-                rotation: restingRotation,
-                duration: 0.15,
-                ease: 'bounce.out'
-            }, impact + 0.5)
-            .to(base, {
-                y: 0,
-                rotation: baseRotation,
-                duration: 0.14,
-                ease: 'bounce.out'
-            }, impact + 0.57);
-    });
-
     timeline
-        .to(awards, { opacity: 0.12, y: -30, duration: 0.34, ease: 'power1.in' }, 1.58)
+        .to(heading, { opacity: 1, y: 0, duration: 0.22, ease: 'none' }, 0)
+        .to(frames, {
+            y: 0,
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.16,
+            ease: 'power2.out'
+        }, 0.15)
+        .to(frames, { opacity: 0.12, y: -30, duration: 0.34, ease: 'power1.in' }, 1.58)
         .to(heading, { opacity: 0, y: -22, duration: 0.28, ease: 'none' }, 1.7);
 
     return () => {
         timeline.scrollTrigger?.kill();
         timeline.kill();
         section.classList.remove('recog-hydrated');
-        gsap.set([heading, ...frames], { clearProps: 'transform,opacity,zIndex' });
+        gsap.set([heading, ...frames], { clearProps: 'transform,opacity' });
     };
 }
 
