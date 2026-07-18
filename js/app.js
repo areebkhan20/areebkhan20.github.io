@@ -1,10 +1,51 @@
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
 let lenis = null;
+const scrollStateKey = 'areeb-khan-scroll-y';
+const initialHash = window.location.hash;
+const navigationEntry = performance.getEntriesByType('navigation')[0];
+const isReload = navigationEntry?.type === 'reload';
+let restoredScrollY = 0;
+let scrollRestored = false;
+
+try {
+    restoredScrollY = isReload ? Number(sessionStorage.getItem(scrollStateKey) || 0) : 0;
+} catch (_) {
+    restoredScrollY = 0;
+}
+
+// Pinned scroll stories need to calculate from a known position. Browser scroll
+// restoration can otherwise restore a mid-page offset while the loader is
+// locking overflow, leaving ScrollTrigger and the smooth scroller out of sync.
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+if (initialHash) {
+    history.replaceState(history.state, '', `${window.location.pathname}${window.location.search}`);
+}
+window.scrollTo(0, 0);
+
+const saveScrollPosition = () => {
+    // While the loader still has the page parked at the top, a second refresh
+    // would otherwise overwrite the saved position with 0 and lose it.
+    const value = (isReload && !scrollRestored) ? restoredScrollY : window.scrollY;
+    try {
+        sessionStorage.setItem(scrollStateKey, String(value));
+    } catch (_) { }
+};
+
+window.addEventListener('pagehide', saveScrollPosition);
+window.addEventListener('beforeunload', saveScrollPosition);
+window.addEventListener('pageshow', event => {
+    if (!event.persisted) {
+        window.scrollTo(0, 0);
+        return;
+    }
+    lenis?.resize();
+    window.ScrollTrigger?.refresh();
+    window.ScrollTrigger?.update();
+});
 
 document.addEventListener('DOMContentLoaded', async () => {
     document.body.classList.add('is-ready');
-    setupSmoothScroll();
     setupNavigation();
     setupReveals();
     setupHeroParallax();
@@ -13,16 +54,76 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!reduceMotion.matches && window.gsap && window.ScrollTrigger) {
         gsap.registerPlugin(ScrollTrigger);
         setupDesktopScrollStories();
+        setupLazyImageRefresh();
     }
-
-    await setupLoader();
 
     if (!reduceMotion.matches && window.gsap) {
         setupHeroEntrance();
     }
 
+    await setupLoader();
+
+    setupSmoothScroll();
     window.ScrollTrigger?.refresh();
+
+    // Jump first so lazy content near the destination starts loading, then run a
+    // full refresh at the restored position: pins and scrubbed timelines hard-sync
+    // to the real layout instead of easing from measurements taken at the top.
+    window.scrollTo(0, getInitialScrollDestination());
+    window.ScrollTrigger?.refresh();
+
+    const destination = getInitialScrollDestination();
+    window.scrollTo(0, destination);
+    lenis?.scrollTo(destination, { immediate: true, force: true });
+    window.ScrollTrigger?.update();
+    scrollRestored = true;
+
+    if (initialHash) {
+        history.replaceState(
+            history.state,
+            '',
+            `${window.location.pathname}${window.location.search}${initialHash}`
+        );
+    }
 });
+
+function setupLazyImageRefresh() {
+    // Lazy images that finish loading after the triggers were measured can move
+    // every section below them, so re-measure once the burst of loads settles.
+    let refreshTimer;
+    document.querySelectorAll('img[loading="lazy"]').forEach(image => {
+        if (image.complete) return;
+        image.addEventListener('load', () => {
+            clearTimeout(refreshTimer);
+            refreshTimer = setTimeout(() => window.ScrollTrigger?.refresh(), 220);
+        }, { once: true });
+    });
+}
+
+function getInitialScrollDestination() {
+    const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+
+    if (initialHash === '#home') return 0;
+
+    if (initialHash === '#sec') {
+        const story = document.querySelector('.hero-work-story.story-hydrated');
+        if (story) {
+            const storyTop = story.getBoundingClientRect().top + window.scrollY;
+            const storyTravel = Math.max(0, story.offsetHeight - window.innerHeight);
+            return Math.min(maxScroll, storyTop + storyTravel * 0.82);
+        }
+    }
+
+    if (initialHash) {
+        const target = document.querySelector(initialHash);
+        if (target) {
+            const targetY = target.getBoundingClientRect().top + window.scrollY;
+            return Math.max(0, Math.min(maxScroll, targetY));
+        }
+    }
+
+    return Math.max(0, Math.min(maxScroll, restoredScrollY));
+}
 
 function setupSmoothScroll() {
     if (reduceMotion.matches || typeof Lenis === 'undefined') return;
@@ -52,7 +153,7 @@ function setupSmoothScroll() {
 
 function smoothScrollTo(target, options = {}) {
     if (lenis) {
-        lenis.scrollTo(target, { duration: 1.1, ...options });
+        lenis.scrollTo(target, { duration: 1.1, force: true, ...options });
         return;
     }
     const top = typeof target === 'number'
@@ -70,8 +171,8 @@ function setupLoader() {
 
     loader.classList.add('is-running');
     const startedAt = performance.now();
-    const minimumDisplay = reduceMotion.matches ? 120 : 520;
-    const maximumDisplay = reduceMotion.matches ? 450 : 2100;
+    const minimumDisplay = reduceMotion.matches ? 650 : 1600;
+    const maximumDisplay = reduceMotion.matches ? 3000 : 7000;
 
     const pageLoaded = document.readyState === 'complete'
         ? Promise.resolve()
@@ -87,7 +188,9 @@ function setupLoader() {
         });
     }));
 
-    const ready = Promise.all([pageLoaded, imagesReady]);
+    const fontsReady = document.fonts?.ready?.catch(() => {}) || Promise.resolve();
+    const layoutSettled = new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    const ready = Promise.all([pageLoaded, imagesReady, fontsReady, layoutSettled]);
     const timeout = new Promise(resolve => setTimeout(resolve, maximumDisplay));
 
     return Promise.race([ready, timeout]).then(() => {
@@ -128,6 +231,12 @@ function setupNavigation() {
         link.addEventListener('click', event => {
             const hash = link.getAttribute('href');
             if (!hash || hash === '#') return;
+
+            if (hash === '#home') {
+                event.preventDefault();
+                smoothScrollTo(0);
+                return;
+            }
 
             if (hash === '#sec') {
                 const story = document.querySelector('.hero-work-story.story-hydrated');
@@ -210,7 +319,7 @@ function setupOctivisParallax() {
 
             // -1..1 progress of the frame's centre through the viewport
             const progressY = ((rect.top + rect.height / 2) - viewHeight / 2) / ((viewHeight + rect.height) / 2);
-            image.style.transform = `translate3d(0, ${progressY * -6}%, 0) scale(1.16)`;
+            image.style.transform = `translate3d(0, ${progressY * -16}%, 0) scale(1.25)`;
         });
     };
 
@@ -251,10 +360,8 @@ function setupHeroParallax() {
     let currentX = 0;
     let currentY = 0;
     let frame = 0;
-    let returning = false;
-
     const render = () => {
-        const ease = returning ? 0.055 : 0.16;
+        const ease = 0.16;
         currentX += (targetX - currentX) * ease;
         currentY += (targetY - currentY) * ease;
         const rotationDegree = (currentX / Math.max(hero.clientWidth / 2, 1)) * 20;
@@ -280,25 +387,15 @@ function setupHeroParallax() {
 
     hero.addEventListener('pointermove', event => {
         const rect = hero.getBoundingClientRect();
-        returning = false;
         targetX = event.clientX - rect.left - rect.width / 2;
         targetY = event.clientY - rect.top - rect.height / 2;
         requestRender();
     }, { passive: true });
-    hero.addEventListener('pointerleave', () => {
-        returning = true;
-        targetX = 0;
-        targetY = 0;
-        requestRender();
-    });
 
-    document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) return;
-        returning = true;
-        targetX = 0;
-        targetY = 0;
-        requestRender();
-    });
+    // Apply the neutral transform immediately so the layered hero is correct
+    // before the first pointer event. When the pointer leaves, the last target
+    // remains in place instead of snapping the composition back to center.
+    render();
 }
 
 function setupDesktopScrollStories() {
@@ -306,6 +403,7 @@ function setupDesktopScrollStories() {
     media.add('(min-width: 901px)', () => {
         const cleanups = [
             setupProjectStory(),
+            setupAboutOctivisTransition(),
             setupRecognitionStory(),
             setupExperienceStory(),
             setupEducationStory()
@@ -321,6 +419,54 @@ function setupDesktopScrollStories() {
     }, { passive: true });
 
     window.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
+}
+
+function setupAboutOctivisTransition() {
+    const about = document.querySelector('.about-reveal');
+    const aboutGrid = about?.querySelector('.about-grid');
+    const section = document.querySelector('.octivis-case');
+    const logo = section?.querySelector('.octivis-case__logo');
+    const intro = section ? [...section.querySelectorAll('.octivis-case__intro > *')] : [];
+    if (!about || !aboutGrid || !section || !logo) return;
+
+    section.classList.add('octivis-transition-hydrated');
+    gsap.set(section, {
+        y: 130,
+        scale: 0.94,
+        clipPath: 'inset(9% 3.5% 0% 3.5% round 34px 34px 0 0)',
+        transformOrigin: '50% 0%'
+    });
+    gsap.set(logo, { opacity: 0, scale: 0.78, y: 24 });
+    gsap.set(intro, { opacity: 0, x: 54 });
+
+    const timeline = gsap.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: {
+            trigger: section,
+            start: 'top 98%',
+            end: 'top 10%',
+            scrub: 0.4,
+            invalidateOnRefresh: true
+        }
+    });
+
+    timeline
+        .to(aboutGrid, { scale: 0.9, y: -84, opacity: 0.18, duration: 1 }, 0)
+        .to(section, {
+            y: 0,
+            scale: 1,
+            clipPath: 'inset(0% 0% 0% 0% round 0px)',
+            duration: 1
+        }, 0)
+        .to(logo, { opacity: 1, scale: 1, y: 0, duration: 0.58, ease: 'power2.out' }, 0.28)
+        .to(intro, { opacity: 1, x: 0, stagger: 0.08, duration: 0.56, ease: 'power2.out' }, 0.34);
+
+    return () => {
+        timeline.scrollTrigger?.kill();
+        timeline.kill();
+        section.classList.remove('octivis-transition-hydrated');
+        gsap.set([section, aboutGrid, logo, ...intro], { clearProps: 'transform,opacity,clipPath' });
+    };
 }
 
 function setupProjectStory() {

@@ -20,6 +20,18 @@ function Get-ScaledSize([System.Drawing.Image]$image, [int]$maxWidth, [int]$maxH
 function New-ResizedBitmap([string]$source, [int]$maxWidth, [int]$maxHeight, [bool]$alpha) {
     $image = [System.Drawing.Image]::FromFile($source)
     try {
+        try {
+            $orientation = $image.GetPropertyItem(274).Value[0]
+            switch ($orientation) {
+                2 { $image.RotateFlip([System.Drawing.RotateFlipType]::RotateNoneFlipX) }
+                3 { $image.RotateFlip([System.Drawing.RotateFlipType]::Rotate180FlipNone) }
+                4 { $image.RotateFlip([System.Drawing.RotateFlipType]::Rotate180FlipX) }
+                5 { $image.RotateFlip([System.Drawing.RotateFlipType]::Rotate90FlipX) }
+                6 { $image.RotateFlip([System.Drawing.RotateFlipType]::Rotate90FlipNone) }
+                7 { $image.RotateFlip([System.Drawing.RotateFlipType]::Rotate270FlipX) }
+                8 { $image.RotateFlip([System.Drawing.RotateFlipType]::Rotate270FlipNone) }
+            }
+        } catch { }
         $size = Get-ScaledSize $image $maxWidth $maxHeight
         $format = if ($alpha) { [System.Drawing.Imaging.PixelFormat]::Format32bppArgb } else { [System.Drawing.Imaging.PixelFormat]::Format24bppRgb }
         $bitmap = [System.Drawing.Bitmap]::new($size.Width, $size.Height, $format)
@@ -91,7 +103,9 @@ $projectAssets = @(
     @{ Source = 'Projects\Picture1.jpg'; Destination = 'sauron.jpg' },
     @{ Source = 'Projects\1.png'; Destination = 'robot-dog.jpg' },
     @{ Source = 'Projects\2.png'; Destination = 'avid.jpg' },
-    @{ Source = 'Projects\Image (14).jpg'; Destination = 'mapless-navigation.jpg' }
+    @{ Source = 'Projects\Image (14).jpg'; Destination = 'mapless-navigation.jpg' },
+    @{ Source = 'Projects\layout.jpg'; Destination = 'layout.jpg' },
+    @{ Source = 'Projects\Gemma4.png'; Destination = 'eop-secure-ai.jpg' }
 )
 foreach ($asset in $projectAssets) {
     Export-Jpeg (Join-Path $projectRoot $asset.Source) (Join-Path $projectDir $asset.Destination) 1600 1000 84
@@ -107,16 +121,20 @@ $lifeAssets = @(
     @{ Source = 'Glimpse\7.JPG'; Destination = '07.jpg' },
     @{ Source = 'Glimpse\8.jpg'; Destination = '08.jpg' },
     @{ Source = 'Glimpse\9.JPG'; Destination = '09.jpg' },
-    @{ Source = 'Glimpse\10.jpg'; Destination = '10.jpg' }
+    @{ Source = 'Glimpse\10.jpg'; Destination = '10.jpg' },
+    @{ Source = 'Glimpse\IMG_3214.jpeg'; Destination = '11.jpg' },
+    @{ Source = 'Glimpse\IMG_5641.jpeg'; Destination = '12.jpg' },
+    @{ Source = 'Glimpse\IMG_5912.JPG'; Destination = '13.jpg' },
+    @{ Source = 'Glimpse\UTA in DC.jpg'; Destination = '14.jpg' }
 )
 foreach ($asset in $lifeAssets) {
     Export-Jpeg (Join-Path $projectRoot $asset.Source) (Join-Path $lifeDir $asset.Destination) 1600 1600 82
 }
 
 $octivisAssets = @(
-    @{ Source = 'Octivis\storelayout.png'; Destination = 'store-layout.jpg' },
-    @{ Source = 'Octivis\Aiagentsconnection.png'; Destination = 'agent-network.jpg' },
-    @{ Source = 'Octivis\Moneysaved.png'; Destination = 'loss-prevention.jpg' }
+    @{ Source = 'Octivis\1.png'; Destination = 'supplier-recovery.jpg' },
+    @{ Source = 'Octivis\2(2).png'; Destination = 'payment-intelligence.jpg' },
+    @{ Source = 'Octivis\3.png'; Destination = 'physical-loss.jpg' }
 )
 foreach ($asset in $octivisAssets) {
     Export-Jpeg (Join-Path $projectRoot $asset.Source) (Join-Path $octivisDir $asset.Destination) 1600 1000 82
