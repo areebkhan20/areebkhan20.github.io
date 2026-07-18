@@ -1,6 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-@import url('https://fonts.cdnfonts.com/css/ica-rubrik-black');
-
 *, *::before, ::after {
     padding: 0;
     margin: 0;
@@ -28,7 +25,7 @@
 }
 
 body{
-    font-family: "Poppins", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     background-color: #0a0714;
     /* smooth, blended top-to-bottom gradient that stays put while scrolling */
     background-image: linear-gradient(
@@ -41,7 +38,7 @@ body{
         #0d0818 88%,
         #0a0714 100%
     );
-    background-attachment: fixed;
+    background-attachment: scroll;
     background-repeat: no-repeat;
     justify-content: center;
     width: 100vw;
@@ -2827,16 +2824,6 @@ main {
 .recog-frame__desc { color: rgba(255,255,255,0.72); font-size: 0.88rem; line-height: 1.55; margin-bottom: 0.8rem; }
 .recog-frame a { color: #fff; font-size: 0.8rem; text-decoration: none; border-bottom: 1px solid var(--brand); padding-bottom: 2px; transition: color 0.3s ease; }
 .recog-frame a:hover { color: var(--brand-soft); }
-.recog-frame--final {
-    background: linear-gradient(135deg, var(--brand-blue), var(--brand) 55%, var(--brand-magenta));
-    border-color: transparent; text-align: center;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem;
-}
-.recog-frame--final::before { display: none; }
-.recog-frame--final .eyebrow { color: rgba(255,255,255,0.9); }
-.recog-frame--final h3 { font-size: 1.7rem; margin: 0; }
-.recog-frame--final .recog-frame__desc { color: rgba(255,255,255,0.92); margin: 0; }
-
 .recog.recog-hydrated { height: 440vh; padding: 0; }
 .recog.recog-hydrated .recog__stage {
     position: sticky; top: 0; height: 100vh; max-width: none; margin: 0; overflow: hidden;
@@ -2851,10 +2838,6 @@ main {
     width: clamp(250px, 23vw, 340px);
     box-shadow: 0 34px 70px rgba(0,0,0,0.55);
 }
-.recog.recog-hydrated .recog-frame--final {
-    width: clamp(290px, 26vw, 380px); min-height: 200px; z-index: 6;
-}
-
 /* ============================================================
    EDUCATION — badge, glow, reveal shine
    ============================================================ */
@@ -2928,4 +2911,1459 @@ main {
 @media (prefers-reduced-motion: reduce) {
     .octivis__logo, .octivis__border, .octivis__scan { animation: none; }
     .octivis__points li { opacity: 1; transform: none; }
+}
+
+/* ============================================================
+   2026 PERFORMANCE + EDITORIAL PASS
+   One motion idea per section; compositor-friendly transforms only.
+   ============================================================ */
+
+body {
+    width: 100%;
+    overflow-x: clip;
+    background-color: #0a0714;
+    background-image:
+        radial-gradient(circle at 12% 18%, rgba(67, 83, 255, 0.13), transparent 30rem),
+        radial-gradient(circle at 88% 47%, rgba(255, 63, 191, 0.10), transparent 34rem),
+        linear-gradient(180deg, #0a0714 0%, #120a20 42%, #0d0818 74%, #0a0714 100%);
+    background-attachment: scroll;
+}
+
+body::after,
+.aurora,
+.customcursor,
+.overlay,
+.loading {
+    display: none !important;
+}
+
+#scroll-progress {
+    width: 100%;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: none;
+    will-change: transform;
+}
+
+header.nav-scrolled {
+    background: rgba(10, 7, 20, 0.90);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+}
+
+main {
+    height: min(100vh, 920px);
+    min-height: 700px;
+    will-change: transform, opacity;
+    isolation: isolate;
+}
+
+.parallax {
+    transition: none;
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+.hero-intro__tag {
+    max-width: 660px;
+    margin-inline: auto;
+}
+
+/* Shared reveal: no blur, perspective or expensive paint effects. */
+.reveal-item {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+    transition: opacity 0.65s cubic-bezier(.16, 1, .3, 1),
+                transform 0.65s cubic-bezier(.16, 1, .3, 1);
+}
+
+.reveal-item.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+}
+
+/* About: deliberate asymmetry instead of free-floating template chips. */
+.sec {
+    opacity: 1;
+    transform: none;
+    overflow: visible;
+    padding: clamp(5rem, 9vw, 8rem) clamp(1.5rem, 5vw, 4rem);
+}
+
+.about-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+    gap: clamp(3rem, 7vw, 7rem);
+    align-items: end;
+    width: min(1120px, 100%);
+    margin: 0 auto;
+}
+
+.about-grid::before {
+    content: '';
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    left: -90px;
+    top: -70px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(67, 83, 255, 0.18), transparent 68%);
+    pointer-events: none;
+}
+
+.textam {
+    position: relative;
+    z-index: 1;
+}
+
+.about-title {
+    max-width: 780px;
+    margin: 0.7rem 0 1.5rem;
+    color: #fff;
+    font-size: clamp(2.25rem, 5vw, 4.8rem);
+    line-height: 0.98;
+    letter-spacing: -0.055em;
+    font-weight: 650;
+}
+
+.about-copy {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    max-width: 820px;
+}
+
+.sec .about-copy p {
+    margin: 0;
+    max-width: none;
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 0.98rem;
+    line-height: 1.75;
+    text-align: left;
+}
+
+.about-notes {
+    display: grid;
+    gap: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.17);
+}
+
+.about-note {
+    display: grid;
+    grid-template-columns: 7.2rem 1fr;
+    gap: 1rem;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.about-note strong {
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+.about-note span {
+    color: rgba(255, 255, 255, 0.58);
+    font-size: 0.82rem;
+    line-height: 1.55;
+}
+
+/* Octivis: a calm product panel with a useful visual instead of AI scanning effects. */
+.octivis {
+    max-width: 1120px;
+    margin: 0 auto clamp(5rem, 9vw, 8rem);
+}
+
+.octivis__inner {
+    position: relative;
+    overflow: hidden;
+    grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(2.5rem, 6vw, 5rem);
+    padding: clamp(2rem, 5vw, 4.2rem);
+    border-radius: 1.4rem;
+    background:
+        linear-gradient(130deg, rgba(67, 83, 255, 0.10), transparent 38%),
+        linear-gradient(150deg, rgba(23, 16, 38, 0.98), rgba(14, 9, 25, 0.98));
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.28);
+}
+
+.octivis__inner::before {
+    height: 3px;
+}
+
+.octivis__vision {
+    padding: 0;
+}
+
+.octivis__logo {
+    animation: none;
+    filter: none;
+    will-change: auto;
+}
+
+.octivis__points li {
+    opacity: 1;
+    transform: none;
+    transition: none;
+}
+
+.signal-panel {
+    width: min(100%, 290px);
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0.9rem;
+    background: rgba(255, 255, 255, 0.035);
+}
+
+.signal-panel__label {
+    display: block;
+    margin-bottom: 0.55rem;
+    color: rgba(255, 255, 255, 0.42);
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.signal-panel > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.55rem 0;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.78rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.signal-panel > div strong {
+    color: #8dffbf;
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.signal-panel > div strong::before {
+    content: '';
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    margin-right: 0.4rem;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.octivis__headline {
+    font-size: clamp(1.8rem, 3.4vw, 3rem);
+    letter-spacing: -0.045em;
+    font-weight: 650;
+}
+
+.octivis__lead {
+    max-width: 620px;
+}
+
+/* Project pull-back: shorter, fewer images, no live backdrop blur. */
+.showcase.sc-hydrated {
+    height: 210vh;
+}
+
+.scatter-item figcaption {
+    background: rgba(10, 7, 20, 0.90);
+    backdrop-filter: none;
+}
+
+.showcase.sc-hydrated .scatter-item {
+    box-shadow: 0 16px 42px rgba(0, 0, 0, 0.42);
+    will-change: transform, opacity;
+}
+
+.showcase.sc-hydrated .scatter-item--lg {
+    width: clamp(210px, 22vw, 320px);
+}
+
+.showcase.sc-hydrated .home-dock {
+    width: min(340px, 29vw);
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.48), 0 0 0 4px rgba(178, 60, 230, 0.08);
+    will-change: transform, opacity;
+}
+
+/* Recognition: ScrollTrigger supplies the scroll distance; avoid a second 440vh spacer. */
+.recog.recog-hydrated {
+    height: 100vh;
+}
+
+.recog.recog-hydrated .recog__stage {
+    position: relative;
+}
+
+.recog.recog-hydrated .recog-frame {
+    box-shadow: 0 22px 50px rgba(0, 0, 0, 0.45);
+    will-change: transform, opacity;
+}
+
+.recog-frame,
+.exp-h__card {
+    background: rgba(23, 16, 38, 0.96);
+}
+
+/* Horizontal experience: readable cards and one calm directional cue. */
+.exp-h__cue span {
+    animation: none;
+}
+
+.exp-h.exp-hydrated .exp-h__track {
+    gap: 1.25rem;
+}
+
+.exp-h.exp-hydrated .exp-h__card {
+    flex-basis: clamp(300px, 35vw, 430px);
+}
+
+.exp-h__desc {
+    line-height: 1.65;
+}
+
+/* Education: keep the material depth, remove animated blur and shine. */
+.educationtitle {
+    margin-top: clamp(5rem, 9vw, 8rem);
+}
+
+.education__card {
+    transform: none;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.education__card:hover {
+    transform: translateY(-3px);
+}
+
+.edu__glow,
+.education__card::after {
+    display: none;
+}
+
+/* Life in Frames remains kinetic, but images no longer carry live filters. */
+.marquee__track--left,
+.marquee__track--right {
+    animation-duration: 58s;
+    will-change: transform;
+}
+
+.frame img,
+.frame:hover img {
+    filter: none;
+}
+
+.frame__tag {
+    background: rgba(10, 7, 20, 0.82);
+    backdrop-filter: none;
+}
+
+.frame:hover {
+    transform: translateY(-4px) scale(1.01);
+}
+
+.education__container,
+.lifeinsight,
+.formcontainer {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 700px;
+}
+
+@media (max-width: 900px) {
+    main {
+        height: 100svh;
+        min-height: 620px;
+    }
+
+    .about-grid,
+    .about-copy,
+    .octivis__inner {
+        grid-template-columns: 1fr;
+    }
+
+    .about-grid {
+        gap: 3rem;
+    }
+
+    .about-title {
+        font-size: clamp(2.2rem, 11vw, 3.7rem);
+    }
+
+    .about-copy {
+        gap: 1rem;
+    }
+
+    .about-note {
+        grid-template-columns: 6.5rem 1fr;
+    }
+
+    .octivis {
+        padding-inline: 1rem;
+    }
+}
+
+/* ============================================================
+   EDITORIAL MOTION POLISH
+   Quiet surfaces, continuous section color, and a short asset loader.
+   ============================================================ */
+html.is-loading,
+html.is-loading body {
+    overflow: hidden;
+}
+
+.site-loader {
+    display: none;
+}
+
+.has-js .site-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 20000;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: clamp(1.25rem, 3vw, 2.75rem);
+    color: #f4f1ec;
+    background: #09080d;
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 0.58s cubic-bezier(.76, 0, .24, 1);
+}
+
+.site-loader__meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    color: rgba(244, 241, 236, 0.62);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+.site-loader__mark {
+    place-self: center;
+    color: #f4f1ec;
+    font-size: clamp(4.5rem, 13vw, 11rem);
+    font-weight: 650;
+    line-height: 0.8;
+    letter-spacing: -0.09em;
+}
+
+.site-loader__progress {
+    width: 100%;
+    height: 1px;
+    overflow: hidden;
+    background: rgba(244, 241, 236, 0.16);
+}
+
+.site-loader__progress span {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: #f4f1ec;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 1.85s cubic-bezier(.16, 1, .3, 1);
+}
+
+.site-loader.is-running .site-loader__progress span {
+    transform: scaleX(0.82);
+}
+
+.site-loader.is-complete .site-loader__progress span {
+    transform: scaleX(1);
+    transition-duration: 0.18s;
+}
+
+.site-loader.is-complete {
+    clip-path: inset(0 0 100% 0);
+    pointer-events: none;
+}
+
+/* Use one uninterrupted dark field through the pinned stories. */
+.hero-work-story,
+.story-hydrated .hero-work-stage,
+.recog,
+.recog__stage,
+.exp-h,
+.exp-h__pin {
+    background-color: #0a0810;
+}
+
+.story-hydrated .hero-work-stage {
+    background-image: radial-gradient(circle at 50% 44%, rgba(151, 105, 255, 0.08), transparent 36%);
+}
+
+.recog,
+.exp-h {
+    isolation: isolate;
+    margin-top: -1px;
+}
+
+.recog::before,
+.exp-h.exp-hydrated::before {
+    content: '';
+    position: absolute;
+    inset: 8% 0;
+    z-index: -1;
+    height: auto;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 50%, rgba(126, 76, 176, 0.11), transparent 68%);
+}
+
+/* Work remains kinetic, while every project panel lands square. */
+.showcase__heading h2,
+.recog__heading h2,
+.exp-h__intro h2 {
+    color: #f4f1ec;
+    background: none;
+    -webkit-text-fill-color: currentColor;
+}
+
+.story-hydrated .scatter-item {
+    border-radius: 10px;
+    transform: translate(-50%, -50%) rotate(0deg);
+    box-shadow: 0 18px 46px rgba(0, 0, 0, 0.42);
+}
+
+.story-hydrated .scatter-item figcaption {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0.7rem 0.85rem;
+    border: 0;
+    border-radius: 0;
+    background: linear-gradient(180deg, transparent, rgba(8, 7, 12, 0.94) 38%);
+}
+
+/* Recognition title is the center of the composition, not another card. */
+.recog.recog-hydrated .recog__heading {
+    top: 50%;
+    left: 50%;
+    z-index: 4;
+    width: min(70vw, 780px);
+    transform: translate(-50%, -50%);
+}
+
+.recog.recog-hydrated .recog__heading h2 {
+    max-width: 780px;
+    margin-inline: auto;
+    overflow: visible;
+    font-size: clamp(3.25rem, 6.6vw, 6.7rem);
+    font-weight: 650;
+    line-height: 0.92;
+    letter-spacing: -0.065em;
+    text-wrap: balance;
+}
+
+.recog.recog-hydrated .recog__heading .eyebrow {
+    margin-bottom: 0.85rem;
+}
+
+.recog.recog-hydrated .recog-frame {
+    z-index: 2;
+    width: clamp(225px, 20vw, 310px);
+    padding: 1.35rem 1.3rem;
+    border: 1px solid rgba(244, 241, 236, 0.13);
+    border-radius: 12px;
+    background: #15111b;
+    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.38);
+}
+
+.recog-frame::before {
+    height: 1px;
+    border-radius: 12px 12px 0 0;
+    background: rgba(255, 143, 230, 0.72);
+}
+
+.recog-frame h3 {
+    color: #f4f1ec;
+    letter-spacing: -0.025em;
+}
+
+/* Experience uses the same material, so the handoff has no visible seam. */
+.exp-h__card {
+    border: 1px solid rgba(244, 241, 236, 0.13);
+    border-radius: 12px;
+    background: #15111b;
+    box-shadow: 0 18px 46px rgba(0, 0, 0, 0.3);
+}
+
+.exp-h__card::before {
+    height: 1px;
+    background: rgba(244, 241, 236, 0.18);
+}
+
+.exp-h__date {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+    .recog.recog-hydrated .recog__heading {
+        width: min(90vw, 680px);
+    }
+
+    .site-loader__meta {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .site-loader,
+    .site-loader__progress span {
+        transition-duration: 0.01ms !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+    }
+    .reveal-item { opacity: 1; transform: none; }
+    .parallax { will-change: auto; }
+}
+
+/* ============================================================
+   CONTINUOUS HERO → WORK STORY
+   The live homepage becomes the bottom-center panel while work appears.
+   ============================================================ */
+.hero-work-story {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-work-stage {
+    position: relative;
+}
+
+.work-reveal {
+    position: relative;
+    padding: clamp(5rem, 9vw, 8rem) 1.5rem;
+}
+
+.work-reveal .showcase__heading {
+    max-width: 680px;
+    margin-inline: auto;
+}
+
+.hero-work-story.story-hydrated {
+    height: 250vh;
+}
+
+.story-hydrated .hero-work-stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 50% 44%, rgba(178, 60, 230, 0.09), transparent 34%),
+        #0a0714;
+}
+
+.story-hydrated main {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    width: 100%;
+    height: 100vh;
+    min-height: 0;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.48);
+    transform-origin: 50% 50%;
+    backface-visibility: hidden;
+}
+
+.story-hydrated .work-reveal {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    padding: 0;
+    visibility: hidden;
+}
+
+.story-hydrated .showcase__heading {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    z-index: 3;
+    width: min(88vw, 680px);
+    margin: 0;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.story-hydrated .scatter {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: block;
+}
+
+.story-hydrated .scatter-item {
+    position: absolute;
+    width: clamp(210px, 22vw, 320px);
+    transform: translate(-50%, -50%);
+    will-change: transform, opacity;
+}
+
+/* About now follows the work reveal instead of interrupting it. */
+.hero-work-story + .sec {
+    padding-top: clamp(6rem, 11vw, 10rem);
+}
+
+/* Octivis: product memo, not a simulated dashboard. */
+.octivis__status {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.76rem;
+}
+
+.octivis__status > span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #8dffbf;
+    box-shadow: 0 0 0 4px rgba(141, 255, 191, 0.09);
+}
+
+.octivis__body > .eyebrow {
+    display: inline-block;
+    margin-bottom: 0.85rem;
+}
+
+.octivis__facts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin: 1.8rem 0 1.7rem;
+    border-block: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.octivis__facts > div {
+    min-width: 0;
+    padding: 1rem 1.15rem 1rem 0;
+}
+
+.octivis__facts > div + div {
+    padding-left: 1.15rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.octivis__facts span,
+.octivis__facts strong {
+    display: block;
+}
+
+.octivis__facts span {
+    margin-bottom: 0.35rem;
+    color: rgba(255, 255, 255, 0.42);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.octivis__facts strong {
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 560;
+    line-height: 1.45;
+}
+
+.octivis__text-link {
+    display: inline-flex;
+    gap: 0.45rem;
+    align-items: center;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.42);
+    padding-bottom: 0.3rem;
+    transition: border-color 0.25s ease, color 0.25s ease;
+}
+
+.octivis__text-link:hover {
+    color: var(--brand-soft);
+    border-color: var(--brand-soft);
+}
+
+/* Recognition settles into Experience; no full-screen zoom. */
+.recog.recog-hydrated .recog-frame {
+    will-change: transform, opacity;
+}
+
+.exp-h.exp-hydrated::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 32vh;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(67, 83, 255, 0.07), transparent);
+}
+
+@media (max-width: 900px) {
+    .hero-work-story.story-hydrated {
+        height: auto;
+    }
+
+    .work-reveal {
+        padding-top: 5rem;
+    }
+
+    .octivis__facts {
+        grid-template-columns: 1fr;
+    }
+
+    .octivis__facts > div,
+    .octivis__facts > div + div {
+        padding: 0.85rem 0;
+        border-left: 0;
+    }
+
+    .octivis__facts > div + div {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Final continuity overrides for rules defined earlier in the cascade. */
+.story-hydrated .hero-work-stage {
+    background:
+        radial-gradient(circle at 50% 44%, rgba(151, 105, 255, 0.08), transparent 36%),
+        #0a0810;
+}
+
+.recog,
+.recog__stage,
+.exp-h,
+.exp-h__pin {
+    background-color: #0a0810;
+}
+
+.exp-h.exp-hydrated::before {
+    inset: 8% 0;
+    height: auto;
+    background: radial-gradient(ellipse at 50% 50%, rgba(126, 76, 176, 0.11), transparent 68%);
+}
+
+/* Inline coordinates only belong to the desktop scroll compositions. */
+.hero-work-story:not(.story-hydrated) .scatter-item,
+.recog:not(.recog-hydrated) .recog-frame {
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+}
+
+/* ============================================================
+   SELECTED WORK → ABOUT CURTAIN
+   About rises over the completed work composition before normal flow resumes.
+   ============================================================ */
+.hero-work-story.story-hydrated {
+    height: 330vh;
+}
+
+.story-hydrated .about-reveal {
+    position: absolute;
+    inset: 0;
+    z-index: 7;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    padding: clamp(5rem, 9vw, 8rem) clamp(1.5rem, 5vw, 4rem);
+    overflow: hidden;
+    border-top: 1px solid rgba(244, 241, 236, 0.14);
+    border-radius: 20px 20px 0 0;
+    background:
+        radial-gradient(circle at 12% 14%, rgba(90, 74, 176, 0.14), transparent 30rem),
+        #100c15;
+    box-shadow: 0 -32px 90px rgba(0, 0, 0, 0.48);
+    will-change: transform;
+}
+
+.story-hydrated .about-reveal .about-grid {
+    width: min(1180px, 100%);
+    will-change: transform, opacity;
+}
+
+.story-hydrated .about-reveal .about-title {
+    max-width: 850px;
+}
+
+/* ============================================================
+   EDUCATION — EXPANDING UTA IMAGE WINDOW
+   ============================================================ */
+.education-story {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    overflow: hidden;
+    color: #f4f1ec;
+    background: #09080d;
+}
+
+.education-story__stage {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 50% 46%, rgba(70, 92, 126, 0.12), transparent 48%),
+        #09080d;
+}
+
+.education-story__meta {
+    position: absolute;
+    top: clamp(1.5rem, 4.5vh, 3.5rem);
+    left: clamp(1.25rem, 4vw, 4rem);
+    right: clamp(1.25rem, 4vw, 4rem);
+    z-index: 5;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    color: rgba(244, 241, 236, 0.5);
+    font-size: 0.67rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.education-story__statement {
+    position: absolute;
+    top: 48%;
+    left: 50%;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: max-content auto max-content;
+    align-items: center;
+    gap: clamp(1rem, 2.4vw, 3rem);
+    width: max-content;
+    transform: translate(-50%, -50%);
+    will-change: transform;
+}
+
+.education-story__word {
+    position: relative;
+    z-index: 3;
+    color: #f4f1ec;
+    font-size: clamp(4.5rem, 10.2vw, 11.5rem);
+    font-weight: 680;
+    line-height: 0.78;
+    letter-spacing: -0.075em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    will-change: transform, opacity;
+}
+
+.education-story__word--left {
+    justify-self: end;
+}
+
+.education-story__word--right {
+    justify-self: start;
+}
+
+.education-story__image {
+    position: relative;
+    z-index: 2;
+    width: clamp(78px, 7vw, 124px);
+    height: clamp(190px, 30vh, 300px);
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid rgba(244, 241, 236, 0.18);
+    border-radius: 5px;
+    background: #111018;
+    box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
+    will-change: width, height;
+}
+
+.education-story__image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(9, 8, 13, 0.05), rgba(9, 8, 13, 0.2));
+}
+
+.education-story__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 68% 50%;
+    display: block;
+}
+
+.education-story .education__container {
+    position: absolute;
+    left: clamp(1.5rem, 6vw, 7rem);
+    right: clamp(1.5rem, 6vw, 7rem);
+    bottom: clamp(1.5rem, 4.5vh, 3.5rem);
+    z-index: 5;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1.5rem, 4vw, 4rem);
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    content-visibility: visible;
+}
+
+.education-story .education__card {
+    min-height: 0;
+    padding: 1.1rem 0 0;
+    overflow: visible;
+    border: 0;
+    border-top: 1px solid rgba(244, 241, 236, 0.24);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    will-change: transform, opacity;
+}
+
+.education-story .education__card::before,
+.education-story .education__card::after {
+    display: none;
+}
+
+.education-story .education__card:hover {
+    transform: none;
+}
+
+.education-story .edu__badge {
+    width: auto;
+    height: auto;
+    margin: 0 0 0.65rem;
+    justify-content: flex-start;
+    color: #ff8fe6;
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    background: none;
+    box-shadow: none;
+}
+
+.education-story .education__card h3 {
+    margin-bottom: 0.35rem;
+    color: #f4f1ec;
+    font-size: clamp(1.1rem, 1.7vw, 1.55rem);
+    letter-spacing: -0.025em;
+}
+
+.education-story .education__card .edu__degree {
+    margin-bottom: 0.55rem;
+    color: rgba(244, 241, 236, 0.62);
+    font-size: 0.82rem;
+}
+
+.education-story .education__card .edu__date {
+    color: rgba(244, 241, 236, 0.42);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.education-story.education-hydrated {
+    height: 100vh;
+    min-height: 0;
+}
+
+.education-story.education-hydrated .education-story__stage {
+    height: 100vh;
+    min-height: 0;
+}
+
+@media (max-width: 900px) {
+    .about-reveal {
+        margin-top: 0;
+    }
+
+    .education-story {
+        min-height: auto;
+        padding: 5.5rem 1rem 5rem;
+    }
+
+    .education-story__stage {
+        min-height: auto;
+        overflow: visible;
+    }
+
+    .education-story__meta,
+    .education-story__statement,
+    .education-story .education__container {
+        position: relative;
+        inset: auto;
+    }
+
+    .education-story__meta {
+        margin-bottom: 4rem;
+    }
+
+    .education-story__statement {
+        top: auto;
+        left: auto;
+        grid-template-columns: max-content 70px max-content;
+        gap: 0.7rem;
+        width: 100%;
+        justify-content: center;
+        transform: none;
+    }
+
+    .education-story__word {
+        font-size: clamp(2.65rem, 12vw, 5rem);
+    }
+
+    .education-story__image {
+        width: 70px;
+        height: 150px;
+    }
+
+    .education-story .education__container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-top: 4rem;
+    }
+}
+
+/* ============================================================
+   FOUNDER HERO — COMPACT NAME LOCKUP
+   ============================================================ */
+.hero-intro__role {
+    margin-bottom: 0.65rem;
+    color: #fff;
+    font-family: inherit;
+    font-size: clamp(0.95rem, 1.5vw, 1.12rem);
+    font-weight: 620;
+    letter-spacing: 0.035em;
+    text-transform: none;
+}
+
+@media (min-width: 1201px) {
+    .fname { top: calc(50% - 78px); }
+    .lname { top: calc(50% + 38px); }
+}
+
+@media (min-width: 769px) and (max-width: 1200px) {
+    .fname { top: calc(50% - 55px); }
+    .lname { top: calc(50% + 20px); }
+}
+
+@media (max-width: 768px) {
+    .fname { top: calc(50% - 25px); }
+    .lname { top: calc(50% + 23px); }
+}
+
+/* A full viewport of settled reading time keeps About from being skipped. */
+.hero-work-story.story-hydrated {
+    height: 440vh;
+}
+
+.story-hydrated .about-reveal .about-grid {
+    width: min(1240px, 100%);
+}
+
+.story-hydrated .about-reveal .about-title {
+    max-width: 920px;
+    font-size: clamp(2.7rem, 5.5vw, 5.5rem);
+}
+
+.story-hydrated .about-reveal .about-copy {
+    max-width: 900px;
+}
+
+/* The UTA image now physically divides the word EDUCATION. */
+.education-story__statement {
+    gap: clamp(0.25rem, 0.8vw, 0.85rem);
+}
+
+.education-story__word {
+    letter-spacing: -0.08em;
+}
+
+/* ============================================================
+   OCTIVIS — PRODUCT STORY CAROUSEL
+   An editorial case-study sequence inspired by founder-led success stories.
+   ============================================================ */
+.octivis.octivis-case {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: clamp(6rem, 10vw, 10rem) 0 clamp(5rem, 9vw, 9rem);
+    overflow: hidden;
+    color: #f4f1ec;
+    background: #0c0a10;
+}
+
+.octivis-case__header,
+.octivis-case__toolbar,
+.octivis-case__link {
+    width: min(1240px, calc(100% - 3rem));
+    margin-inline: auto;
+}
+
+.octivis-case__header {
+    display: grid;
+    grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1.28fr);
+    gap: clamp(3rem, 7vw, 8rem);
+    align-items: end;
+    padding-bottom: clamp(3rem, 6vw, 5.5rem);
+    border-bottom: 1px solid rgba(244, 241, 236, 0.18);
+}
+
+.octivis-case__identity {
+    display: grid;
+    gap: 1.4rem;
+    align-content: space-between;
+}
+
+.octivis-case__logo {
+    width: min(270px, 100%);
+    height: auto;
+    display: block;
+}
+
+.octivis-case__intro h2 {
+    max-width: 900px;
+    margin-bottom: 1.4rem;
+    color: #f4f1ec;
+    font-size: clamp(2.5rem, 5.4vw, 5.5rem);
+    font-weight: 630;
+    line-height: 0.91;
+    letter-spacing: -0.065em;
+}
+
+.octivis-case__intro p {
+    max-width: 680px;
+    color: rgba(244, 241, 236, 0.62);
+    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+    line-height: 1.7;
+}
+
+.octivis-case__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 0;
+}
+
+.octivis-case__count {
+    color: rgba(244, 241, 236, 0.45);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+}
+
+.octivis-case__count b {
+    color: #f4f1ec;
+    font-weight: 650;
+}
+
+.octivis-case__controls {
+    display: flex;
+    gap: 0.55rem;
+}
+
+.octivis-case__controls button {
+    width: 46px;
+    height: 46px;
+    border: 1px solid rgba(244, 241, 236, 0.28);
+    border-radius: 50%;
+    color: #f4f1ec;
+    background: transparent;
+    cursor: pointer;
+    transition: color 0.25s ease, background 0.25s ease, opacity 0.25s ease;
+}
+
+.octivis-case__controls button:hover:not(:disabled) {
+    color: #0c0a10;
+    background: #f4f1ec;
+}
+
+.octivis-case__controls button:disabled {
+    opacity: 0.25;
+    cursor: default;
+}
+
+.octivis-case__viewport {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    overscroll-behavior-inline: contain;
+}
+
+.octivis-case__viewport::-webkit-scrollbar {
+    display: none;
+}
+
+.octivis-case__viewport:focus-visible {
+    outline: 1px solid #ff8fe6;
+    outline-offset: -1px;
+}
+
+.octivis-case__track {
+    display: flex;
+    gap: clamp(1.25rem, 2.4vw, 2.5rem);
+    width: max-content;
+    padding-inline: max(1.5rem, calc((100vw - 1240px) / 2));
+}
+
+.octivis-story {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+    width: min(78vw, 1080px);
+    min-height: 560px;
+    overflow: hidden;
+    scroll-snap-align: start;
+    border: 1px solid rgba(244, 241, 236, 0.16);
+    border-radius: 10px;
+    background: #15121a;
+}
+
+.octivis-story__media {
+    min-width: 0;
+    min-height: 420px;
+    margin: 0;
+    overflow: hidden;
+    background: #ece9e2;
+}
+
+.octivis-story__media img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(.16, 1, .3, 1);
+}
+
+.octivis-story:hover .octivis-story__media img {
+    transform: scale(1.025);
+}
+
+.octivis-story__media--light img {
+    object-fit: contain;
+    padding: clamp(1rem, 3vw, 3rem);
+}
+
+.octivis-story__body {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(1.7rem, 3.6vw, 3.4rem);
+}
+
+.octivis-story__body > span {
+    color: rgba(244, 241, 236, 0.44);
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.octivis-story__body h3 {
+    margin: auto 0 1rem;
+    color: #f4f1ec;
+    font-size: clamp(1.8rem, 3vw, 3.25rem);
+    font-weight: 620;
+    line-height: 0.98;
+    letter-spacing: -0.05em;
+}
+
+.octivis-story__body p {
+    color: rgba(244, 241, 236, 0.62);
+    font-size: 0.9rem;
+    line-height: 1.65;
+}
+
+.octivis-story__body strong {
+    margin-top: 1.7rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(244, 241, 236, 0.14);
+    color: #ff8fe6;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+.octivis-case__link {
+    display: flex;
+    justify-content: space-between;
+    margin-top: clamp(2.5rem, 5vw, 4.5rem);
+    padding: 1.25rem 0;
+    border-block: 1px solid rgba(244, 241, 236, 0.18);
+    color: #f4f1ec;
+    font-size: clamp(1rem, 1.7vw, 1.25rem);
+    text-decoration: none;
+}
+
+.octivis-case__link span {
+    transition: transform 0.25s ease;
+}
+
+.octivis-case__link:hover span {
+    transform: translate(4px, -4px);
+}
+
+@media (max-width: 900px) {
+    .octivis.octivis-case {
+        padding-top: 5.5rem;
+    }
+
+    .octivis-case__header {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .octivis-case__logo {
+        width: min(220px, 70vw);
+    }
+
+    .octivis-story {
+        grid-template-columns: 1fr;
+        width: min(86vw, 620px);
+        min-height: 0;
+    }
+
+    .octivis-story__media {
+        min-height: 0;
+        height: clamp(250px, 58vw, 390px);
+    }
+
+    .octivis-story__body {
+        min-height: 330px;
+    }
+
+    .octivis-story__body h3 {
+        margin-top: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .education-story__statement {
+        grid-template-columns: max-content 56px max-content;
+        gap: 0.28rem;
+    }
+
+    .education-story__word {
+        font-size: clamp(2rem, 9.5vw, 2.8rem);
+    }
+
+    .education-story__image {
+        width: 56px;
+        height: 128px;
+    }
 }

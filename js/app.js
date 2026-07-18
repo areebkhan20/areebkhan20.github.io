@@ -1,840 +1,593 @@
-// Global variables for parallax effect
-const parallax_el = document.querySelectorAll(".parallax");
-const main = document.querySelector("main");
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
 
-let xValue = 0, yValue = 0;
-let rotateDegree = 0;
-let timeline; // Make timeline globally accessible
+document.addEventListener('DOMContentLoaded', async () => {
+    document.body.classList.add('is-ready');
+    setupNavigation();
+    setupReveals();
+    setupHeroParallax();
+    setupOctivisCarousel();
 
-// Set main content height based on screen size
-if(window.innerWidth >= 768){
-    if (main) main.style.maxHeight = `${window.innerWidth * 0.6}px`;
-} else {
-    if (main) main.style.maxHeight = `${window.innerWidth * 1.6}px`;
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-    // Set initial body opacity to 1 for the loading screen
-    document.body.style.opacity = 1;
-    
-    // Set main content opacity to 0 (will be shown after loader)
-    const mainContent = document.querySelector("main");
-    if (mainContent) {
-        mainContent.style.opacity = 0;
+    if (!reduceMotion.matches && window.gsap && window.ScrollTrigger) {
+        gsap.registerPlugin(ScrollTrigger);
+        setupDesktopScrollStories();
     }
-    
-    // Only call this once
-    splitTextIntoSpans(".logo p");
-    
-    // Start the loader animation
-    startLoader();
-    
-    // Set up hamburger menu
-    setupHamburgerMenu();
+
+    await setupLoader();
+
+    if (!reduceMotion.matches && window.gsap) {
+        setupHeroEntrance();
+    }
+
+    window.ScrollTrigger?.refresh();
 });
 
-// Parallax effect update function
-function update(cursorposition) {
-    parallax_el.forEach((el) => {
-        if (el.closest('header')) return;  // Exclude navbar from transformations
-        let isInLeft = parseFloat(getComputedStyle(el).left) < window.innerWidth / 2 ? 1 : -1;
-        let zValue = (cursorposition - parseFloat(getComputedStyle(el).left)) * isInLeft * 0.05;
-    
-        let speedx = el.dataset.speedx;
-        let speedy = el.dataset.speedy;
-        let speedz = el.dataset.speedz;
-        let rotateSpeed = el.dataset.rotation;
-    
-        el.style.transform = `rotateY(${rotateDegree * rotateSpeed}deg) 
-                              translateX(calc(-50% + ${-xValue * speedx}px)) 
-                              translateY(calc(-50% + ${yValue * speedy}px)) 
-                              perspective(2300px) 
-                              translateZ(${Math.min(zValue * speedz, 50)}px)`;
-    });
+function setupLoader() {
+    const loader = document.querySelector('.site-loader');
+    if (!loader) {
+        document.documentElement.classList.remove('is-loading');
+        return Promise.resolve();
+    }
+
+    loader.classList.add('is-running');
+    const startedAt = performance.now();
+    const minimumDisplay = reduceMotion.matches ? 120 : 520;
+    const maximumDisplay = reduceMotion.matches ? 450 : 2100;
+
+    const pageLoaded = document.readyState === 'complete'
+        ? Promise.resolve()
+        : new Promise(resolve => window.addEventListener('load', resolve, { once: true }));
+
+    const criticalImages = [...document.querySelectorAll('main img, .work-reveal img')];
+    criticalImages.forEach(image => { image.loading = 'eager'; });
+    const imagesReady = Promise.all(criticalImages.map(image => {
+        if (image.complete) return image.decode?.().catch(() => {}) || Promise.resolve();
+        return new Promise(resolve => {
+            image.addEventListener('load', resolve, { once: true });
+            image.addEventListener('error', resolve, { once: true });
+        });
+    }));
+
+    const ready = Promise.all([pageLoaded, imagesReady]);
+    const timeout = new Promise(resolve => setTimeout(resolve, maximumDisplay));
+
+    return Promise.race([ready, timeout]).then(() => {
+        const remaining = Math.max(0, minimumDisplay - (performance.now() - startedAt));
+        return new Promise(resolve => setTimeout(resolve, remaining));
+    }).then(() => new Promise(resolve => {
+        loader.classList.add('is-complete');
+        document.documentElement.classList.remove('is-loading');
+        window.setTimeout(() => {
+            loader.remove();
+            resolve();
+        }, reduceMotion.matches ? 80 : 620);
+    }));
 }
 
-// Mouse move event for parallax effect
-window.addEventListener("mousemove", (e) => {
-    if (timeline && timeline.isActive()) return;
-
-    xValue = e.clientX - window.innerWidth / 2;
-    yValue = e.clientY - window.innerHeight / 2;
-
-    rotateDegree = (xValue / (window.innerWidth / 2)) * 20;
-
-    update(e.clientX);
-});
-
-// Hamburger menu setup
-function setupHamburgerMenu() {
+function setupNavigation() {
+    const header = document.querySelector('header');
     const hamburger = document.querySelector('.hamburger');
     const menu = document.querySelector('.menu');
-    
-    // Check if elements exist before adding event listeners
+    const progress = document.getElementById('scroll-progress');
+    let ticking = false;
+
     if (hamburger && menu) {
-        hamburger.addEventListener('click', function() {
-            menu.classList.toggle('active');
-        });
-        
-        // Close menu when clicking on a link
-        const menuLinks = document.querySelectorAll('.menu a');
-        menuLinks.forEach(link => {
-            link.addEventListener('click', function() {
+        hamburger.addEventListener('click', () => menu.classList.toggle('active'));
+        menu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
                 menu.classList.remove('active');
             });
         });
-        
-        // Close menu when clicking outside
-        document.addEventListener('click', function(event) {
-            const isClickInsideMenu = menu.contains(event.target);
-            const isClickOnHamburger = hamburger.contains(event.target);
-            
-            if (!isClickInsideMenu && !isClickOnHamburger && menu.classList.contains('active')) {
+        document.addEventListener('click', event => {
+            if (!menu.contains(event.target) && !hamburger.contains(event.target)) {
                 menu.classList.remove('active');
             }
         });
-    } else {
-        console.warn('Hamburger menu or navigation elements not found');
     }
-}
 
-// Text splitting function for animation
-function splitTextIntoSpans(selector) {
-    var element = document.querySelector(selector);
-    if (element) {
-        var text = element.innerText;
-        var splitText = text.split("").map((char) => `<span>${char}</span>`).join("");
-        element.innerHTML = splitText;
-        
-        // Make sure all spans are visible initially
-        var spans = element.querySelectorAll("span");
-        spans.forEach(span => {
-            span.style.display = "inline-block";
-            span.style.position = "relative";
-            span.style.color = "#ffffff";
-            
-            // For logo spans specifically
-            if (element.closest(".logo")) {
-                span.style.top = "200px"; // Match CSS initial position
-            }
+    document.querySelectorAll('a[href="#sec"]').forEach(link => {
+        link.addEventListener('click', event => {
+            const story = document.querySelector('.hero-work-story.story-hydrated');
+            if (!story) return;
+
+            event.preventDefault();
+            const storyTop = story.getBoundingClientRect().top + window.scrollY;
+            const storyTravel = Math.max(0, story.offsetHeight - window.innerHeight);
+            window.scrollTo({
+                top: storyTop + storyTravel * 0.82,
+                behavior: reduceMotion.matches ? 'auto' : 'smooth'
+            });
         });
-    }
+    });
+
+    const paintScrollUI = () => {
+        const scrollY = window.scrollY;
+        header?.classList.toggle('nav-scrolled', scrollY > 48);
+
+        if (progress) {
+            const max = document.documentElement.scrollHeight - window.innerHeight;
+            const value = max > 0 ? Math.min(1, scrollY / max) : 0;
+            progress.style.transform = `scaleX(${value})`;
+        }
+        ticking = false;
+    };
+
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            ticking = true;
+            requestAnimationFrame(paintScrollUI);
+        }
+    }, { passive: true });
+    paintScrollUI();
 }
 
-// Loading counter animation
-function startLoader() {
-    var counterElement = document.querySelector(".counter p");
-    
-    // If counter element doesn't exist, check if we need to create loading structure
-    if (!counterElement) {
-        console.warn("Counter element not found, checking if overlay exists");
-        
-        // Check if overlay exists
-        let overlay = document.querySelector(".overlay");
-        
-        // If no overlay, create the loading structure
-        if (!overlay) {
-            console.log("Creating loading structure");
-            const loadingHTML = `
-                <div class="overlay">
-                    <div class="overlay-content">
-                        <div class="counter"><p>0</p></div>
-                        <div class="logo"><p>VOIDSCAPE</p></div>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('afterbegin', loadingHTML);
-            
-            // Re-get the counter element
-            counterElement = document.querySelector(".counter p");
-            
-            // Also call splitTextIntoSpans for the logo again
-            splitTextIntoSpans(".logo p");
-        }
-    }
-    
-    if (!counterElement) {
-        console.error("Counter element still not found after attempts to create it");
+function setupReveals() {
+    const targets = [
+        ...document.querySelectorAll('.octivis-case__header, .life__header, .contact-card')
+    ];
+
+    if (reduceMotion.matches || !('IntersectionObserver' in window)) {
+        targets.forEach(element => element.classList.add('is-visible'));
         return;
     }
-    
-    var currentValue = 0;
-    
-    function updateCounter() {
-        if (currentValue === 100) {
-            animateText();
-            return;
-        }
-        
-        currentValue += Math.floor(Math.random() * 10) + 1;
-        currentValue = currentValue > 100 ? 100 : currentValue;
-        
-        // Create spans for counter digits
-        counterElement.innerHTML = currentValue.toString().split("").map((char) => 
-            `<span style="position:relative; display:inline-block; color:#ffffff;">${char}</span>`).join("") + 
-            `<span style="position:relative; display:inline-block; color:#ffffff;">%</span>`;
-        
-        var delay = Math.floor(Math.random() * 200) + 100;
-        setTimeout(updateCounter, delay);
-    }
-    
-    // Start the counter
-    updateCounter();
+
+    targets.forEach(element => element.classList.add('reveal-item'));
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+        });
+    }, { threshold: 0.14, rootMargin: '0px 0px -6% 0px' });
+
+    targets.forEach(element => observer.observe(element));
 }
 
-// Text animation after loading counter reaches 100%
-function animateText() {
-    setTimeout(() => {
-        // Ensure counter elements are visible before animating
-        document.querySelectorAll(".counter p span").forEach(span => {
-            span.style.position = "relative";
-            span.style.display = "inline-block";
-            span.style.color = "#ffffff";
+function setupOctivisCarousel() {
+    const viewport = document.querySelector('.octivis-case__viewport');
+    const track = viewport?.querySelector('.octivis-case__track');
+    const cards = viewport ? [...viewport.querySelectorAll('.octivis-story')] : [];
+    const previous = document.querySelector('[data-octivis-prev]');
+    const next = document.querySelector('[data-octivis-next]');
+    const count = document.querySelector('.octivis-case__count b');
+    if (!viewport || !track || !cards.length || !previous || !next || !count) return;
+
+    let activeIndex = 0;
+    let ticking = false;
+
+    const updateUI = index => {
+        activeIndex = Math.max(0, Math.min(cards.length - 1, index));
+        count.textContent = String(activeIndex + 1).padStart(2, '0');
+        previous.disabled = activeIndex === 0;
+        next.disabled = activeIndex === cards.length - 1;
+    };
+
+    const goTo = index => {
+        const targetIndex = Math.max(0, Math.min(cards.length - 1, index));
+        const viewportRect = viewport.getBoundingClientRect();
+        const cardRect = cards[targetIndex].getBoundingClientRect();
+        const inset = parseFloat(getComputedStyle(track).paddingLeft) || 0;
+        viewport.scrollTo({
+            left: viewport.scrollLeft + cardRect.left - viewportRect.left - inset,
+            behavior: reduceMotion.matches ? 'auto' : 'smooth'
         });
-        
-        gsap.to(".counter p span", {
-            top: "-400px",
-            stagger: 0.1,
-            ease: "power3.inOut",
-            duration: 1,
-        });
-        
-        gsap.to(".loading", {
-            opacity: 0,
-            pointerEvents: "none", // This prevents click capturing when invisible
-            zIndex: -1, // Move it below other content
-            ease: "power3.inOut",
-            duration: 1,
-            delay: 3,
+        updateUI(targetIndex);
+    };
+
+    const findClosestCard = () => {
+        const viewportRect = viewport.getBoundingClientRect();
+        const inset = parseFloat(getComputedStyle(track).paddingLeft) || 0;
+        const targetX = viewportRect.left + inset;
+        let closestIndex = 0;
+        let closestDistance = Infinity;
+
+        cards.forEach((card, index) => {
+            const distance = Math.abs(card.getBoundingClientRect().left - targetX);
+            if (distance >= closestDistance) return;
+            closestDistance = distance;
+            closestIndex = index;
         });
 
-        
-        
-        // Ensure logo spans are visible
-        document.querySelectorAll(".logo p span").forEach(span => {
-            span.style.position = "relative";
-            span.style.display = "inline-block";
-            span.style.color = "#ffffff";
-        });
-        
-        gsap.to(".logo p span", {
-            top: 0,
-            stagger: 0.1,
-            ease: "power3.inOut",
-            duration: 1,
-            onComplete: startParallaxAnimation // Start parallax animation when text is completely gone
-        });
-        
-        gsap.to(".logo p span", {
-            top: "-400px",
-            stagger: 0.1,
-            ease: "power3.inOut",
-            duration: 1,
-            delay: 2,
-        });
-        
-        gsap.to(".overlay", {
-            opacity: 0,
-            ease: "power3.inOut",
-            duration: 1,
-            delay: 3
-        });
-    }, 300);
+        updateUI(closestIndex);
+        ticking = false;
+    };
+
+    previous.addEventListener('click', () => goTo(activeIndex - 1));
+    next.addEventListener('click', () => goTo(activeIndex + 1));
+    viewport.addEventListener('keydown', event => {
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+        event.preventDefault();
+        goTo(activeIndex + (event.key === 'ArrowRight' ? 1 : -1));
+    });
+    viewport.addEventListener('scroll', () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(findClosestCard);
+    }, { passive: true });
+
+    updateUI(0);
 }
 
-// Cinematic scroll-driven zoom-out on the hero: as you scroll past it, the
-// whole hero scene scales down, fades and softens, revealing the work below.
-// Driven by GSAP ScrollTrigger so it works reliably across browsers.
-function setupHeroZoom() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    if (!window.gsap || !window.ScrollTrigger) return;
-    gsap.registerPlugin(ScrollTrigger);
-
-    // avoid stacking duplicates if this ever runs twice
-    ScrollTrigger.getById('heroZoom')?.kill();
-
-    gsap.to("main", {
-        scale: 0.7,
+function setupHeroEntrance() {
+    gsap.from('.hero-intro > *', {
+        y: 22,
         opacity: 0,
-        filter: "blur(7px)",
-        ease: "none",
+        duration: 0.75,
+        stagger: 0.09,
+        ease: 'power2.out',
+        delay: 0.12
+    });
+}
+
+function setupHeroParallax() {
+    const hero = document.querySelector('main');
+    if (!hero || reduceMotion.matches || !finePointer.matches) return;
+
+    const layers = [...hero.querySelectorAll('.parallax')].map(element => ({
+        element,
+        speedX: Number(element.dataset.speedx || 0),
+        speedY: Number(element.dataset.speedy || 0),
+        speedZ: Number(element.dataset.speedz || 0),
+        rotation: Number(element.dataset.rotation || 0)
+    }));
+
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let frame = 0;
+    let returning = false;
+
+    const render = () => {
+        const ease = returning ? 0.055 : 0.16;
+        currentX += (targetX - currentX) * ease;
+        currentY += (targetY - currentY) * ease;
+        const rotationDegree = (currentX / Math.max(hero.clientWidth / 2, 1)) * 20;
+
+        layers.forEach(({ element, speedX, speedY, speedZ, rotation }) => {
+            const x = -currentX * speedX;
+            const y = currentY * speedY;
+            const z = Math.max(-50, Math.min(50, currentX * speedZ * 0.08));
+            const r = rotationDegree * rotation;
+            element.style.transform = `translate3d(calc(-50% + ${x}px), calc(-50% + ${y}px), ${z}px) rotateY(${r}deg)`;
+        });
+
+        if (Math.abs(targetX - currentX) > 0.15 || Math.abs(targetY - currentY) > 0.15) {
+            frame = requestAnimationFrame(render);
+        } else {
+            frame = 0;
+        }
+    };
+
+    const requestRender = () => {
+        if (!frame) frame = requestAnimationFrame(render);
+    };
+
+    hero.addEventListener('pointermove', event => {
+        const rect = hero.getBoundingClientRect();
+        returning = false;
+        targetX = event.clientX - rect.left - rect.width / 2;
+        targetY = event.clientY - rect.top - rect.height / 2;
+        requestRender();
+    }, { passive: true });
+    hero.addEventListener('pointerleave', () => {
+        returning = true;
+        targetX = 0;
+        targetY = 0;
+        requestRender();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) return;
+        returning = true;
+        targetX = 0;
+        targetY = 0;
+        requestRender();
+    });
+}
+
+function setupDesktopScrollStories() {
+    const media = gsap.matchMedia();
+    media.add('(min-width: 901px)', () => {
+        const cleanups = [
+            setupProjectStory(),
+            setupRecognitionStory(),
+            setupExperienceStory(),
+            setupEducationStory()
+        ].filter(Boolean);
+
+        return () => cleanups.forEach(cleanup => cleanup());
+    });
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => ScrollTrigger.refresh(), 180);
+    }, { passive: true });
+
+    window.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
+}
+
+function setupProjectStory() {
+    const story = document.querySelector('.hero-work-story');
+    const stage = story?.querySelector('.hero-work-stage');
+    const main = story?.querySelector('main');
+    const reveal = story?.querySelector('.work-reveal');
+    const about = story?.querySelector('.about-reveal');
+    if (!story || !stage || !main || !reveal || !about) return;
+
+    story.classList.add('story-hydrated');
+    const scatter = reveal.querySelector('.scatter');
+    const items = gsap.utils.toArray('.work-reveal .scatter-item');
+    const heading = reveal.querySelector('.showcase__heading');
+    const heroIntro = main.querySelector('.hero-intro');
+    const aboutGrid = about.querySelector('.about-grid');
+    const aboutHold = { progress: 0 };
+
+    gsap.set(reveal, { autoAlpha: 0 });
+    gsap.set(items, { xPercent: -50, yPercent: -50, opacity: 0, scale: 0.72, y: 70 });
+    gsap.set(heading, { opacity: 0, y: 24 });
+    gsap.set(about, { yPercent: 100 });
+    gsap.set(aboutGrid, { opacity: 0, y: 52 });
+
+    const timeline = gsap.timeline({
+        defaults: { ease: 'none' },
         scrollTrigger: {
-            id: 'heroZoom',
-            trigger: "main",
-            start: "top top",
-            end: "+=780",
-            scrub: 0.5,
+            trigger: story,
+            start: 'top top',
+            end: 'bottom bottom',
+            scrub: 0.32,
             invalidateOnRefresh: true
         }
     });
-    ScrollTrigger.refresh();
-}
 
-// ============================================================
-//  PINNED SCROLL SHOWCASES
-//  A) Project scatter — a sticky stage where project images fan out
-//     around a heading (zoom-out reveal) with the home screen docked
-//     bottom-center.  B) Experience — a pinned section whose cards
-//     scroll horizontally as you scroll vertically.
-//  Both are gated to desktop + motion-allowed; otherwise the CSS
-//  default (simple grid / wrapped cards) stands as a safe fallback.
-// ============================================================
-function setupScrollShowcases() {
-    if (!window.gsap || !window.ScrollTrigger) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    if (window.innerWidth <= 900) return;              // mobile keeps the static layout
-    gsap.registerPlugin(ScrollTrigger);
-
-    /* ---------- A) Project scatter reveal ---------- */
-    const showcase = document.querySelector('.showcase');
-    if (showcase) {
-        showcase.classList.add('sc-hydrated');         // switch CSS to pinned/absolute mode
-        const scatter = showcase.querySelector('.scatter');
-        const items   = gsap.utils.toArray('.scatter .scatter-item');
-        const heading = showcase.querySelector('.showcase__heading');
-        const dock    = showcase.querySelector('.home-dock');
-
-        // from-states (kept centred via the -50/-50 that never changes)
-        gsap.set(items, { xPercent: -50, yPercent: -50, opacity: 0, scale: 0.35 });
-        gsap.set(scatter, { scale: 1.35 });
-        gsap.set(heading, { opacity: 0, y: 40 });
-        gsap.set(dock, { xPercent: -50, yPercent: -50, opacity: 0, scale: 0.8 });
-
-        const tl = gsap.timeline({
-            scrollTrigger: {
-                trigger: showcase, start: 'top top', end: 'bottom bottom',
-                scrub: 0.6, invalidateOnRefresh: true
-            }
-        });
-        tl.to(scatter, { scale: 1, ease: 'none' }, 0)
-          .to(heading, { opacity: 1, y: 0, ease: 'none' }, 0.05)
-          .to(items, {
-                opacity: 1, scale: 1,
-                rotation: (i, t) => parseFloat(t.dataset.rot) || 0,
-                ease: 'none', stagger: 0.05
-          }, 0.05)
-          .to(dock, { opacity: 1, scale: 1, ease: 'none' }, 0.35);
-    }
-
-    /* ---------- B) Experience horizontal pinned scroll ---------- */
-    const expH  = document.querySelector('.exp-h');
-    const track = document.querySelector('.exp-h__track');
-    if (expH && track) {
-        expH.classList.add('exp-hydrated');            // switch CSS to nowrap horizontal row
-        const distance = () => Math.max(0, track.scrollWidth - window.innerWidth + window.innerWidth * 0.07);
-        gsap.to(track, {
-            x: () => -distance(),
-            ease: 'none',
-            scrollTrigger: {
-                trigger: expH, start: 'top top',
-                end: () => '+=' + distance(),
-                pin: true, scrub: 0.5, anticipatePin: 1, invalidateOnRefresh: true
-            }
-        });
-    }
-
-    /* ---------- C) Recognition — falling frames, then zoom the final ---------- */
-    const recog = document.querySelector('.recog');
-    if (recog) {
-        recog.classList.add('recog-hydrated');
-        const frames = gsap.utils.toArray('.recog .recog-frame');
-        const finalFrame = recog.querySelector('.recog-frame--final');
-        const others = frames.filter(f => f !== finalFrame);
-        const heading = recog.querySelector('.recog__heading');
-        const vh = () => window.innerHeight;
-
-        gsap.set(frames, { xPercent: -50, yPercent: -50 });
-        frames.forEach(f => gsap.set(f, {
-            y: -1.3 * vh(), rotation: parseFloat(f.dataset.rot0) || -28, opacity: 0
-        }));
-        gsap.set(heading, { opacity: 0, y: 24 });
-
-        const tl = gsap.timeline({
-            scrollTrigger: {
-                trigger: recog, start: 'top top',
-                end: () => '+=' + (vh() * 4),
-                pin: true, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true
-            }
-        });
-        tl.to(heading, { opacity: 1, y: 0, ease: 'none', duration: 0.6 }, 0);
-        frames.forEach((f, i) => {
-            tl.to(f, {
-                y: 0, rotation: parseFloat(f.dataset.rot) || 0, opacity: 1,
-                ease: 'power3.out', duration: 1.1
-            }, 0.5 + i * 0.85);
-        });
-        // once everything has landed, zoom the "Where I've been" frame to fill the screen
-        const zoomAt = 0.5 + frames.length * 0.85 + 0.5;
-        tl.to(others, { opacity: 0, ease: 'none', duration: 0.8 }, zoomAt)
-          .to(heading, { opacity: 0, ease: 'none', duration: 0.8 }, zoomAt)
-          .to(finalFrame, { scale: 13, ease: 'power2.in', duration: 2.4 }, zoomAt)
-          .to(finalFrame, { opacity: 0, ease: 'none', duration: 0.5 }, zoomAt + 1.9);
-    }
-}
-
-// Function to start parallax animation after loader is complete
-function startParallaxAnimation() {
-    // Fade in the main content
-    const mainContent = document.querySelector("main");
-    if (mainContent) {
-        gsap.to(mainContent, {
+    timeline
+        .to(main, {
+            scale: 0.32,
+            y: () => window.innerHeight * 0.34,
+            borderRadius: 24,
+            duration: 0.54
+        }, 0)
+        .to(heroIntro, { opacity: 0, duration: 0.18 }, 0.04)
+        .to(reveal, { autoAlpha: 1, duration: 0.18 }, 0.12)
+        .to(heading, { opacity: 1, y: 0, duration: 0.28 }, 0.18)
+        .to(items, {
             opacity: 1,
-            duration: 1,
-            ease: "power2.inOut",
-            onComplete: function() {
-                // Initialize the parallax effect
-                update(window.innerWidth / 2); // Initial update with center position
-                // Hero now visible — arm the scroll-driven zoom-out
-                setupHeroZoom();
-            }
-        });
-    }
-    
-    // Create a GSAP timeline for initial animations
-    timeline = gsap.timeline();
+            scale: 1,
+            y: 0,
+            rotation: 0,
+            stagger: 0.055,
+            duration: 0.44
+        }, 0.24)
+        .to(reveal, { autoAlpha: 0.2, y: -40, duration: 0.3 }, 0.7)
+        .to(main, { opacity: 0.12, duration: 0.24 }, 0.7)
+        .to(about, { yPercent: 0, duration: 0.3, ease: 'power2.inOut' }, 0.7)
+        .to(aboutGrid, { opacity: 1, y: 0, duration: 0.2, ease: 'power2.out' }, 0.8)
+        .to(aboutHold, { progress: 1, duration: 0.55, ease: 'none' });
 
-    // Animate parallax elements
-    Array.from(parallax_el)
-        .filter(el => !el.classList.contains("lname") && !el.classList.contains("fname"))
-        .forEach(el => {
-            // Get original position from computed style
-            const originalTop = getComputedStyle(el).top;
-
-            // Animate each element
-            timeline.fromTo(el, {
-                opacity: 0
-            }, {
-                opacity: 1,
-                duration: 0.3,
-                ease: "power3.out",
-            }, "<0.1"); // Stagger slightly
-        });
-
-    // Get name elements
-    const fnameElement = document.querySelector(".fname");
-    const lnameElement = document.querySelector(".lname");
-
-    // Check if elements are found
-    if (!fnameElement || !lnameElement) {
-        console.error("Elements with class .fname or .lname not found.");
-        return;
-    }
-
-    const fntop = getComputedStyle(fnameElement).top;
-    const lntop = getComputedStyle(lnameElement).top;
-
-    // Name animation timeline - with a slight delay after the body fade-in
-    const nameTimeline = gsap.timeline({
-        delay: 0.3
-    });
-
-    nameTimeline.fromTo(
-        ".lname", 
-        {
-            top: window.innerHeight - fnameElement.getBoundingClientRect().top,
-            opacity: 0,
-        },
-        {
-            top: lntop,
-            duration: 1,
-            opacity: 1,
-            delay: 2,
-        },
-        "0"
-    ).fromTo(
-        ".fname",
-        {
-            top: "-150px",
-            opacity: 0,
-        },
-        {
-            top: fntop,
-            duration: 1,
-            opacity: 1,
-            delay: 2,
-        },
-        "0.5"
-    );
-}
-document.addEventListener("DOMContentLoaded", () => {
-    const sec = document.getElementById("sec");
-
-    const observer = new IntersectionObserver(
-        ([entry]) => {
-            if (entry.isIntersecting) {
-                sec.classList.add("visible");
-            } else {
-                sec.classList.remove("visible");
-            }
-        },
-        { threshold: 0.1 }
-    );
-
-    observer.observe(sec);
-});
-
-
-// Function to adjust the width
-function adjustArrowWidth() {
-    const screenWidth = window.innerWidth; // Get the screen width
-    const newWidth = screenWidth; // Subtract 100px
-    const arrowElement = document.querySelector('.awards .arrow');
-    
-    if (arrowElement) {
-        arrowElement.style.width = `${newWidth}px`; // Set the new width
-    }
-}
-
-// Adjust width on page load
-adjustArrowWidth();
-
-// Adjust width when the window is resized
-window.addEventListener('resize', adjustArrowWidth);
-
-
-const containers = document.querySelectorAll(".awards .container");
-let counter = 0;
-
-function left() {
-    counter--;
-    scroll();
-}
-
-function right() {
-    counter++;
-    scroll();
-}
-
-function setAnimationScroll() {
-    gsap.registerPlugin(ScrollTrigger);
-    // Background tone is now handled by a static, smooth CSS gradient on <body>
-    // (see body background-image) so the whole page blends top-to-bottom.
-}
-
-
-
-setAnimationScroll();
-
-// ============================================================
-//  INTERACTIVITY & SCROLL EFFECTS (redesign)
-// ============================================================
-(function () {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    document.addEventListener('DOMContentLoaded', () => {
-        if (window.gsap) gsap.registerPlugin(ScrollTrigger);
-
-        /* ---- 1. Reveal Areas-of-Interest cards on scroll into view ---- */
-        const cardObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (!entry.isIntersecting) return;
-                entry.target.classList.add('is-visible');
-                cardObserver.unobserve(entry.target);
-            });
-        }, { threshold: 0.3 });
-        document.querySelectorAll('.interest-card').forEach(el => cardObserver.observe(el));
-
-        if (reduce || !window.gsap) return;
-
-        /* ---- 2. Experience timeline scroll-fill + node activation ---- */
-        const expContainer = document.querySelector('.experience__container');
-        if (expContainer) {
-            const fill = document.createElement('div');
-            fill.className = 'timeline-fill';
-            expContainer.appendChild(fill);
-            gsap.to(fill, {
-                height: '100%',
-                ease: 'none',
-                scrollTrigger: { trigger: expContainer, start: 'top 70%', end: 'bottom 75%', scrub: 0.5 }
-            });
-            document.querySelectorAll('.experience__card').forEach(card => {
-                ScrollTrigger.create({
-                    trigger: card,
-                    start: 'top 65%',
-                    end: 'bottom 65%',
-                    onToggle: self => card.classList.toggle('node-on', self.isActive)
-                });
-            });
-        }
-
-        /* ---- 3. Drifting aurora glow blobs ---- */
-        document.querySelectorAll('.aurora').forEach(el => {
-            const speed = parseFloat(el.dataset.aurora) || 0.1;
-            gsap.to(el, {
-                y: speed * 650,
-                ease: 'none',
-                scrollTrigger: { trigger: document.body, start: 'top top', end: 'bottom bottom', scrub: 1.2 }
-            });
-        });
-
-        /* ---- 4. Subtle parallax on section headings ---- */
-        gsap.utils.toArray('.experiencetitle h2, .projectstitle h2, .titleawards h2, .educationtitle h2')
-            .forEach(h => {
-                gsap.fromTo(h, { y: 30 }, {
-                    y: -30, ease: 'none',
-                    scrollTrigger: { trigger: h, start: 'top bottom', end: 'bottom top', scrub: true }
-                });
-            });
-
-        /* ---- 5. Hero scroll cue fades out as you leave the hero ---- */
-        const cue = document.querySelector('.scroll-cue');
-        if (cue) {
-            gsap.to(cue, {
-                opacity: 0, ease: 'none',
-                scrollTrigger: { trigger: 'main', start: 'top top', end: '40% top', scrub: true }
-            });
-        }
-
-        /* ---- 6. 3D tilt on project cards ---- */
-        document.querySelectorAll('.projects__card').forEach(card => {
-            card.addEventListener('mousemove', e => {
-                const r = card.getBoundingClientRect();
-                const px = (e.clientX - r.left) / r.width - 0.5;
-                const py = (e.clientY - r.top) / r.height - 0.5;
-                card.style.transform =
-                    `rotateY(${px * 12}deg) rotateX(${-py * 12}deg) translateY(-8px)`;
-            });
-            card.addEventListener('mouseleave', () => { card.style.transform = ''; });
-        });
-
-        /* ---- 7. Magnetic buttons / icons ---- */
-        document.querySelectorAll('.btn, .projects__button, .socialicons a, .cert__badge').forEach(btn => {
-            btn.addEventListener('mousemove', e => {
-                const r = btn.getBoundingClientRect();
-                const x = e.clientX - r.left - r.width / 2;
-                const y = e.clientY - r.top - r.height / 2;
-                btn.style.setProperty('transform', `translate(${x * 0.3}px, ${y * 0.45}px)`, 'important');
-            });
-            btn.addEventListener('mouseleave', () => { btn.style.setProperty('transform', '', ''); });
-        });
-
-        /* ---- 8. Custom cursor reacts to interactive targets ---- */
-        const circles = document.querySelectorAll('.circle');
-        if (circles.length) {
-            const setActive = on => circles.forEach(c => c.classList.toggle('cursor-active', on));
-            document.querySelectorAll('a, button, .icon, .frame, .projects__card, .interest-card, .experience__data, .education__card')
-                .forEach(el => {
-                    el.addEventListener('mouseenter', () => setActive(true));
-                    el.addEventListener('mouseleave', () => setActive(false));
-                });
-        }
-
-        /* ---- 9. Pinned showcases: project scatter + horizontal experience ---- */
-        setupScrollShowcases();
-
-        ScrollTrigger.refresh();
-    });
-})();
-
-// Re-measure pinned triggers once every image (project thumbs, home screenshot) has loaded
-window.addEventListener('load', () => {
-    if (window.ScrollTrigger) ScrollTrigger.refresh();
-});
-
-/*const track = document.getElementById("image-track");
-
-window.onmousedown = e => {
-    track.dataset.mouseDownAt = e.clientX;
-}
-
-window.onmousemove = e => {
-    if(track.dataset.mouseDownAt === "0") return;
-
-    const mouseDelta = parseFloat(track.dataset.mouseDownAt) - e.clientX,
-        maxDelta = window.innerWidth / 2;
-
-    const percentage = (mouseDelta / maxDelta) * -100;
-
-    track.style.transform = 'translate(${percentage}%, -50%)';
-}
-*/
-
-
-
-document.addEventListener("DOMContentLoaded", function () {
-    const circles = document.querySelectorAll(".circle");
-    let mouseX = window.innerWidth / 2;
-    let mouseY = window.innerHeight / 2;
-    let cursorMoved = false;
-
-    circles.forEach(function (circle) {
-        circle.x = mouseX;
-        circle.y = mouseY;
-    });
-
-    window.addEventListener("mousemove", function (e) {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-
-        if (!cursorMoved) {
-            cursorMoved = true;
-            circles.forEach(c => {
-                c.x = mouseX;
-                c.y = mouseY;
-                c.classList.add("cursor-visible");
-            });
-        }
-    });
-
-    function animateCircles() {
-        let x = mouseX;
-        let y = mouseY;
-
-        circles.forEach(function (circle, index) {
-            circle.style.left = x - 8 + "px";
-            circle.style.top  = y - 8 + "px";
-            circle.style.scale = (circles.length - index) / circles.length;
-
-            circle.x = x;
-            circle.y = y;
-
-            const nextCircle = circles[index + 1] || circles[0];
-            x += (nextCircle.x - x) * 0.25;
-            y += (nextCircle.y - y) * 0.25;
-        });
-
-        requestAnimationFrame(animateCircles);
-    }
-
-    animateCircles();
-
-    // Nav scroll glass effect
-    const header = document.querySelector("header");
-    window.addEventListener("scroll", () => {
-        if (window.scrollY > 80) {
-            header.classList.add("nav-scrolled");
-        } else {
-            header.classList.remove("nav-scrolled");
-        }
-    }, { passive: true });
-
-    // Scroll progress bar
-    const progressBar = document.getElementById("scroll-progress");
-    if (progressBar) {
-        window.addEventListener("scroll", () => {
-            const scrollTop = window.scrollY;
-            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-            progressBar.style.width = (scrollTop / docHeight * 100) + "%";
-        }, { passive: true });
-    }
-});
-
-// ============================================================
-//  SCROLL REVEAL SYSTEM — different effect per section
-// ============================================================
-document.addEventListener('DOMContentLoaded', () => {
-    const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                revealObserver.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.12, rootMargin: '0px 0px -7% 0px' });
-
-    const tag = (el, effect, delay = 0) => {
-        if (!el) return;
-        el.setAttribute('data-reveal', effect);
-        if (delay) el.style.transitionDelay = delay + 's';
-        revealObserver.observe(el);
+    return () => {
+        timeline.scrollTrigger?.kill();
+        timeline.kill();
+        story.classList.remove('story-hydrated');
+        gsap.set(main, { clearProps: 'transform,borderRadius,opacity' });
+        gsap.set(reveal, { clearProps: 'transform,opacity,visibility' });
+        gsap.set([heroIntro, heading, about, aboutGrid], { clearProps: 'transform,opacity' });
+        gsap.set(items, { clearProps: 'transform,opacity' });
     };
-
-    // Section titles — fade up
-    document.querySelectorAll('.experiencetitle, .educationtitle, .projectstitle, .titleawards')
-        .forEach(el => tag(el, 'fade-up'));
-
-    // Experience cards — alternating slide from sides (timeline reveal)
-    document.querySelectorAll('.experience__card')
-        .forEach((el, i) => tag(el, i % 2 ? 'slide-right' : 'slide-left'));
-
-    // Education cards — 3D flip
-    document.querySelectorAll('.education__card')
-        .forEach((el, i) => tag(el, 'flip', i * 0.12));
-
-    // Certification badges — zoom in
-    document.querySelectorAll('.cert__badge')
-        .forEach((el, i) => tag(el, 'zoom', i * 0.1));
-
-    // Project cards — blur-in with stagger
-    document.querySelectorAll('.projects__card')
-        .forEach((el, i) => tag(el, 'blur-in', (i % 4) * 0.1));
-
-    // Award cards — fade up with stagger
-    document.querySelectorAll('.awards .card')
-        .forEach((el, i) => tag(el, 'fade-up', (i % 4) * 0.1));
-
-    // Life-in-frames header — fade up
-    document.querySelectorAll('.life__header[data-reveal]')
-        .forEach(el => revealObserver.observe(el));
-
-    // Contact card — zoom in
-    tag(document.querySelector('.contact-card'), 'fade-up');
-
-    // Octivis founder section + supporting copy
-    tag(document.querySelector('.octivis'), 'fade-up');
-    tag(document.querySelector('.projects__intro'), 'fade-up');
-});
-  
-
-
-
-/*
-document.addEventListener("DOMContentLoaded", function () {
-    const track = document.getElementById("image-track");
-
-    const handleOnDown = e => track.dataset.mouseDownAt = e.clientX;
-
-    const handleOnUp = () => {
-    track.dataset.mouseDownAt = "0";  
-    track.dataset.prevPercentage = track.dataset.percentage;
-    }
-
-    const handleOnMove = e => {
-    if(track.dataset.mouseDownAt === "0") return;
-    
-    const mouseDelta = parseFloat(track.dataset.mouseDownAt) - e.clientX,
-            maxDelta = window.innerWidth / 2;
-    
-    const percentage = (mouseDelta / maxDelta) * -80,
-            nextPercentageUnconstrained = parseFloat(track.dataset.prevPercentage) + percentage,
-            nextPercentage = Math.max(Math.min(nextPercentageUnconstrained, 0), -100);
-    
-    track.dataset.percentage = nextPercentage;
-
-    
-    
-    track.animate({
-        transform: `translate(${nextPercentage}%, -50%)`
-    }, { duration: 1200, fill: "forwards" });
-    
-    for(const image of track.getElementsByClassName("image")) {
-        image.animate({
-        objectPosition: `${100 + nextPercentage}% center`
-        }, { duration: 1200, fill: "forwards" });
-    }
 }
 
-    /* -- Had to add extra lines for touch events 
+function setupRecognitionStory() {
+    const section = document.querySelector('.recog');
+    if (!section) return;
 
-    window.onmousedown = e => handleOnDown(e);
+    section.classList.add('recog-hydrated');
+    const frames = gsap.utils.toArray('.recog .recog-frame');
+    const awards = frames;
+    const topFrames = awards.slice(0, 2);
+    const bottomFrames = awards.slice(2, 4);
+    const heading = section.querySelector('.recog__heading');
 
-    window.ontouchstart = e => handleOnDown(e.touches[0]);
+    gsap.set(frames, { xPercent: -50, yPercent: -50 });
+    gsap.set(awards, {
+        y: () => -window.innerHeight * 0.82,
+        opacity: 0,
+        rotation: (_, target) => Number(target.dataset.rot0 || -24)
+    });
+    gsap.set(topFrames, { zIndex: 3 });
+    gsap.set(bottomFrames, { zIndex: 2 });
+    gsap.set(heading, { opacity: 0, y: 24 });
 
-    window.onmouseup = e => handleOnUp(e);
+    const timeline = gsap.timeline({
+        scrollTrigger: {
+            trigger: section,
+            start: 'top top',
+            end: () => `+=${window.innerHeight * 2.35}`,
+            pin: true,
+            scrub: 0.24,
+            anticipatePin: 1,
+            invalidateOnRefresh: true
+        }
+    });
 
-    window.ontouchend = e => handleOnUp(e.touches[0]);
+    timeline.to(heading, { opacity: 1, y: 0, duration: 0.22, ease: 'none' }, 0);
 
-    window.onmousemove = e => handleOnMove(e);
+    bottomFrames.forEach((frame, index) => {
+        const restingRotation = Number(frame.dataset.rot || 0);
+        const start = 0.12 + index * 0.13;
+        timeline
+            .to(frame, {
+                y: 20,
+                opacity: 1,
+                rotation: restingRotation * 1.18,
+                duration: 0.36,
+                ease: 'power3.in'
+            }, start)
+            .to(frame, {
+                y: -8,
+                rotation: restingRotation * 0.88,
+                duration: 0.11,
+                ease: 'power2.out'
+            }, start + 0.36)
+            .to(frame, {
+                y: 0,
+                rotation: restingRotation,
+                duration: 0.14,
+                ease: 'bounce.out'
+            }, start + 0.47);
+    });
 
-    window.ontouchmove = e => handleOnMove(e.touches[0]);
+    topFrames.forEach((frame, index) => {
+        const base = bottomFrames[index];
+        if (!base) return;
+        const restingRotation = Number(frame.dataset.rot || 0);
+        const baseRotation = Number(base.dataset.rot || 0);
+        const impact = 0.74 + index * 0.17;
 
-});*/
+        timeline
+            .to(frame, {
+                y: 12,
+                opacity: 1,
+                rotation: restingRotation * 1.15,
+                duration: 0.38,
+                ease: 'power3.in'
+            }, impact)
+            .to(base, {
+                y: 29,
+                rotation: baseRotation + (index === 0 ? 2.5 : -2.5),
+                duration: 0.08,
+                ease: 'power2.out'
+            }, impact + 0.38)
+            .to(frame, {
+                y: -10,
+                rotation: restingRotation * 0.84,
+                duration: 0.12,
+                ease: 'power2.out'
+            }, impact + 0.38)
+            .to(base, {
+                y: -6,
+                rotation: baseRotation * 0.92,
+                duration: 0.11,
+                ease: 'power2.out'
+            }, impact + 0.46)
+            .to(frame, {
+                y: 0,
+                rotation: restingRotation,
+                duration: 0.15,
+                ease: 'bounce.out'
+            }, impact + 0.5)
+            .to(base, {
+                y: 0,
+                rotation: baseRotation,
+                duration: 0.14,
+                ease: 'bounce.out'
+            }, impact + 0.57);
+    });
 
+    timeline
+        .to(awards, { opacity: 0.12, y: -30, duration: 0.34, ease: 'power1.in' }, 1.58)
+        .to(heading, { opacity: 0, y: -22, duration: 0.28, ease: 'none' }, 1.7);
 
+    return () => {
+        timeline.scrollTrigger?.kill();
+        timeline.kill();
+        section.classList.remove('recog-hydrated');
+        gsap.set([heading, ...frames], { clearProps: 'transform,opacity,zIndex' });
+    };
+}
 
+function setupExperienceStory() {
+    const section = document.querySelector('.exp-h');
+    const track = section?.querySelector('.exp-h__track');
+    if (!section || !track) return;
 
+    section.classList.add('exp-hydrated');
+    const intro = section.querySelector('.exp-h__intro');
+    const cards = gsap.utils.toArray('.exp-h__card');
+    const distance = () => Math.max(0, track.scrollWidth - window.innerWidth + window.innerWidth * 0.07);
+    gsap.set(intro, { opacity: 0, y: 34 });
+    gsap.set(cards, { opacity: 0.36, y: 54 });
 
+    const timeline = gsap.timeline({
+        scrollTrigger: {
+            trigger: section,
+            start: 'top top',
+            end: () => `+=${distance() + window.innerHeight * 0.35}`,
+            pin: true,
+            scrub: 0.2,
+            anticipatePin: 1,
+            invalidateOnRefresh: true
+        }
+    });
 
+    timeline
+        .to(intro, { opacity: 1, y: 0, duration: 0.12, ease: 'none' }, 0)
+        .to(cards, { opacity: 1, y: 0, stagger: 0.02, duration: 0.16, ease: 'power1.out' }, 0.02)
+        .to(track, { x: () => -distance(), duration: 0.88, ease: 'none' }, 0.12);
 
-    
+    return () => {
+        timeline.scrollTrigger?.kill();
+        timeline.kill();
+        section.classList.remove('exp-hydrated');
+        gsap.set([track, intro, ...cards], { clearProps: 'transform,opacity' });
+    };
+}
 
+function setupEducationStory() {
+    const section = document.querySelector('.education-story');
+    const stage = section?.querySelector('.education-story__stage');
+    const statement = section?.querySelector('.education-story__statement');
+    const image = section?.querySelector('.education-story__image');
+    const meta = section?.querySelector('.education-story__meta');
+    const leftWord = section?.querySelector('.education-story__word--left');
+    const rightWord = section?.querySelector('.education-story__word--right');
+    const details = section?.querySelector('.education__container');
+    const cards = section ? gsap.utils.toArray('.education-story .education__card') : [];
+    if (!section || !stage || !statement || !image || !meta || !leftWord || !rightWord || !details) return;
+
+    section.classList.add('education-hydrated');
+    gsap.set(meta, { opacity: 0, y: -18 });
+    gsap.set(leftWord, { x: -70, opacity: 0.28 });
+    gsap.set(rightWord, { x: 70, opacity: 0.28 });
+    gsap.set(details, { opacity: 0, y: 54 });
+    gsap.set(cards, { opacity: 0, y: 28 });
+
+    const timeline = gsap.timeline({
+        scrollTrigger: {
+            trigger: section,
+            start: 'top top',
+            end: () => `+=${window.innerHeight * 2.15}`,
+            pin: true,
+            scrub: 0.2,
+            anticipatePin: 1,
+            invalidateOnRefresh: true
+        }
+    });
+
+    timeline
+        .to(meta, { opacity: 1, y: 0, duration: 0.16, ease: 'none' }, 0)
+        .to(leftWord, { x: 0, opacity: 1, duration: 0.26, ease: 'power2.out' }, 0.02)
+        .to(rightWord, { x: 0, opacity: 1, duration: 0.26, ease: 'power2.out' }, 0.02)
+        .to(image, {
+            width: () => Math.min(window.innerWidth * 0.32, 560),
+            height: () => Math.min(window.innerHeight * 0.58, 610),
+            borderRadius: 8,
+            duration: 0.46,
+            ease: 'power2.inOut'
+        }, 0.18)
+        .to(statement, {
+            y: () => -window.innerHeight * 0.11,
+            duration: 0.34,
+            ease: 'power2.inOut'
+        }, 0.42)
+        .to(details, { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' }, 0.57)
+        .to(cards, { opacity: 1, y: 0, stagger: 0.05, duration: 0.24, ease: 'power2.out' }, 0.6);
+
+    return () => {
+        timeline.scrollTrigger?.kill();
+        timeline.kill();
+        section.classList.remove('education-hydrated');
+        gsap.set([meta, leftWord, rightWord, statement, image, details, ...cards], {
+            clearProps: 'transform,opacity,width,height,borderRadius'
+        });
+    };
+}

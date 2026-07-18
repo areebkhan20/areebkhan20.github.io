@@ -10,22 +10,31 @@
     <meta property="og:type" content="website">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="awardspage.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <script defer src="js/app.js"></script>
+    <script>document.documentElement.classList.add('has-js', 'is-loading');</script>
 
 </head>
 <body>
+    <div class="site-loader" role="status" aria-live="polite" aria-label="Loading Areeb Khan's website">
+        <div class="site-loader__meta">
+            <span>Areeb Khan</span>
+            <span>Founder / Octivis</span>
+        </div>
+        <div class="site-loader__mark" aria-hidden="true">AK</div>
+        <div class="site-loader__progress" aria-hidden="true"><span></span></div>
+    </div>
     <div id="scroll-progress"></div>
-
-    <!-- drifting ambient glow blobs (subtle scroll parallax) -->
-    <div class="aurora aurora--1" data-aurora="0.12" aria-hidden="true"></div>
-    <div class="aurora aurora--2" data-aurora="-0.18" aria-hidden="true"></div>
-    <div class="aurora aurora--3" data-aurora="0.08" aria-hidden="true"></div>
 
     <header>
         <nav>
             <img src="img2/Hamburger.png" alt="menu" class="hamburger">
             <ul class="menu">
 
+                <li>
+                    <a href="#Projects">Work</a>
+                </li>
                 <li>
                     <a href="#sec">About</a>
                 </li>
@@ -34,12 +43,6 @@
                 </li>
                 <li>
                     <a href="#Experience">Background</a>
-                </li>
-                <li>
-                    <a href="#Projects">Work</a>
-                </li>
-                <li>
-                    <a href="#education">Credentials</a>
                 </li>
                 <li>
                     <a href="#banner">Life</a>
@@ -52,212 +55,173 @@
         </nav>
         
     </header>
-    <div class="overlay">
-        <div class="overlay-content">
-            <!--<div class="images">
-                <div class="img-holder">
-                    <img class="img-class" src="headshot.png" alt="">
-                    <img class="img-class" src="headshot.png" alt="">
-                    <img class="img-class" src="headshot.png" alt="">
-                    <img class="img-class" src="headshot.png" alt="">
-                    <img class="img-class" src="headshot.png" alt="">
-                    <img class="img-class" src="headshot.png" alt="">
-                    <img class="img-class" src="headshot.png" alt="">
-                    <img class="img-class" src="headshot.png" alt="">
-                    <img class="img-class" src="headshot.png" alt="">
-                    <img class="img-class" src="headshot.png" alt="">
-                </div>
-            </div>-->
-            <div class="text">
-                <div class="counter"><p>100%</p></div>
-                <div class="logo"><p>Hi!</p></div>
-            </div>
-        </div>
-    </div>
-    <div class="loading"></div>
-    
-    
-    
+    <section class="hero-work-story" id="Projects" aria-label="Introduction and selected work">
+    <div class="hero-work-stage">
     <main>
-        <img src="img2/bg.png" data-speedx="0.3" data-speedy="0.2" data-speedz="0" data-rotation="0" data-distance="-200" class="parallax bg-img">
-        <img src="img2/Mist back.png" data-speedx="0.25" data-speedy="0.15" data-speedz="0" data-rotation="0" data-distance="850" class="parallax mistB">
+        <img src="media/hero/bg.jpg" data-speedx="0.3" data-speedy="0.2" data-speedz="0" data-rotation="0" data-distance="-200" class="parallax bg-img" fetchpriority="high">
+        <img src="media/hero/mist-back.png" data-speedx="0.25" data-speedy="0.15" data-speedz="0" data-rotation="0" data-distance="850" class="parallax mistB">
         <img src="img2/Areeb.png" data-speedx="0.195" data-speedy="0.12" data-speedz="0.05" data-rotation="0.15" class="parallax fname">
         <img src="img2/KHAN.png" data-speedx="0.23" data-speedy="0.1" data-speedz="0.08" data-rotation="0.1" class="parallax lname">
-        <img src="img2/Right build.png" data-speedx="0.125" data-speedy="0.05" data-speedz="0.12" data-rotation="0.13" data-distance="1400" class="parallax rbuild">
-        <img src="img2/Empire state.png" data-speedx="0.17" data-speedy="0.065" data-speedz="0.07" data-rotation="0.2" data-distance="1600" class="parallax empbuild">
-        <img src="img2/Left building.png" data-speedx="0.07" data-speedy="0.03" data-speedz="0.1" data-rotation="0.09" data-distance="1900" class="parallax lbuild">
+        <img src="media/hero/right-building.png" data-speedx="0.125" data-speedy="0.05" data-speedz="0.12" data-rotation="0.13" data-distance="1400" class="parallax rbuild">
+        <img src="media/hero/empire-state.png" data-speedx="0.17" data-speedy="0.065" data-speedz="0.07" data-rotation="0.2" data-distance="1600" class="parallax empbuild">
+        <img src="media/hero/left-building.png" data-speedx="0.07" data-speedy="0.03" data-speedz="0.1" data-rotation="0.09" data-distance="1900" class="parallax lbuild">
         <img src="img2/Plane.png" data-speedx="0.32" data-speedy="0.28" data-speedz="0.05" data-rotation="0.18" data-distance="2100" class="parallax plane">
-        <img src="img2/Mist inf.png" data-speedx="0.065" data-speedy="0.065" data-speedz="0" data-rotation="0" data-distance="2500" class="parallax mistI">
+        <img src="media/hero/mist-front.png" data-speedx="0.065" data-speedy="0.065" data-speedz="0" data-rotation="0" data-distance="2500" class="parallax mistI">
 
         <div class="hero-intro">
-            <p class="hero-intro__role">Founder &amp; CEO — Octivis</p>
+            <p class="hero-intro__role">Founder and CEO - Octivis</p>
             <p class="hero-intro__tag">I turn the cameras a store already owns into intelligence its managers can act on.</p>
             <div class="hero-intro__cta">
                 <a href="https://octivis.com" target="_blank" rel="noopener" class="hero-btn hero-btn--primary">Visit Octivis <span aria-hidden="true">↗</span></a>
-                <a href="#octivis" class="hero-btn hero-btn--ghost">Meet the founder</a>
+                <a href="#sec" class="hero-btn hero-btn--ghost">Meet the founder</a>
             </div>
         </div>
     </main>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-    <script src="https://unpkg.com/lenis@1.1.19/dist/lenis.min.js"></script> 
-    <script src="https://static.elfsight.com/platform/platform.js" async></script>
-    <script src="js/app.js"></script>
-    <!--Scroll Reveal-->
-    <script src="/js/scrollreveal.min.js"></script>
 
-    
-
-    <div class="sec" id="sec">
-        <div class="about-float" aria-hidden="true">
-            <div class="fchip fchip--1" data-depth="0.5"><span class="fchip__k">Founder</span><span class="fchip__v">Octivis</span></div>
-            <div class="fchip fchip--2" data-depth="1.1"><span class="fchip__k">Certified</span><span class="fchip__v">AWS Solutions Architect</span></div>
-            <div class="fchip fchip--3" data-depth="0.8"><span class="fchip__k">Researching</span><span class="fchip__v">Computer Vision</span></div>
-            <div class="fchip fchip--4" data-depth="1.4"><span class="fchip__k">Studying</span><span class="fchip__v">MS · Computer Science</span></div>
-            <span class="forb forb--1" data-depth="1.8"></span>
-            <span class="forb forb--2" data-depth="0.6"></span>
-            <span class="fring" data-depth="1.2"></span>
+    <div class="work-reveal" aria-label="Selected work">
+        <div class="showcase__heading">
+            <span class="eyebrow">Selected work</span>
+            <h2>A few things<br>I've built.</h2>
+            <p>Computer vision and robotics—the work behind Octivis.</p>
         </div>
-        <div class="textam">
-            <div class="wavy">
-                <span style="--i:1;"><h2>A</h2></span>
-                <span style="--i:2;"><h2>b</h2></span>
-                <span style="--i:3;"><h2>o</h2></span>
-                <span style="--i:4;"><h2>u</h2></span>
-                <span style="--i:5;"><h2>t</h2></span>
-                <span style="--i:6;"><h2>&nbsp;</h2></span>
-                <span style="--i:7;"><h2>m</h2></span>
-                <span style="--i:8;"><h2>e</h2></span>
-            </div>
-            <p class="sec_para">I'm Areeb Khan, founder of Octivis and an AI engineer by training, based in Arlington, TX. Before Octivis I spent three years in a machine-learning lab building computer-vision and robotics systems, led student organizations that represented tens of thousands of people, and worked in Washington on how AI actually gets built and governed. Octivis is where that all points: taking real computer-vision research and shaping it into something a business can use on day one — not a demo, a product. I'm finishing my MS in Computer Science at UT Arlington while I build it.</p>
-            <div class="trust-strip">
-                <span class="trust-strip__label">Along the way</span>
-                <ul class="trust-strip__list">
-                    <li>UT Arlington</li>
-                    <li>Embassy of Pakistan</li>
-                    <li>UT System Archer Fellowship</li>
-                    <li>AWS Certified</li>
-                </ul>
-            </div>
-        </div>
-    </div>
 
-    <section class="octivis" id="octivis" aria-label="About Octivis">
-        <div class="octivis__inner">
-            <span class="octivis__border" aria-hidden="true"></span>
-            <div class="octivis__brand">
-                <span class="octivis__eyebrow">What I'm building</span>
-                <div class="octivis__vision">
-                    <span class="octivis__bracket octivis__bracket--tl" aria-hidden="true"></span>
-                    <span class="octivis__bracket octivis__bracket--tr" aria-hidden="true"></span>
-                    <span class="octivis__bracket octivis__bracket--bl" aria-hidden="true"></span>
-                    <span class="octivis__bracket octivis__bracket--br" aria-hidden="true"></span>
-                    <span class="octivis__scan" aria-hidden="true"></span>
-                    <img src="OctivisLogoDark.png" alt="Octivis" class="octivis__logo">
-                </div>
-                <a href="https://octivis.com" target="_blank" rel="noopener" class="octivis__cta octivis__cta--brand">octivis.com <span aria-hidden="true">↗</span></a>
-            </div>
-            <div class="octivis__body">
-                <h2 class="octivis__headline">Every store already has cameras. Octivis makes them useful.</h2>
-                <p class="octivis__lead">Octivis is a computer-vision platform that reads the feeds retailers already run and turns them into the handful of answers a manager actually acts on — how long the lines are, where shoppers stall, when to open another register. No new hardware to install, no dashboard nobody opens.</p>
-                <ul class="octivis__points">
-                    <li><strong>Uses cameras you already own.</strong> Nothing new to bolt to the ceiling.</li>
-                    <li><strong>Built on AWS.</strong> One store or a whole chain, same system.</li>
-                    <li><strong>Privacy by design.</strong> It reads patterns and movement, not identities.</li>
-                </ul>
-                <a href="https://octivis.com" target="_blank" rel="noopener" class="octivis__cta">See what we're building at octivis.com <span aria-hidden="true">↗</span></a>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============ PROJECT SCATTER SHOWCASE (pinned zoom-out reveal) ============ -->
-    <section class="showcase" id="Projects" aria-label="Selected work">
-        <div class="showcase__stage">
-            <div class="showcase__heading">
-                <span class="eyebrow">Selected work</span>
-                <h2>A few things<br>I've built.</h2>
-                <p>Computer vision &amp; robotics — the DNA behind Octivis.</p>
-            </div>
-
-            <div class="scatter">
-                <figure class="scatter-item scatter-item--lg" style="left:13%; top:20%;" data-rot="-5">
-                    <img src="Projects/8.png" alt="SauRON surveillance coverage" loading="lazy">
-                    <figcaption><strong>SauRON</strong><span>Smart surveillance coverage</span></figcaption>
-                </figure>
-                <figure class="scatter-item scatter-item--lg" style="left:84%; top:22%;" data-rot="4">
-                    <img src="Projects/5.png" alt="Disaster response robot dog" loading="lazy">
-                    <figcaption><strong>Robot Dog</strong><span>Search &amp; rescue · Judges' Choice '24</span></figcaption>
-                </figure>
-                <figure class="scatter-item scatter-item--lg" style="left:16%; top:74%;" data-rot="3">
-                    <img src="Projects/6.png" alt="AVID assistive drone" loading="lazy">
-                    <figcaption><strong>AVID</strong><span>Assistive drone · 3rd Place '23</span></figcaption>
-                </figure>
-                <figure class="scatter-item scatter-item--lg" style="left:86%; top:72%;" data-rot="-4">
-                    <img src="Projects/3.png" alt="Financial LLM assistant" loading="lazy">
-                    <figcaption><strong>Financial LLM</strong><span>RAG over SEC filings</span></figcaption>
-                </figure>
-                <figure class="scatter-item scatter-item--sm" style="left:32%; top:9%;" data-rot="6">
-                    <img src="Projects/1.png" alt="Project" loading="lazy">
-                </figure>
-                <figure class="scatter-item scatter-item--sm" style="left:68%; top:8%;" data-rot="-6">
-                    <img src="Projects/2.png" alt="Project" loading="lazy">
-                </figure>
-                <figure class="scatter-item scatter-item--sm" style="left:33%; top:88%;" data-rot="-3">
-                    <img src="Projects/4.png" alt="Project" loading="lazy">
-                </figure>
-                <figure class="scatter-item scatter-item--sm" style="left:67%; top:90%;" data-rot="5">
-                    <img src="Projects/7.png" alt="Project" loading="lazy">
-                </figure>
-            </div>
-
-            <figure class="home-dock">
-                <img src="Projects/website.png" alt="areebkhan.xyz — home" loading="lazy">
-                <figcaption>areebkhan.xyz</figcaption>
+        <div class="scatter">
+            <figure class="scatter-item scatter-item--lg" style="left:13%; top:20%;" data-rot="0">
+                <img src="media/projects/sauron.jpg" alt="SauRON surveillance coverage" loading="lazy" decoding="async">
+                <figcaption><strong>SauRON</strong><span>Smart surveillance coverage</span></figcaption>
+            </figure>
+            <figure class="scatter-item scatter-item--lg" style="left:84%; top:22%;" data-rot="0">
+                <img src="media/projects/robot-dog.jpg" alt="Disaster response robot dog" loading="lazy" decoding="async">
+                <figcaption><strong>Robot Dog</strong><span>Search and rescue · Judges' Choice '24</span></figcaption>
+            </figure>
+            <figure class="scatter-item scatter-item--lg" style="left:16%; top:74%;" data-rot="0">
+                <img src="media/projects/avid.jpg" alt="AVID assistive drone" loading="lazy" decoding="async">
+                <figcaption><strong>AVID</strong><span>Assistive drone · 3rd Place '23</span></figcaption>
+            </figure>
+            <figure class="scatter-item scatter-item--lg" style="left:86%; top:72%;" data-rot="0">
+                <img src="media/projects/mapless-navigation.jpg" alt="Map-less robot navigation test" loading="lazy" decoding="async">
+                <figcaption><strong>Map-less Navigation</strong><span>Autonomous robotics · Best Presentation '24</span></figcaption>
             </figure>
         </div>
+    </div>
+    <section class="sec about-reveal" id="sec" aria-label="About Areeb Khan">
+        <div class="about-grid">
+            <div class="textam">
+                <span class="eyebrow">A little context</span>
+                <h2 class="about-title">I build at the point where research has to become useful.</h2>
+                <div class="about-copy">
+                    <p>I'm Areeb Khan, the founder of Octivis. I got here through three years in a machine-learning lab, a lot of time building robots, and leadership roles that taught me how to make decisions when the path is not obvious.</p>
+                    <p>These days I split my time between Arlington and Washington, finish my master's, and turn computer-vision work into a product retailers can actually run.</p>
+                </div>
+            </div>
+            <aside class="about-notes" aria-label="Areeb Khan at a glance">
+                <div class="about-note"><strong>3 years</strong><span>in computer-vision and robotics research</span></div>
+                <div class="about-note"><strong>45,000</strong><span>students represented as vice president</span></div>
+                <div class="about-note"><strong>DC ↔ Texas</strong><span>AI policy, engineering, and company building</span></div>
+            </aside>
+        </div>
+    </section>
+    </div>
     </section>
 
+    <section class="octivis octivis-case" id="octivis" aria-label="About Octivis">
+        <div class="octivis-case__header">
+            <div class="octivis-case__identity">
+                <span class="eyebrow">My company · Product stories</span>
+                <img src="OctivisLogoDark.png" alt="Octivis" class="octivis-case__logo">
+            </div>
+            <div class="octivis-case__intro">
+                <h2>Existing cameras.<br>A clearer operating picture.</h2>
+                <p>I started Octivis to turn video stores already collect into practical signals about queues, dwell, register demand, and preventable loss.</p>
+            </div>
+        </div>
+
+        <div class="octivis-case__toolbar">
+            <span class="octivis-case__count"><b>01</b> / 03</span>
+            <div class="octivis-case__controls" aria-label="Octivis product stories">
+                <button type="button" data-octivis-prev aria-label="Previous story">←</button>
+                <button type="button" data-octivis-next aria-label="Next story">→</button>
+            </div>
+        </div>
+
+        <div class="octivis-case__viewport" tabindex="0" aria-label="Scrollable Octivis product stories">
+            <div class="octivis-case__track">
+                <article class="octivis-story">
+                    <figure class="octivis-story__media">
+                        <img src="media/octivis/store-layout.jpg" alt="Detailed retail store floor plan" loading="lazy" decoding="async">
+                    </figure>
+                    <div class="octivis-story__body">
+                        <span>01 / Floor context</span>
+                        <h3>See the store as one operating system.</h3>
+                        <p>Octivis connects movement, queues, and service zones to the layout managers already understand.</p>
+                        <strong>Existing video → live floor context</strong>
+                    </div>
+                </article>
+
+                <article class="octivis-story">
+                    <figure class="octivis-story__media octivis-story__media--light">
+                        <img src="media/octivis/agent-network.jpg" alt="Connected network representing coordinated AI agents" loading="lazy" decoding="async">
+                    </figure>
+                    <div class="octivis-story__body">
+                        <span>02 / Coordinated intelligence</span>
+                        <h3>Turn isolated signals into one useful answer.</h3>
+                        <p>Specialized agents can compare what is happening across the floor and surface the next decision to the right person.</p>
+                        <strong>Multiple signals → one operating picture</strong>
+                    </div>
+                </article>
+
+                <article class="octivis-story">
+                    <figure class="octivis-story__media">
+                        <img src="media/octivis/loss-prevention.jpg" alt="Piggy bank representing preventable retail loss" loading="lazy" decoding="async">
+                    </figure>
+                    <div class="octivis-story__body">
+                        <span>03 / Earlier intervention</span>
+                        <h3>Act while there is still time to change the outcome.</h3>
+                        <p>Useful alerts help store teams respond to pressure points and suspicious patterns before they become larger problems.</p>
+                        <strong>Earlier context → faster intervention</strong>
+                    </div>
+                </article>
+            </div>
+        </div>
+
+        <a href="https://octivis.com" target="_blank" rel="noopener" class="octivis-case__link">Follow what we're building <span aria-hidden="true">↗</span></a>
+    </section>
 
     <!-- ============ RECOGNITION — FALLING FRAMES → ZOOM TRANSITION ============ -->
     <section class="recog" id="awds" aria-label="Recognition">
         <div class="recog__stage">
             <div class="recog__heading">
                 <span class="eyebrow">Recognition</span>
-                <h2>A few trophies<br>along the way.</h2>
+                <h2>The work got noticed.</h2>
             </div>
             <div class="recog__frames">
-                <article class="recog-frame" style="left:26%; top:34%;" data-rot="-8" data-rot0="-34">
+                <article class="recog-frame" style="left:19%; top:51%;" data-rot="-5" data-rot0="-26">
                     <span class="recog-frame__year">2024</span>
                     <h3>Judges' Choice</h3>
                     <p class="recog-frame__event">UTA Innovation Day</p>
                     <p class="recog-frame__desc">A self-sustaining search-and-rescue robot dog.</p>
                     <a href="https://uta.engineering/innovationday/project-2024.php?p=16" target="_blank" rel="noopener">View <span aria-hidden="true">↗</span></a>
                 </article>
-                <article class="recog-frame" style="left:71%; top:29%;" data-rot="7" data-rot0="28">
+                <article class="recog-frame" style="left:81%; top:51%;" data-rot="4" data-rot0="24">
                     <span class="recog-frame__year">2024</span>
                     <h3>Best Presentation</h3>
                     <p class="recog-frame__event">UTA Student Computing Research Festival</p>
                     <p class="recog-frame__desc">A map-less robot navigation algorithm.</p>
                     <a href="https://uta.engineering/scrf/presentations.php" target="_blank" rel="noopener">View <span aria-hidden="true">↗</span></a>
                 </article>
-                <article class="recog-frame" style="left:31%; top:69%;" data-rot="5" data-rot0="-22">
+                <article class="recog-frame" style="left:20%; top:76%;" data-rot="3" data-rot0="-20">
                     <span class="recog-frame__year">2023</span>
                     <h3>3rd Place</h3>
                     <p class="recog-frame__event">UTA Innovation Day</p>
                     <p class="recog-frame__desc">A drone that guides visually impaired people with sound.</p>
                     <a href="https://uta.engineering/innovationday/project-2023.php?p=69" target="_blank" rel="noopener">View <span aria-hidden="true">↗</span></a>
                 </article>
-                <article class="recog-frame" style="left:74%; top:66%;" data-rot="-6" data-rot0="30">
+                <article class="recog-frame" style="left:80%; top:76%;" data-rot="-4" data-rot0="22">
                     <span class="recog-frame__year">2024</span>
                     <h3>Maverick of the Month</h3>
                     <p class="recog-frame__event">UT Arlington</p>
                     <p class="recog-frame__desc">Recognized for outstanding school spirit.</p>
                     <a href="https://www.instagram.com/p/C38MI_DuyVd/" target="_blank" rel="noopener">View <span aria-hidden="true">↗</span></a>
-                </article>
-                <article class="recog-frame recog-frame--final" style="left:50%; top:50%;" data-rot="0" data-rot0="-14">
-                    <span class="eyebrow">Next</span>
-                    <h3>Where I've been</h3>
-                    <p class="recog-frame__desc">The path that led to Octivis <span aria-hidden="true">↓</span></p>
                 </article>
             </div>
         </div>
@@ -276,53 +240,67 @@
                     <span class="exp-h__date">June 2026 – Present</span>
                     <h3>AI Systems Intern</h3>
                     <p class="exp-h__org">Embassy of Pakistan · Washington, DC</p>
-                    <p class="exp-h__desc">Building AI tools for an environment where the data can't leak — private and local LLM deployments, retrieval that respects access control, and the unglamorous security work underneath: least-privilege access, encryption, IAM, audit logging. Good practice for a founder who'll be trusted with other people's data.</p>
+                    <p class="exp-h__desc">Building private AI tools for confidential workflows, with access control, encryption, and auditability built in from the start.</p>
                 </article>
                 <article class="exp-h__card">
                     <span class="exp-h__date">May 2026 – Present</span>
                     <h3>Graduate Archer Fellow — AI Policy</h3>
                     <p class="exp-h__org">UT System Archer Fellowship · Washington, DC</p>
-                    <p class="exp-h__desc">A competitive fellowship placing UT graduate students in Washington. My work looks at the parts of AI most builders skip — the energy and infrastructure cost of running models at scale, and how governance actually gets written. I translate between engineers and the people who make policy, and I'm better at both for it.</p>
+                    <p class="exp-h__desc">Studying the infrastructure and policy behind AI at scale—and learning how technical decisions become public policy.</p>
                 </article>
                 <article class="exp-h__card">
                     <span class="exp-h__date">Sep 2022 – May 2025</span>
                     <h3>Machine Learning Researcher</h3>
                     <p class="exp-h__org">UT Arlington · Machine Learning Lab</p>
-                    <p class="exp-h__desc">Three years of computer-vision and robotics research — object detection and tracking, reinforcement-learning locomotion, real-time perception with PyTorch, OpenCV and YOLO. The core tech behind Octivis started here. Recognized at UTA Innovation Day (Judges' Choice '24, 3rd Place '23) and the Student Computing Research Festival (Best Presentation '24).</p>
+                    <p class="exp-h__desc">Three years working on object detection, tracking, robot locomotion, and real-time perception. This is where the technical foundation for Octivis began.</p>
                 </article>
                 <article class="exp-h__card">
                     <span class="exp-h__date">May 2024 – May 2025</span>
                     <h3>Student Body Vice President</h3>
                     <p class="exp-h__org">Student Government · UT Arlington</p>
-                    <p class="exp-h__desc">Elected to represent roughly 45,000 students. The job was mostly what running an early company is: set priorities with no clear playbook, get people aligned, and ship. Grew the Maverick Discount Program to 30+ local business partners and ran the strongest post-COVID recruitment campaign the org had seen.</p>
+                    <p class="exp-h__desc">Elected to represent roughly 45,000 students. Expanded the Maverick Discount Program to more than 30 local businesses and rebuilt recruitment after COVID.</p>
                 </article>
                 <article class="exp-h__card">
                     <span class="exp-h__date">April 2024 – April 2025</span>
                     <h3>President</h3>
                     <p class="exp-h__org">Engineering Student Council · UT Arlington</p>
-                    <p class="exp-h__desc">Took over a struggling umbrella org for ~10,000 engineering students and rebuilt it — restructured how it ran, grew membership tenfold, and put on its largest event in years at roughly 1,800 attendees. I like fixing things that are quietly broken.</p>
+                    <p class="exp-h__desc">Rebuilt an umbrella organization for about 10,000 engineering students, grew membership tenfold, and helped deliver an event for roughly 1,800 attendees.</p>
                 </article>
             </div>
         </div>
     </section>
 
-    <div class="educationtitle" id="education"><h2>Education</h2></div>
-    <div class="education__container">
+    <section class="education-story" id="education" aria-label="Education at UT Arlington">
+        <div class="education-story__stage">
+            <div class="education-story__meta">
+                <span>Education</span>
+                <span>UT Arlington · 2022—2026</span>
+            </div>
+
+            <div class="education-story__statement" aria-label="Education">
+                <span class="education-story__word education-story__word--left">Edu</span>
+                <figure class="education-story__image">
+                    <img src="UTA.jpg" alt="The University of Texas at Arlington campus tower" loading="lazy" decoding="async">
+                </figure>
+                <span class="education-story__word education-story__word--right">cation</span>
+            </div>
+
+            <div class="education__container">
         <div class="education__card">
-            <span class="edu__glow" aria-hidden="true"></span>
             <span class="edu__badge">MS</span>
             <h3>M.S. Computer Science</h3>
             <p class="edu__degree">University of Texas at Arlington</p>
             <span class="edu__date">Expected Summer 2026</span>
         </div>
         <div class="education__card">
-            <span class="edu__glow" aria-hidden="true"></span>
             <span class="edu__badge">BS</span>
             <h3>B.S. Computer Science</h3>
             <p class="edu__degree">University of Texas at Arlington · Magna Cum Laude</p>
             <span class="edu__date">Graduated 2025</span>
         </div>
-    </div>
+            </div>
+        </div>
+    </section>
     <section class="lifeinsight" id="banner">
         <div class="life__header" data-reveal="fade-up">
             <span class="life__eyebrow">Outside the work</span>
@@ -332,33 +310,33 @@
 
         <div class="marquee">
             <div class="marquee__track marquee__track--left">
-                <figure class="frame"><img src="Glimpse/1.jpg" alt="" loading="lazy"><span class="frame__tag">01</span></figure>
-                <figure class="frame"><img src="Glimpse/2.JPEG" alt="" loading="lazy"><span class="frame__tag">02</span></figure>
-                <figure class="frame"><img src="Glimpse/3.jpg" alt="" loading="lazy"><span class="frame__tag">03</span></figure>
-                <figure class="frame"><img src="Glimpse/4.PNG" alt="" loading="lazy"><span class="frame__tag">04</span></figure>
-                <figure class="frame"><img src="Glimpse/5.jpg" alt="" loading="lazy"><span class="frame__tag">05</span></figure>
+                <figure class="frame"><img src="media/life/01.jpg" alt="" loading="lazy" decoding="async"><span class="frame__tag">01</span></figure>
+                <figure class="frame"><img src="media/life/02.jpg" alt="" loading="lazy" decoding="async"><span class="frame__tag">02</span></figure>
+                <figure class="frame"><img src="media/life/03.jpg" alt="" loading="lazy" decoding="async"><span class="frame__tag">03</span></figure>
+                <figure class="frame"><img src="media/life/04.jpg" alt="" loading="lazy" decoding="async"><span class="frame__tag">04</span></figure>
+                <figure class="frame"><img src="media/life/05.jpg" alt="" loading="lazy" decoding="async"><span class="frame__tag">05</span></figure>
                 <!-- duplicate for seamless loop -->
-                <figure class="frame"><img src="Glimpse/1.jpg" alt="" loading="lazy"><span class="frame__tag">01</span></figure>
-                <figure class="frame"><img src="Glimpse/2.JPEG" alt="" loading="lazy"><span class="frame__tag">02</span></figure>
-                <figure class="frame"><img src="Glimpse/3.jpg" alt="" loading="lazy"><span class="frame__tag">03</span></figure>
-                <figure class="frame"><img src="Glimpse/4.PNG" alt="" loading="lazy"><span class="frame__tag">04</span></figure>
-                <figure class="frame"><img src="Glimpse/5.jpg" alt="" loading="lazy"><span class="frame__tag">05</span></figure>
+                <figure class="frame"><img src="media/life/01.jpg" alt="" loading="lazy" decoding="async"><span class="frame__tag">01</span></figure>
+                <figure class="frame"><img src="media/life/02.jpg" alt="" loading="lazy" decoding="async"><span class="frame__tag">02</span></figure>
+                <figure class="frame"><img src="media/life/03.jpg" alt="" loading="lazy" decoding="async"><span class="frame__tag">03</span></figure>
+                <figure class="frame"><img src="media/life/04.jpg" alt="" loading="lazy" decoding="async"><span class="frame__tag">04</span></figure>
+                <figure class="frame"><img src="media/life/05.jpg" alt="" loading="lazy" decoding="async"><span class="frame__tag">05</span></figure>
             </div>
         </div>
 
         <div class="marquee">
             <div class="marquee__track marquee__track--right">
-                <figure class="frame"><img src="Glimpse/6.JPEG" alt="" loading="lazy"><span class="frame__tag">06</span></figure>
-                <figure class="frame"><img src="Glimpse/7.JPG" alt="" loading="lazy"><span class="frame__tag">07</span></figure>
-                <figure class="frame"><img src="Glimpse/8.jpg" alt="" loading="lazy"><span class="frame__tag">08</span></figure>
-                <figure class="frame"><img src="Glimpse/9.JPG" alt="" loading="lazy"><span class="frame__tag">09</span></figure>
-                <figure class="frame"><img src="Glimpse/10.jpg" alt="" loading="lazy"><span class="frame__tag">10</span></figure>
+                <figure class="frame"><img src="media/life/06.jpg" alt="" loading="lazy" decoding="async"><span class="frame__tag">06</span></figure>
+                <figure class="frame"><img src="media/life/07.jpg" alt="" loading="lazy" decoding="async"><span class="frame__tag">07</span></figure>
+                <figure class="frame"><img src="media/life/08.jpg" alt="" loading="lazy" decoding="async"><span class="frame__tag">08</span></figure>
+                <figure class="frame"><img src="media/life/09.jpg" alt="" loading="lazy" decoding="async"><span class="frame__tag">09</span></figure>
+                <figure class="frame"><img src="media/life/10.jpg" alt="" loading="lazy" decoding="async"><span class="frame__tag">10</span></figure>
                 <!-- duplicate for seamless loop -->
-                <figure class="frame"><img src="Glimpse/6.JPEG" alt="" loading="lazy"><span class="frame__tag">06</span></figure>
-                <figure class="frame"><img src="Glimpse/7.JPG" alt="" loading="lazy"><span class="frame__tag">07</span></figure>
-                <figure class="frame"><img src="Glimpse/8.jpg" alt="" loading="lazy"><span class="frame__tag">08</span></figure>
-                <figure class="frame"><img src="Glimpse/9.JPG" alt="" loading="lazy"><span class="frame__tag">09</span></figure>
-                <figure class="frame"><img src="Glimpse/10.jpg" alt="" loading="lazy"><span class="frame__tag">10</span></figure>
+                <figure class="frame"><img src="media/life/06.jpg" alt="" loading="lazy" decoding="async"><span class="frame__tag">06</span></figure>
+                <figure class="frame"><img src="media/life/07.jpg" alt="" loading="lazy" decoding="async"><span class="frame__tag">07</span></figure>
+                <figure class="frame"><img src="media/life/08.jpg" alt="" loading="lazy" decoding="async"><span class="frame__tag">08</span></figure>
+                <figure class="frame"><img src="media/life/09.jpg" alt="" loading="lazy" decoding="async"><span class="frame__tag">09</span></figure>
+                <figure class="frame"><img src="media/life/10.jpg" alt="" loading="lazy" decoding="async"><span class="frame__tag">10</span></figure>
             </div>
         </div>
     </section>
@@ -373,10 +351,10 @@
         <div class="contact-card">
             <div class="contactleft">
                 <h2 class="subtitle">Get in touch</h2>
-                <p class="contact-blurb">Partnering, piloting Octivis, or just want to compare notes on building? Reach out.</p>
+                <p class="contact-blurb">If you're interested in Octivis, computer vision, or building something together, send me a note.</p>
                 <p><i class="fa-regular fa-paper-plane"></i>areebkhan03@outlook.com</p>
                 <div class="socialicons">
-                    <a href="https://www.instagram.com/areebkhan20/"><i class="fa-brands fa-instagram"></i></i></a>
+                    <a href="https://www.instagram.com/areebkhan20/"><i class="fa-brands fa-instagram"></i></a>
                     <a href="https://www.linkedin.com/in/areeb-khan25/"><i class="fa-brands fa-linkedin"></i></a>
                 </div>
             </div>
@@ -386,7 +364,7 @@
                     <input type="email" name="email" required placeholder="Email">
                     <input type="text" name="subject" required placeholder="Subject">
                     <textarea name="msg" rows="6" required placeholder="Message"></textarea>
-                    <button type="submit" class="btn">Submit</button>
+                    <button type="submit" class="btn">Send message</button>
                 </form>
             </div>
             
@@ -397,15 +375,5 @@
         <p>Areeb Khan <i class="fa-regular fa-copyright"></i> 2026 · Founder of <a href="https://octivis.com" target="_blank" rel="noopener">Octivis</a></p>
     </div>
 
-    <div class="customcursor">
-        <div class="circle"></div>
-        <div class="circle"></div>
-        <div class="circle"></div>
-        <div class="circle"></div>
-        <div class="circle"></div>
-        <div class="circle"></div>
-    </div>
-
-    
 </body>
 </html>
