@@ -242,6 +242,136 @@ function animateText() {
     }, 300);
 }
 
+// Cinematic scroll-driven zoom-out on the hero: as you scroll past it, the
+// whole hero scene scales down, fades and softens, revealing the work below.
+// Driven by GSAP ScrollTrigger so it works reliably across browsers.
+function setupHeroZoom() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!window.gsap || !window.ScrollTrigger) return;
+    gsap.registerPlugin(ScrollTrigger);
+
+    // avoid stacking duplicates if this ever runs twice
+    ScrollTrigger.getById('heroZoom')?.kill();
+
+    gsap.to("main", {
+        scale: 0.7,
+        opacity: 0,
+        filter: "blur(7px)",
+        ease: "none",
+        scrollTrigger: {
+            id: 'heroZoom',
+            trigger: "main",
+            start: "top top",
+            end: "+=780",
+            scrub: 0.5,
+            invalidateOnRefresh: true
+        }
+    });
+    ScrollTrigger.refresh();
+}
+
+// ============================================================
+//  PINNED SCROLL SHOWCASES
+//  A) Project scatter — a sticky stage where project images fan out
+//     around a heading (zoom-out reveal) with the home screen docked
+//     bottom-center.  B) Experience — a pinned section whose cards
+//     scroll horizontally as you scroll vertically.
+//  Both are gated to desktop + motion-allowed; otherwise the CSS
+//  default (simple grid / wrapped cards) stands as a safe fallback.
+// ============================================================
+function setupScrollShowcases() {
+    if (!window.gsap || !window.ScrollTrigger) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (window.innerWidth <= 900) return;              // mobile keeps the static layout
+    gsap.registerPlugin(ScrollTrigger);
+
+    /* ---------- A) Project scatter reveal ---------- */
+    const showcase = document.querySelector('.showcase');
+    if (showcase) {
+        showcase.classList.add('sc-hydrated');         // switch CSS to pinned/absolute mode
+        const scatter = showcase.querySelector('.scatter');
+        const items   = gsap.utils.toArray('.scatter .scatter-item');
+        const heading = showcase.querySelector('.showcase__heading');
+        const dock    = showcase.querySelector('.home-dock');
+
+        // from-states (kept centred via the -50/-50 that never changes)
+        gsap.set(items, { xPercent: -50, yPercent: -50, opacity: 0, scale: 0.35 });
+        gsap.set(scatter, { scale: 1.35 });
+        gsap.set(heading, { opacity: 0, y: 40 });
+        gsap.set(dock, { xPercent: -50, yPercent: -50, opacity: 0, scale: 0.8 });
+
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: showcase, start: 'top top', end: 'bottom bottom',
+                scrub: 0.6, invalidateOnRefresh: true
+            }
+        });
+        tl.to(scatter, { scale: 1, ease: 'none' }, 0)
+          .to(heading, { opacity: 1, y: 0, ease: 'none' }, 0.05)
+          .to(items, {
+                opacity: 1, scale: 1,
+                rotation: (i, t) => parseFloat(t.dataset.rot) || 0,
+                ease: 'none', stagger: 0.05
+          }, 0.05)
+          .to(dock, { opacity: 1, scale: 1, ease: 'none' }, 0.35);
+    }
+
+    /* ---------- B) Experience horizontal pinned scroll ---------- */
+    const expH  = document.querySelector('.exp-h');
+    const track = document.querySelector('.exp-h__track');
+    if (expH && track) {
+        expH.classList.add('exp-hydrated');            // switch CSS to nowrap horizontal row
+        const distance = () => Math.max(0, track.scrollWidth - window.innerWidth + window.innerWidth * 0.07);
+        gsap.to(track, {
+            x: () => -distance(),
+            ease: 'none',
+            scrollTrigger: {
+                trigger: expH, start: 'top top',
+                end: () => '+=' + distance(),
+                pin: true, scrub: 0.5, anticipatePin: 1, invalidateOnRefresh: true
+            }
+        });
+    }
+
+    /* ---------- C) Recognition — falling frames, then zoom the final ---------- */
+    const recog = document.querySelector('.recog');
+    if (recog) {
+        recog.classList.add('recog-hydrated');
+        const frames = gsap.utils.toArray('.recog .recog-frame');
+        const finalFrame = recog.querySelector('.recog-frame--final');
+        const others = frames.filter(f => f !== finalFrame);
+        const heading = recog.querySelector('.recog__heading');
+        const vh = () => window.innerHeight;
+
+        gsap.set(frames, { xPercent: -50, yPercent: -50 });
+        frames.forEach(f => gsap.set(f, {
+            y: -1.3 * vh(), rotation: parseFloat(f.dataset.rot0) || -28, opacity: 0
+        }));
+        gsap.set(heading, { opacity: 0, y: 24 });
+
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: recog, start: 'top top',
+                end: () => '+=' + (vh() * 4),
+                pin: true, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true
+            }
+        });
+        tl.to(heading, { opacity: 1, y: 0, ease: 'none', duration: 0.6 }, 0);
+        frames.forEach((f, i) => {
+            tl.to(f, {
+                y: 0, rotation: parseFloat(f.dataset.rot) || 0, opacity: 1,
+                ease: 'power3.out', duration: 1.1
+            }, 0.5 + i * 0.85);
+        });
+        // once everything has landed, zoom the "Where I've been" frame to fill the screen
+        const zoomAt = 0.5 + frames.length * 0.85 + 0.5;
+        tl.to(others, { opacity: 0, ease: 'none', duration: 0.8 }, zoomAt)
+          .to(heading, { opacity: 0, ease: 'none', duration: 0.8 }, zoomAt)
+          .to(finalFrame, { scale: 13, ease: 'power2.in', duration: 2.4 }, zoomAt)
+          .to(finalFrame, { opacity: 0, ease: 'none', duration: 0.5 }, zoomAt + 1.9);
+    }
+}
+
 // Function to start parallax animation after loader is complete
 function startParallaxAnimation() {
     // Fade in the main content
@@ -254,6 +384,8 @@ function startParallaxAnimation() {
             onComplete: function() {
                 // Initialize the parallax effect
                 update(window.innerWidth / 2); // Initial update with center position
+                // Hero now visible — arm the scroll-driven zoom-out
+                setupHeroZoom();
             }
         });
     }
@@ -487,9 +619,17 @@ setAnimationScroll();
                 });
         }
 
+        /* ---- 9. Pinned showcases: project scatter + horizontal experience ---- */
+        setupScrollShowcases();
+
         ScrollTrigger.refresh();
     });
 })();
+
+// Re-measure pinned triggers once every image (project thumbs, home screenshot) has loaded
+window.addEventListener('load', () => {
+    if (window.ScrollTrigger) ScrollTrigger.refresh();
+});
 
 /*const track = document.getElementById("image-track");
 
@@ -629,6 +769,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Contact card — zoom in
     tag(document.querySelector('.contact-card'), 'fade-up');
+
+    // Octivis founder section + supporting copy
+    tag(document.querySelector('.octivis'), 'fade-up');
+    tag(document.querySelector('.projects__intro'), 'fade-up');
 });
   
 
