@@ -233,7 +233,7 @@ header ul a:hover {
     
     .rbuild, .empbuild, .lbuild {
         width: 200px; /* Reduced size */
-        transform: translateX(-50%); /* Center horizontally */
+        transform: translate3d(-50%, -50%, 0); /* Keep the same center anchor as the JS parallax */
         left: 50%;
     }
     
@@ -462,7 +462,10 @@ main{
 
 .parallax{
     pointer-events: none;
-    transition: 0.45s cubic-bezier(.2,.49,.32,.99);    
+    transition: 0.45s cubic-bezier(.2,.49,.32,.99);
+    /* Baseline centering. The pointer-parallax JS overrides this on desktop;
+       touch devices (phones/iPads) never run it and rely on this transform. */
+    transform: translate3d(-50%, -50%, 0);
 }
 
 
@@ -4416,6 +4419,109 @@ html.is-loading body {
 
     .octivis-story__body strong {
         margin-top: 1.6rem;
+    }
+}
+
+/* ============================================================
+   MOBILE / TABLET POLISH — centering + room for the scroll
+   animations that js/app.js adds below 901px.
+   ============================================================ */
+@media (max-width: 900px) {
+    html,
+    body {
+        overflow-x: hidden;
+    }
+
+    /* The mobile hero pull-back scales <main>; keep the edges tidy. */
+    main {
+        will-change: transform;
+        border-radius: 0;
+    }
+
+    .about-title {
+        text-align: center;
+    }
+
+    .sec .about-copy p,
+    .expertise {
+        text-align: center;
+    }
+
+    /* The scroll parallax drives these directly; the hover transition would
+       make every scrub update lag behind the finger. */
+    main .parallax {
+        transition: none;
+        will-change: transform;
+    }
+
+    .octivis-case__intro h2,
+    .octivis-case__intro p {
+        text-align: center;
+    }
+
+    .octivis-case__intro p {
+        margin-inline: auto;
+    }
+
+    .octivis-case__identity {
+        display: flex;
+        justify-content: center;
+    }
+
+    .exp-h__intro {
+        text-align: center;
+    }
+
+    .exp-h__cue {
+        display: none !important;
+    }
+
+    .education-story__meta {
+        justify-content: center;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .work-reveal {
+        padding-inline: 1.1rem;
+    }
+
+    .octivis-case__link {
+        justify-content: center;
+        gap: 0.6rem;
+        text-align: center;
+    }
+
+    /* Octivis product stories: centered media and copy. */
+    .octivis-story__media {
+        margin-inline: auto;
+    }
+
+    .octivis-story__body {
+        align-items: center;
+        text-align: center;
+    }
+
+    .octivis-story__body strong {
+        align-self: center;
+    }
+
+    /* Education degree cards: centered content. */
+    .education__card {
+        text-align: center;
+    }
+
+    /* Experience: equal-width tiles in a grid so a lone last card doesn't
+       stretch wider than the rest, with centered content. */
+    .exp-h__track {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+        gap: 1.2rem;
+    }
+
+    .exp-h__card {
+        max-width: none;
+        text-align: center;
     }
 }
 

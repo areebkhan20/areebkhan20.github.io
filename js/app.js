@@ -343,9 +343,50 @@ function setupHeroEntrance() {
     });
 }
 
+function bindHeroTap(element, onTap) {
+    let startPoint = null;
+
+    const isInteractive = target => target instanceof Element
+        && Boolean(target.closest('a, button, input, textarea, select, label'));
+
+    const handlePointerDown = event => {
+        if (event.pointerType === 'mouse' || event.isPrimary === false || isInteractive(event.target)) {
+            startPoint = null;
+            return;
+        }
+
+        startPoint = { x: event.clientX, y: event.clientY, pointerId: event.pointerId };
+    };
+
+    const handlePointerUp = event => {
+        if (!startPoint || event.pointerId !== startPoint.pointerId) return;
+
+        const distance = Math.hypot(
+            event.clientX - startPoint.x,
+            event.clientY - startPoint.y
+        );
+        startPoint = null;
+
+        // A short stationary gesture is a tap. Longer movement is page scroll.
+        if (distance <= 18) onTap(event);
+    };
+
+    const cancelTap = () => { startPoint = null; };
+
+    element.addEventListener('pointerdown', handlePointerDown, { passive: true });
+    element.addEventListener('pointerup', handlePointerUp, { passive: true });
+    element.addEventListener('pointercancel', cancelTap, { passive: true });
+
+    return () => {
+        element.removeEventListener('pointerdown', handlePointerDown);
+        element.removeEventListener('pointerup', handlePointerUp);
+        element.removeEventListener('pointercancel', cancelTap);
+    };
+}
+
 function setupHeroParallax() {
     const hero = document.querySelector('main');
-    if (!hero || reduceMotion.matches || !finePointer.matches) return;
+    if (!hero || reduceMotion.matches) return;
 
     const layers = [...hero.querySelectorAll('.parallax')].map(element => ({
         element,
@@ -385,12 +426,28 @@ function setupHeroParallax() {
         if (!frame) frame = requestAnimationFrame(render);
     };
 
-    hero.addEventListener('pointermove', event => {
+    if (finePointer.matches) {
+        hero.addEventListener('pointermove', event => {
+            // Mobile scroll motion owns these transforms at this breakpoint.
+            if (window.matchMedia('(max-width: 900px)').matches) return;
+
+            const rect = hero.getBoundingClientRect();
+            targetX = event.clientX - rect.left - rect.width / 2;
+            targetY = event.clientY - rect.top - rect.height / 2;
+            requestRender();
+        }, { passive: true });
+    }
+
+    // Touch-first tablets wider than the mobile breakpoint use the same layer
+    // math as desktop, but a tap supplies the target instead of a cursor.
+    bindHeroTap(hero, event => {
+        if (window.matchMedia('(max-width: 900px)').matches) return;
+
         const rect = hero.getBoundingClientRect();
         targetX = event.clientX - rect.left - rect.width / 2;
         targetY = event.clientY - rect.top - rect.height / 2;
         requestRender();
-    }, { passive: true });
+    });
 
     // Apply the neutral transform immediately so the layered hero is correct
     // before the first pointer event. When the pointer leaves, the last target
@@ -412,6 +469,12 @@ function setupDesktopScrollStories() {
         return () => cleanups.forEach(cleanup => cleanup());
     });
 
+    // Phones and small tablets get lighter, unpinned takes on the same stories.
+    // gsap.matchMedia() reverts everything created here when the breakpoint flips.
+    media.add('(max-width: 900px)', () => {
+        return setupMobileStories();
+    });
+
     let resizeTimer;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
@@ -419,6 +482,175 @@ function setupDesktopScrollStories() {
     }, { passive: true });
 
     window.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
+}
+
+function setupMobileStories() {
+    const revealFrom = (target, vars, start = 'top 87%') => {
+        gsap.from(target, {
+            ease: 'power2.out',
+            duration: 0.7,
+            ...vars,
+            scrollTrigger: {
+                trigger: vars.trigger || target,
+                start,
+                toggleActions: 'play none none reverse'
+            }
+        });
+    };
+
+    const hero = document.querySelector('main');
+    const touchLayers = [];
+
+    // Scroll supplies the base drift. Tap offsets are kept separately and
+    // added on top, so the composition stays where the user moved it even
+    // after the tap animation settles.
+    gsap.utils.toArray('main .parallax').forEach(layer => {
+        const speedY = Number(layer.dataset.speedy || 0.06);
+        const speedX = Number(layer.dataset.speedx || 0);
+        const speedZ = Number(layer.dataset.speedz || 0);
+        const rotation = Number(layer.dataset.rotation || 0);
+        const state = {
+            scrollX: 0,
+            scrollY: 0,
+            tapX: 0,
+            tapY: 0,
+            tapZ: 0,
+            tapRotation: 0
+        };
+        gsap.set(layer, {
+            xPercent: -50,
+            yPercent: -50,
+            transformPerspective: 900,
+            force3D: true
+        });
+        const setX = gsap.quickSetter(layer, 'x', 'px');
+        const setY = gsap.quickSetter(layer, 'y', 'px');
+        const setZ = gsap.quickSetter(layer, 'z', 'px');
+        const setRotation = gsap.quickSetter(layer, 'rotationY', 'deg');
+        const renderLayer = () => {
+            setX(state.scrollX + state.tapX);
+            setY(state.scrollY + state.tapY);
+            setZ(state.tapZ);
+            setRotation(state.tapRotation);
+        };
+
+        renderLayer();
+        gsap.to(state, {
+            scrollY: () => -speedY * window.innerHeight * 1.5,
+            scrollX: () => speedX * 50,
+            ease: 'none',
+            onUpdate: renderLayer,
+            scrollTrigger: {
+                trigger: 'main',
+                start: 'top top',
+                end: 'bottom top',
+                scrub: 0.3,
+                invalidateOnRefresh: true
+            }
+        });
+
+        touchLayers.push({ state, speedX, speedY, speedZ, rotation, renderLayer, tapTween: null });
+    });
+
+    const removeTapHandler = hero ? bindHeroTap(hero, event => {
+        const rect = hero.getBoundingClientRect();
+        const targetX = event.clientX - rect.left - rect.width / 2;
+        const targetY = event.clientY - rect.top - rect.height / 2;
+        const rotationDegree = (targetX / Math.max(rect.width / 2, 1)) * 16;
+
+        touchLayers.forEach(entry => {
+            entry.tapTween?.kill();
+            entry.tapTween = gsap.to(entry.state, {
+                tapX: -targetX * entry.speedX,
+                tapY: targetY * entry.speedY,
+                tapZ: Math.max(-40, Math.min(40, targetX * entry.speedZ * 0.08)),
+                tapRotation: rotationDegree * entry.rotation,
+                duration: 0.78,
+                ease: 'power3.out',
+                overwrite: 'auto',
+                onUpdate: entry.renderLayer
+            });
+        });
+    }) : () => {};
+
+    // Hero recedes as the work scrolls up over it — mobile echo of the desktop
+    // pull-back story.
+    gsap.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: {
+            trigger: 'main',
+            start: 'top top',
+            end: 'bottom 30%',
+            scrub: 0.35
+        }
+    })
+        .to('main', { scale: 0.92, yPercent: 6, opacity: 0.3, borderRadius: 26 }, 0)
+        .to('.hero-intro', { opacity: 0, y: -26, duration: 0.55 }, 0);
+
+    revealFrom('.showcase__heading', { y: 44, opacity: 0 });
+    gsap.utils.toArray('.scatter-item').forEach((item, index) => {
+        revealFrom(item, {
+            y: 58,
+            x: index % 2 ? 30 : -30,
+            rotation: index % 2 ? 2.4 : -2.4,
+            scale: 0.94,
+            opacity: 0,
+            duration: 0.75
+        }, 'top 90%');
+    });
+
+    // Octivis rises in with the rounded clip hand-off from the desktop story.
+    gsap.from('.octivis-case', {
+        y: 90,
+        scale: 0.965,
+        clipPath: 'inset(4% 4% 0% 4% round 26px 26px 0 0)',
+        transformOrigin: '50% 0%',
+        ease: 'none',
+        scrollTrigger: {
+            trigger: '.octivis-case',
+            start: 'top 96%',
+            end: 'top 42%',
+            scrub: 0.4
+        }
+    });
+
+    revealFrom('.recog__heading', { y: 40, opacity: 0 });
+    gsap.utils.toArray('.recog-frame').forEach((frame, index) => {
+        revealFrom(frame, {
+            y: 60,
+            rotation: index % 2 ? 2.6 : -2.6,
+            opacity: 0
+        }, 'top 92%');
+    });
+
+    revealFrom('.exp-h__intro', { y: 40, opacity: 0 });
+    gsap.utils.toArray('.exp-h__card').forEach(card => {
+        revealFrom(card, { y: 54, scale: 0.97, opacity: 0, duration: 0.65 }, 'top 92%');
+    });
+
+    // Education wordmark slides together around the tower, like the desktop pin.
+    gsap.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: {
+            trigger: '.education-story__statement',
+            start: 'top 92%',
+            end: 'top 40%',
+            scrub: 0.35
+        }
+    })
+        .from('.education-story__word--left', { x: -46, opacity: 0.25 }, 0)
+        .from('.education-story__word--right', { x: 46, opacity: 0.25 }, 0)
+        .from('.education-story__image', { scaleY: 0.62, transformOrigin: '50% 100%' }, 0);
+
+    revealFrom('.education-story__meta', { y: 26, opacity: 0 });
+    gsap.utils.toArray('.education__card').forEach(card => {
+        revealFrom(card, { y: 42, opacity: 0 }, 'top 93%');
+    });
+
+    return () => {
+        removeTapHandler();
+        touchLayers.forEach(entry => entry.tapTween?.kill());
+    };
 }
 
 function setupAboutOctivisTransition() {
