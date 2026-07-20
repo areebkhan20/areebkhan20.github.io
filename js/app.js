@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupReveals();
     setupHeroParallax();
     setupOctivisParallax();
+    setupMarqueeDrag();
 
     if (!reduceMotion.matches && window.gsap && window.ScrollTrigger) {
         gsap.registerPlugin(ScrollTrigger);
@@ -140,8 +141,15 @@ function setupSmoothScroll() {
         lenis.on('scroll', ScrollTrigger.update);
         gsap.ticker.add(time => lenis.raf(time * 1000));
         gsap.ticker.lagSmoothing(0);
+        // Halt Lenis while ScrollTrigger measures: pin reverts shift the page
+        // mid-refresh, and if Lenis re-asserts its cached position during that
+        // window the triggers record positions offset by the scroll amount.
+        ScrollTrigger.addEventListener('refreshInit', () => lenis?.stop());
         // pin spacers change the page height after Lenis measures it
-        ScrollTrigger.addEventListener('refresh', () => lenis?.resize());
+        ScrollTrigger.addEventListener('refresh', () => {
+            lenis?.resize();
+            lenis?.start();
+        });
     } else {
         const raf = time => {
             lenis.raf(time);
@@ -297,6 +305,76 @@ function setupReveals() {
     }, { threshold: 0.14, rootMargin: '0px 0px -6% 0px' });
 
     targets.forEach(element => observer.observe(element));
+}
+
+function setupMarqueeDrag() {
+    if (!window.gsap) return;
+
+    document.querySelectorAll('.marquee').forEach(marquee => {
+        const track = marquee.querySelector('.marquee__track');
+        if (!track) return;
+
+        // JS drives the loop from here on; the CSS keyframes are disabled via
+        // this class so drag flicks can speed the ride up or pull it backwards.
+        marquee.classList.add('marquee--interactive');
+        const direction = track.classList.contains('marquee__track--right') ? 1 : -1;
+        let half = 0;
+        let offset = 0;
+        let velocity = 0;
+        let dragging = false;
+        let lastX = 0;
+
+        const measure = () => { half = track.scrollWidth / 2; };
+        measure();
+        window.addEventListener('resize', measure, { passive: true });
+
+        // The track holds two copies of the same frames, so any offset in
+        // (-half, 0] shows a seamless strip.
+        const wrap = value => {
+            if (!half) return 0;
+            let wrapped = value % half;
+            if (wrapped > 0) wrapped -= half;
+            return wrapped;
+        };
+
+        const render = () => {
+            track.style.transform = `translate3d(${offset}px, 0, 0)`;
+        };
+
+        gsap.ticker.add((_, deltaTime) => {
+            if (dragging) return;
+            const dt = Math.min(deltaTime / 1000, 0.1);
+            const base = reduceMotion.matches ? 0 : direction * (half / 45);
+            offset = wrap(offset + (base + velocity) * dt);
+            velocity *= Math.exp(-2.6 * dt);
+            if (Math.abs(velocity) < 2) velocity = 0;
+            render();
+        });
+
+        marquee.addEventListener('dragstart', event => event.preventDefault());
+        marquee.addEventListener('pointerdown', event => {
+            dragging = true;
+            lastX = event.clientX;
+            velocity = 0;
+            try { marquee.setPointerCapture(event.pointerId); } catch (_) { }
+            marquee.classList.add('is-dragging');
+        });
+        marquee.addEventListener('pointermove', event => {
+            if (!dragging) return;
+            const dx = event.clientX - lastX;
+            lastX = event.clientX;
+            offset = wrap(offset + dx);
+            velocity = dx * 60;
+            render();
+        });
+        const release = () => {
+            if (!dragging) return;
+            dragging = false;
+            marquee.classList.remove('is-dragging');
+        };
+        marquee.addEventListener('pointerup', release);
+        marquee.addEventListener('pointercancel', release);
+    });
 }
 
 function setupOctivisParallax() {
@@ -535,7 +613,7 @@ function setupMobileStories() {
         };
 
         renderLayer();
-        gsap.to(state, {
+        gsap.fromTo(state, { scrollX: 0, scrollY: 0 }, {
             scrollY: () => -speedY * window.innerHeight * 1.5,
             scrollX: () => speedX * 50,
             ease: 'none',
@@ -682,16 +760,28 @@ function setupAboutOctivisTransition() {
         }
     });
 
+    // Explicit from-values keep a mid-scroll ScrollTrigger.refresh() from
+    // re-recording animated states as the new baseline (see setupProjectStory).
     timeline
-        .to(aboutGrid, { scale: 0.9, y: -84, opacity: 0.18, duration: 1 }, 0)
-        .to(section, {
+        .fromTo(aboutGrid, { scale: 1, y: 0, opacity: 1 }, {
+            scale: 0.9, y: -84, opacity: 0.18, duration: 1, immediateRender: false
+        }, 0)
+        .fromTo(section, {
+            y: 130,
+            scale: 0.94,
+            clipPath: 'inset(9% 3.5% 0% 3.5% round 34px 34px 0 0)'
+        }, {
             y: 0,
             scale: 1,
             clipPath: 'inset(0% 0% 0% 0% round 0px)',
             duration: 1
         }, 0)
-        .to(logo, { opacity: 1, scale: 1, y: 0, duration: 0.58, ease: 'power2.out' }, 0.28)
-        .to(intro, { opacity: 1, x: 0, stagger: 0.08, duration: 0.56, ease: 'power2.out' }, 0.34);
+        .fromTo(logo, { opacity: 0, scale: 0.78, y: 24 }, {
+            opacity: 1, scale: 1, y: 0, duration: 0.58, ease: 'power2.out', immediateRender: false
+        }, 0.28)
+        .fromTo(intro, { opacity: 0, x: 54 }, {
+            opacity: 1, x: 0, stagger: 0.08, duration: 0.56, ease: 'power2.out', immediateRender: false
+        }, 0.34);
 
     return () => {
         timeline.scrollTrigger?.kill();
@@ -734,28 +824,33 @@ function setupProjectStory() {
         }
     });
 
+    // Every tween declares explicit from-values: with invalidateOnRefresh, a
+    // ScrollTrigger.refresh() mid-story (lazy image load, resize) would
+    // otherwise re-record the current mid-animation state as the new start and
+    // the story could never scrub back to its resting look.
     timeline
-        .to(main, {
+        .fromTo(main, { scale: 1, y: 0, borderRadius: 0 }, {
             scale: 0.32,
             y: () => window.innerHeight * 0.34,
             borderRadius: 24,
             duration: 0.54
         }, 0)
-        .to(heroIntro, { opacity: 0, duration: 0.18 }, 0.04)
-        .to(reveal, { autoAlpha: 1, duration: 0.18 }, 0.12)
-        .to(heading, { opacity: 1, y: 0, duration: 0.28 }, 0.18)
-        .to(items, {
+        .fromTo(heroIntro, { opacity: 1 }, { opacity: 0, duration: 0.18, immediateRender: false }, 0.04)
+        .fromTo(reveal, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.18, immediateRender: false }, 0.12)
+        .fromTo(heading, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.28, immediateRender: false }, 0.18)
+        .fromTo(items, { opacity: 0, scale: 0.72, y: 70 }, {
             opacity: 1,
             scale: 1,
             y: 0,
             rotation: 0,
-            stagger: 0.055,
-            duration: 0.44
-        }, 0.24)
-        .to(reveal, { autoAlpha: 0.2, y: -40, duration: 0.3 }, 0.7)
-        .to(main, { opacity: 0.12, duration: 0.24 }, 0.7)
-        .to(about, { yPercent: 0, duration: 0.3, ease: 'power2.inOut' }, 0.7)
-        .to(aboutGrid, { opacity: 1, y: 0, duration: 0.2, ease: 'power2.out' }, 0.8)
+            stagger: 0.045,
+            duration: 0.34,
+            immediateRender: false
+        }, 0.2)
+        .fromTo(reveal, { autoAlpha: 1, y: 0 }, { autoAlpha: 0.2, y: -40, duration: 0.22, immediateRender: false }, 1.0)
+        .fromTo(main, { opacity: 1 }, { opacity: 0.12, duration: 0.2, immediateRender: false }, 1.0)
+        .fromTo(about, { yPercent: 100 }, { yPercent: 0, duration: 0.3, ease: 'power2.inOut', immediateRender: false }, 1.0)
+        .fromTo(aboutGrid, { opacity: 0, y: 52 }, { opacity: 1, y: 0, duration: 0.18, ease: 'power2.out', immediateRender: false }, 1.12)
         .to(aboutHold, { progress: 1, duration: 0.55, ease: 'none' });
 
     return () => {
@@ -798,17 +893,20 @@ function setupRecognitionStory() {
         }
     });
 
+    // Explicit from-values keep a mid-scroll ScrollTrigger.refresh() from
+    // re-recording animated states as the new baseline (see setupProjectStory).
     timeline
-        .to(heading, { opacity: 1, y: 0, duration: 0.22, ease: 'none' }, 0)
-        .to(frames, {
+        .fromTo(heading, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.22, ease: 'none' }, 0)
+        .fromTo(frames, { y: 64, opacity: 0 }, {
             y: 0,
             opacity: 1,
             duration: 0.5,
             stagger: 0.16,
-            ease: 'power2.out'
+            ease: 'power2.out',
+            immediateRender: false
         }, 0.15)
-        .to(frames, { opacity: 0.12, y: -30, duration: 0.34, ease: 'power1.in' }, 1.58)
-        .to(heading, { opacity: 0, y: -22, duration: 0.28, ease: 'none' }, 1.7);
+        .fromTo(frames, { opacity: 1, y: 0 }, { opacity: 0.12, y: -30, duration: 0.34, ease: 'power1.in', immediateRender: false }, 1.58)
+        .fromTo(heading, { opacity: 1, y: 0 }, { opacity: 0, y: -22, duration: 0.28, ease: 'none', immediateRender: false }, 1.7);
 
     return () => {
         timeline.scrollTrigger?.kill();
@@ -842,10 +940,14 @@ function setupExperienceStory() {
         }
     });
 
+    // Explicit from-values keep a mid-scroll ScrollTrigger.refresh() from
+    // re-recording animated states as the new baseline (see setupProjectStory).
     timeline
-        .to(intro, { opacity: 1, y: 0, duration: 0.12, ease: 'none' }, 0)
-        .to(cards, { opacity: 1, y: 0, stagger: 0.02, duration: 0.16, ease: 'power1.out' }, 0.02)
-        .to(track, { x: () => -distance(), duration: 0.88, ease: 'none' }, 0.12);
+        .fromTo(intro, { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.12, ease: 'none' }, 0)
+        .fromTo(cards, { opacity: 0.36, y: 54 }, {
+            opacity: 1, y: 0, stagger: 0.02, duration: 0.16, ease: 'power1.out', immediateRender: false
+        }, 0.02)
+        .fromTo(track, { x: 0 }, { x: () => -distance(), duration: 0.88, ease: 'none', immediateRender: false }, 0.12);
 
     return () => {
         timeline.scrollTrigger?.kill();
@@ -886,24 +988,34 @@ function setupEducationStory() {
         }
     });
 
+    // Explicit from-values keep a mid-scroll ScrollTrigger.refresh() from
+    // re-recording animated states as the new baseline (see setupProjectStory).
+    // The image's from mirrors its stylesheet size so invalidation re-records
+    // the same resting frame.
     timeline
-        .to(meta, { opacity: 1, y: 0, duration: 0.16, ease: 'none' }, 0)
-        .to(leftWord, { x: 0, opacity: 1, duration: 0.26, ease: 'power2.out' }, 0.02)
-        .to(rightWord, { x: 0, opacity: 1, duration: 0.26, ease: 'power2.out' }, 0.02)
-        .to(image, {
+        .fromTo(meta, { opacity: 0, y: -18 }, { opacity: 1, y: 0, duration: 0.16, ease: 'none' }, 0)
+        .fromTo(leftWord, { x: -70, opacity: 0.28 }, { x: 0, opacity: 1, duration: 0.26, ease: 'power2.out', immediateRender: false }, 0.02)
+        .fromTo(rightWord, { x: 70, opacity: 0.28 }, { x: 0, opacity: 1, duration: 0.26, ease: 'power2.out', immediateRender: false }, 0.02)
+        .fromTo(image, {
+            width: () => Math.min(Math.max(78, window.innerWidth * 0.07), 124),
+            height: () => Math.min(Math.max(190, window.innerHeight * 0.3), 300),
+            borderRadius: 5
+        }, {
             width: () => Math.min(window.innerWidth * 0.32, 560),
             height: () => Math.min(window.innerHeight * 0.58, 610),
             borderRadius: 8,
             duration: 0.46,
-            ease: 'power2.inOut'
+            ease: 'power2.inOut',
+            immediateRender: false
         }, 0.18)
-        .to(statement, {
+        .fromTo(statement, { y: 0 }, {
             y: () => -window.innerHeight * 0.11,
             duration: 0.34,
-            ease: 'power2.inOut'
+            ease: 'power2.inOut',
+            immediateRender: false
         }, 0.42)
-        .to(details, { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' }, 0.57)
-        .to(cards, { opacity: 1, y: 0, stagger: 0.05, duration: 0.24, ease: 'power2.out' }, 0.6);
+        .fromTo(details, { opacity: 0, y: 54 }, { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out', immediateRender: false }, 0.57)
+        .fromTo(cards, { opacity: 0, y: 28 }, { opacity: 1, y: 0, stagger: 0.05, duration: 0.24, ease: 'power2.out', immediateRender: false }, 0.6);
 
     return () => {
         timeline.scrollTrigger?.kill();

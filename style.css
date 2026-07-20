@@ -1182,9 +1182,12 @@ form input, textarea{
     box-shadow: 0 0 25px rgba(106, 31, 122,0.7);
 }
 
-/* Smooth scrolling */
+/* Native smooth scrolling must stay OFF: Lenis supplies the smoothing, and
+   ScrollTrigger.refresh() measures with instant internal scrolls — an animated
+   scroll-behavior makes those async and corrupts every trigger position.
+   The JS fallback passes behavior: 'smooth' per call where it's wanted. */
 html {
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
 }
 
 /* Lenis smooth scroll (native anchor smoothing must yield to it) */
@@ -1801,6 +1804,26 @@ form input::placeholder, textarea::placeholder {
 .marquee__track--right { animation: marquee-right 45s linear infinite; }
 
 .marquee:hover .marquee__track { animation-play-state: paused; }
+
+/* JS-driven marquee: drag or flick a strip to speed it up or pull it back. */
+.marquee--interactive {
+    cursor: grab;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.marquee--interactive.is-dragging { cursor: grabbing; }
+
+.marquee--interactive .marquee__track {
+    animation: none;
+    will-change: transform;
+}
+
+.marquee--interactive .frame img {
+    -webkit-user-drag: none;
+    user-drag: none;
+}
 
 @keyframes marquee-left {
     from { transform: translateX(0); }
@@ -3590,7 +3613,7 @@ html.is-loading body {
 }
 
 .expertise h3 {
-    padding: 0 0 1rem;
+    padding: 0.9rem 0 1rem;
     color: rgba(255, 255, 255, 0.52);
     font-size: 0.72rem;
     font-weight: 600;
@@ -4267,6 +4290,15 @@ html.is-loading body {
     padding-inline: 1.25rem;
     background: #0c0a10;
     filter: none;
+}
+
+.octivis-case__intro .octivis-case__eyebrow {
+    margin: 0 0 1rem;
+    color: var(--brand-soft);
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
 }
 
 .octivis-case__intro h2 {
