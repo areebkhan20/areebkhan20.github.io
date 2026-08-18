@@ -4572,3 +4572,47 @@ html.is-loading body {
         height: 128px;
     }
 }
+
+/* ============================================================
+   FIRST-VISIT PERFORMANCE
+   Images are served as AVIF through <picture> with the original
+   file as the fallback source. The wrapper must not become a box
+   of its own, or every flex/grid image below would re-layout.
+   ============================================================ */
+picture {
+    display: contents;
+}
+
+/* The hero layers carry width/height attributes so the browser can reserve
+   their boxes before the bytes arrive. Those attributes are also a
+   presentational height, which would flatten the art against the CSS width —
+   height:auto hands sizing back to the intrinsic aspect ratio. */
+.parallax {
+    height: auto;
+}
+
+/* Icons are inline SVG now (the icon font was a render-blocking
+   request from a second origin for four glyphs). They inherit
+   font-size and color, so the old <i> styling still applies.
+   Named ui-icon, not icon: .icon is already the skills-grid logo. */
+.ui-icon {
+    display: inline-block;
+    height: 1em;
+    width: auto;
+    vertical-align: -0.125em;
+}
+
+.contactleft p .ui-icon--text {
+    color: #6a1f7a;
+    margin-right: 12px;
+}
+
+.copyright p .ui-icon--text {
+    vertical-align: -0.14em;
+}
+
+/* The curtain now lifts in well under a second, so the progress
+   sweep has to finish in that window instead of crawling. */
+.site-loader__progress span {
+    transition-duration: 0.85s;
+}

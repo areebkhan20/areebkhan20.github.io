@@ -1,5 +1,14 @@
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+
+// Data Saver, and the very slow connection tiers, are the clearest signal that
+// a first-time visitor is on a metered or weak link. Used to shorten the
+// loader rather than to remove anything from the page.
+const saveData = () => {
+    const connection = navigator.connection;
+    if (!connection) return false;
+    return Boolean(connection.saveData) || /(^|-)2g$/.test(connection.effectiveType || '');
+};
 let lenis = null;
 const scrollStateKey = 'areeb-khan-scroll-y';
 const initialHash = window.location.hash;
@@ -179,15 +188,21 @@ function setupLoader() {
 
     loader.classList.add('is-running');
     const startedAt = performance.now();
-    const minimumDisplay = reduceMotion.matches ? 650 : 1600;
-    const maximumDisplay = reduceMotion.matches ? 3000 : 7000;
+    // A first-time visitor on a phone downloads the hero cold. Holding the
+    // curtain for a long minimum makes a fast connection feel slow, and a long
+    // maximum makes a slow one feel broken, so keep both short and let the
+    // hero fade in behind the curtain instead.
+    const minimumDisplay = reduceMotion.matches || saveData() ? 350 : 700;
+    const maximumDisplay = reduceMotion.matches || saveData() ? 1600 : 2600;
 
-    const pageLoaded = document.readyState === 'complete'
-        ? Promise.resolve()
-        : new Promise(resolve => window.addEventListener('load', resolve, { once: true }));
-
-    const criticalImages = [...document.querySelectorAll('main img, .work-reveal img')];
-    criticalImages.forEach(image => { image.loading = 'eager'; });
+    // Only the hero is on screen when the curtain lifts. Everything below it
+    // stays lazy: waiting on the project scatter used to add megabytes to the
+    // very first paint for content the visitor could not see yet.
+    const criticalImages = [...document.querySelectorAll('main img')];
+    criticalImages.forEach(image => {
+        image.loading = 'eager';
+        image.fetchPriority = image.fetchPriority || 'high';
+    });
     const imagesReady = Promise.all(criticalImages.map(image => {
         if (image.complete) return image.decode?.().catch(() => {}) || Promise.resolve();
         return new Promise(resolve => {
@@ -196,9 +211,14 @@ function setupLoader() {
         });
     }));
 
-    const fontsReady = document.fonts?.ready?.catch(() => {}) || Promise.resolve();
+    // document.fonts.ready can idle behind a slow webfont; the page reads fine
+    // in the fallback face, so give it a ceiling rather than a veto.
+    const fontsReady = Promise.race([
+        document.fonts?.ready?.catch(() => {}) || Promise.resolve(),
+        new Promise(resolve => setTimeout(resolve, 1200))
+    ]);
     const layoutSettled = new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    const ready = Promise.all([pageLoaded, imagesReady, fontsReady, layoutSettled]);
+    const ready = Promise.all([imagesReady, fontsReady, layoutSettled]);
     const timeout = new Promise(resolve => setTimeout(resolve, maximumDisplay));
 
     return Promise.race([ready, timeout]).then(() => {
