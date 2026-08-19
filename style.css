@@ -2880,7 +2880,10 @@ main {
 }
 .recog.recog-hydrated .recog__frames { position: absolute; inset: 0; display: block; }
 .recog.recog-hydrated .recog-frame {
-    position: absolute; transform: translate(-50%, -50%);
+    /* GSAP owns the -50% centering for hydrated cards. Keeping a CSS
+       translate here makes GSAP preserve it as a pixel offset and then add
+       its own xPercent/yPercent translation, shifting the cards left. */
+    position: absolute;
     width: clamp(250px, 23vw, 340px);
     box-shadow: 0 34px 70px rgba(0,0,0,0.55);
 }
@@ -3473,7 +3476,6 @@ html.is-loading body {
 
 .story-hydrated .scatter-item {
     border-radius: 10px;
-    transform: translate(-50%, -50%) rotate(0deg);
     box-shadow: 0 18px 46px rgba(0, 0, 0, 0.42);
 }
 
@@ -3729,7 +3731,8 @@ html.is-loading body {
 .story-hydrated .scatter-item {
     position: absolute;
     width: clamp(200px, 19vw, 355px);
-    transform: translate(-50%, -50%);
+    /* setupProjectStory applies xPercent/yPercent centering. Defining the
+       same translation in CSS produces a second half-card offset in GSAP. */
     will-change: transform, opacity;
 }
 
