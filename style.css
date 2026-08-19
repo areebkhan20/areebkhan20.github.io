@@ -3910,6 +3910,7 @@ html.is-loading body {
         radial-gradient(circle at 12% 14%, rgba(90, 74, 176, 0.14), transparent 30rem),
         #100c15;
     box-shadow: 0 -32px 90px rgba(0, 0, 0, 0.48);
+    transition: none;
     will-change: transform;
 }
 
@@ -4188,9 +4189,9 @@ html.is-loading body {
     .hero-intro { top: calc(50% + 72px); bottom: auto; }
 }
 
-/* A full viewport of settled reading time keeps About from being skipped. */
+/* The story ends as About settles, so normal document flow resumes immediately. */
 .hero-work-story.story-hydrated {
-    height: 440vh;
+    height: 330vh;
 }
 
 .story-hydrated .about-reveal .about-grid {
@@ -4250,28 +4251,6 @@ html.is-loading body {
     display: grid;
     place-items: center;
     align-content: center;
-}
-
-.octivis-transition-hydrated {
-    position: relative;
-    z-index: 9;
-    margin-top: -11vh !important;
-    box-shadow: 0 -42px 110px rgba(0, 0, 0, 0.58);
-    will-change: transform, clip-path;
-}
-
-.octivis-transition-hydrated::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    z-index: 4;
-    width: min(42vw, 520px);
-    height: 1px;
-    transform: translateX(-50%);
-    background: rgba(255, 143, 230, 0.75);
-    box-shadow: 0 0 30px rgba(178, 60, 230, 0.38);
-    pointer-events: none;
 }
 
 .octivis-case__identity::before {
@@ -4361,7 +4340,7 @@ html.is-loading body {
 .octivis-parallax .octivis-story__media img {
     transition: none;
     will-change: transform;
-    transform: scale(1.25);
+    transform: scale(1.4);
 }
 
 .octivis-story__media--light {

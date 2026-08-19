@@ -11,6 +11,7 @@ const saveData = () => {
 };
 let lenis = null;
 const scrollStateKey = 'areeb-khan-scroll-y';
+const aboutStoryProgress = 0.99;
 const initialHash = window.location.hash;
 const navigationEntry = performance.getEntriesByType('navigation')[0];
 const isReload = navigationEntry?.type === 'reload';
@@ -101,11 +102,21 @@ function setupLazyImageRefresh() {
     // Lazy images that finish loading after the triggers were measured can move
     // every section below them, so re-measure once the burst of loads settles.
     let refreshTimer;
+    const refreshWhenIdle = () => {
+        // Refreshing stops Lenis while ScrollTrigger measures. If that happens
+        // during a wheel or anchor scroll, the destination can be cut short.
+        if (lenis?.isScrolling) {
+            refreshTimer = setTimeout(refreshWhenIdle, 180);
+            return;
+        }
+        window.ScrollTrigger?.refresh();
+    };
+
     document.querySelectorAll('img[loading="lazy"]').forEach(image => {
         if (image.complete) return;
         image.addEventListener('load', () => {
             clearTimeout(refreshTimer);
-            refreshTimer = setTimeout(() => window.ScrollTrigger?.refresh(), 220);
+            refreshTimer = setTimeout(refreshWhenIdle, 220);
         }, { once: true });
     });
 }
@@ -120,7 +131,7 @@ function getInitialScrollDestination() {
         if (story) {
             const storyTop = story.getBoundingClientRect().top + window.scrollY;
             const storyTravel = Math.max(0, story.offsetHeight - window.innerHeight);
-            return Math.min(maxScroll, storyTop + storyTravel * 0.82);
+            return Math.min(maxScroll, storyTop + storyTravel * aboutStoryProgress);
         }
     }
 
@@ -272,7 +283,7 @@ function setupNavigation() {
                     event.preventDefault();
                     const storyTop = story.getBoundingClientRect().top + window.scrollY;
                     const storyTravel = Math.max(0, story.offsetHeight - window.innerHeight);
-                    smoothScrollTo(storyTop + storyTravel * 0.82);
+                    smoothScrollTo(storyTop + storyTravel * aboutStoryProgress);
                     return;
                 }
             }
@@ -412,12 +423,18 @@ function setupOctivisParallax() {
         const viewHeight = window.innerHeight;
 
         images.forEach(image => {
-            const rect = image.parentElement.getBoundingClientRect();
+            // The image is wrapped in a display:contents <picture>, whose box
+            // has no geometry. Measure the visible clipped media frame instead.
+            const media = image.closest('.octivis-story__media');
+            if (!media) return;
+            const rect = media.getBoundingClientRect();
             if (rect.bottom < -120 || rect.top > viewHeight + 120) return;
 
             // -1..1 progress of the frame's centre through the viewport
-            const progressY = ((rect.top + rect.height / 2) - viewHeight / 2) / ((viewHeight + rect.height) / 2);
-            image.style.transform = `translate3d(0, ${progressY * -16}%, 0) scale(1.25)`;
+            const rawProgress = ((rect.top + rect.height / 2) - viewHeight / 2) / ((viewHeight + rect.height) / 2);
+            const progressY = Math.max(-1, Math.min(1, rawProgress));
+            const speed = Number(image.dataset.parallaxSpeed || 13);
+            image.style.transform = `translate3d(0, ${progressY * -speed}%, 0) scale(1.4)`;
         });
     };
 
@@ -558,7 +575,6 @@ function setupDesktopScrollStories() {
     media.add('(min-width: 901px)', () => {
         const cleanups = [
             setupProjectStory(),
-            setupAboutOctivisTransition(),
             setupRecognitionStory(),
             setupExperienceStory(),
             setupEducationStory()
@@ -751,66 +767,6 @@ function setupMobileStories() {
     };
 }
 
-function setupAboutOctivisTransition() {
-    const about = document.querySelector('.about-reveal');
-    const aboutGrid = about?.querySelector('.about-grid');
-    const section = document.querySelector('.octivis-case');
-    const logo = section?.querySelector('.octivis-case__logo');
-    const intro = section ? [...section.querySelectorAll('.octivis-case__intro > *')] : [];
-    if (!about || !aboutGrid || !section || !logo) return;
-
-    section.classList.add('octivis-transition-hydrated');
-    gsap.set(section, {
-        y: 130,
-        scale: 0.94,
-        clipPath: 'inset(9% 3.5% 0% 3.5% round 34px 34px 0 0)',
-        transformOrigin: '50% 0%'
-    });
-    gsap.set(logo, { opacity: 0, scale: 0.78, y: 24 });
-    gsap.set(intro, { opacity: 0, x: 54 });
-
-    const timeline = gsap.timeline({
-        defaults: { ease: 'none' },
-        scrollTrigger: {
-            trigger: section,
-            start: 'top 98%',
-            end: 'top 10%',
-            scrub: 0.4,
-            invalidateOnRefresh: true
-        }
-    });
-
-    // Explicit from-values keep a mid-scroll ScrollTrigger.refresh() from
-    // re-recording animated states as the new baseline (see setupProjectStory).
-    timeline
-        .fromTo(aboutGrid, { scale: 1, y: 0, opacity: 1 }, {
-            scale: 0.9, y: -84, opacity: 0.18, duration: 1, immediateRender: false
-        }, 0)
-        .fromTo(section, {
-            y: 130,
-            scale: 0.94,
-            clipPath: 'inset(9% 3.5% 0% 3.5% round 34px 34px 0 0)'
-        }, {
-            y: 0,
-            scale: 1,
-            clipPath: 'inset(0% 0% 0% 0% round 0px)',
-            duration: 1
-        }, 0)
-        .fromTo(logo, { opacity: 0, scale: 0.78, y: 24 }, {
-            opacity: 1, scale: 1, y: 0, duration: 0.58, ease: 'power2.out', immediateRender: false
-        }, 0.28)
-        .fromTo(intro, { opacity: 0, x: 54 }, {
-            opacity: 1, x: 0, stagger: 0.08, duration: 0.56, ease: 'power2.out', immediateRender: false
-        }, 0.34);
-
-    return () => {
-        timeline.scrollTrigger?.kill();
-        timeline.kill();
-        section.classList.remove('octivis-transition-hydrated');
-        gsap.set([section, aboutGrid, logo, ...intro], { clearProps: 'transform,opacity,clipPath' });
-    };
-}
-
 function setupProjectStory() {
     const story = document.querySelector('.hero-work-story');
     const stage = story?.querySelector('.hero-work-stage');
@@ -825,7 +781,6 @@ function setupProjectStory() {
     const heading = reveal.querySelector('.showcase__heading');
     const heroIntro = main.querySelector('.hero-intro');
     const aboutGrid = about.querySelector('.about-grid');
-    const aboutHold = { progress: 0 };
 
     gsap.set(reveal, { autoAlpha: 0 });
     gsap.set(items, { xPercent: -50, yPercent: -50, opacity: 0, scale: 0.72, y: 70 });
@@ -839,7 +794,9 @@ function setupProjectStory() {
             trigger: story,
             start: 'top top',
             end: 'bottom bottom',
-            scrub: 0.32,
+            // Keep the pinned story in exact step with native scroll. Lenis
+            // supplies enough global smoothing without a second catch-up lag.
+            scrub: true,
             invalidateOnRefresh: true
         }
     });
@@ -867,11 +824,10 @@ function setupProjectStory() {
             duration: 0.34,
             immediateRender: false
         }, 0.2)
-        .fromTo(reveal, { autoAlpha: 1, y: 0 }, { autoAlpha: 0.2, y: -40, duration: 0.22, immediateRender: false }, 1.0)
-        .fromTo(main, { opacity: 1 }, { opacity: 0.12, duration: 0.2, immediateRender: false }, 1.0)
-        .fromTo(about, { yPercent: 100 }, { yPercent: 0, duration: 0.3, ease: 'power2.inOut', immediateRender: false }, 1.0)
-        .fromTo(aboutGrid, { opacity: 0, y: 52 }, { opacity: 1, y: 0, duration: 0.18, ease: 'power2.out', immediateRender: false }, 1.12)
-        .to(aboutHold, { progress: 1, duration: 0.55, ease: 'none' });
+        .fromTo(reveal, { autoAlpha: 1, y: 0 }, { autoAlpha: 0.12, y: -40, duration: 0.22, immediateRender: false }, 0.78)
+        .fromTo(main, { opacity: 1 }, { opacity: 0.08, duration: 0.2, immediateRender: false }, 0.78)
+        .fromTo(about, { yPercent: 100 }, { yPercent: 0, duration: 0.28, ease: 'none', immediateRender: false }, 0.78)
+        .fromTo(aboutGrid, { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.2, ease: 'none', immediateRender: false }, 0.78);
 
     return () => {
         timeline.scrollTrigger?.kill();
