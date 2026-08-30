@@ -4221,13 +4221,18 @@ html.is-loading body {
    An editorial case-study sequence inspired by founder-led success stories.
    ============================================================ */
 .octivis.octivis-case {
+    --octivis-red: #ff3131;
+    --octivis-red-soft: #ff7770;
+    --octivis-navy: #003366;
     width: 100%;
     max-width: none;
     margin: 0;
     padding: clamp(6rem, 10vw, 10rem) 0 clamp(5rem, 9vw, 9rem);
     overflow: hidden;
-    color: #f4f1ec;
-    background: #0c0a10;
+    color: #f7f4ef;
+    background:
+        radial-gradient(circle at 84% 10%, rgba(255, 49, 49, 0.1), transparent 30rem),
+        #101419;
 }
 
 .octivis-case__header,
@@ -4260,7 +4265,7 @@ html.is-loading body {
     right: 0;
     top: 50%;
     height: 1px;
-    background: rgba(244, 241, 236, 0.22);
+    background: linear-gradient(90deg, rgba(255, 49, 49, 0.08), rgba(255, 49, 49, 0.55), rgba(255, 49, 49, 0.08));
 }
 
 .octivis-case__logo {
@@ -4270,13 +4275,13 @@ html.is-loading body {
     height: auto;
     display: block;
     padding-inline: 1.25rem;
-    background: #0c0a10;
+    background: #101419;
     filter: none;
 }
 
 .octivis-case__intro .octivis-case__eyebrow {
     margin: 0 0 1rem;
-    color: var(--brand-soft);
+    color: var(--octivis-red-soft);
     font-size: 0.74rem;
     font-weight: 600;
     letter-spacing: 0.18em;
@@ -4321,7 +4326,7 @@ html.is-loading body {
     overflow: hidden;
     border-radius: 6px;
     aspect-ratio: 16 / 10;
-    background: #15121a;
+    background: #171b20;
 }
 
 .octivis-story__media img {
@@ -4386,8 +4391,8 @@ html.is-loading body {
     margin-top: auto;
     padding: 0.6rem 0.85rem;
     border-radius: 5px;
-    background: rgba(244, 241, 236, 0.09);
-    color: #ff8fe6;
+    background: rgba(255, 49, 49, 0.11);
+    color: var(--octivis-red-soft);
     font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.04em;
@@ -4398,7 +4403,7 @@ html.is-loading body {
     justify-content: space-between;
     margin-top: clamp(2.5rem, 5vw, 4.5rem);
     padding: 1.25rem 0;
-    border-block: 1px solid rgba(244, 241, 236, 0.18);
+    border-block: 1px solid rgba(255, 49, 49, 0.28);
     color: #f4f1ec;
     font-size: clamp(1rem, 1.7vw, 1.25rem);
     text-decoration: none;
@@ -4410,6 +4415,10 @@ html.is-loading body {
 
 .octivis-case__link:hover span {
     transform: translate(4px, -4px);
+}
+
+.octivis-case__link:hover {
+    color: var(--octivis-red-soft);
 }
 
 @media (max-width: 900px) {
@@ -4424,6 +4433,12 @@ html.is-loading body {
 
     .octivis-case__logo {
         width: min(220px, 70vw);
+        padding-inline: 0;
+        background: transparent;
+    }
+
+    .octivis-case__identity::before {
+        display: none;
     }
 
     .octivis-story {
