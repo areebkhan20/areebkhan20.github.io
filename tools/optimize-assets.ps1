@@ -131,13 +131,16 @@ foreach ($asset in $lifeAssets) {
     Export-Jpeg (Join-Path $projectRoot $asset.Source) (Join-Path $lifeDir $asset.Destination) 1600 1600 82
 }
 
+# Story images are diagrams and product shots — they hold text, so they keep
+# their full frame (no height cap that would force a downscale) and a higher
+# quality than the photographic assets above.
 $octivisAssets = @(
-    @{ Source = 'Octivis\1.png'; Destination = 'supplier-recovery.jpg' },
-    @{ Source = 'Octivis\2(2).png'; Destination = 'payment-intelligence.jpg' },
-    @{ Source = 'Octivis\3.png'; Destination = 'physical-loss.jpg' }
+    @{ Source = 'Octivis\store.png'; Destination = 'store.jpg' },
+    @{ Source = 'Octivis\connected-systems.png'; Destination = 'connected-systems.jpg' },
+    @{ Source = 'Octivis\app.png'; Destination = 'app-review.jpg' }
 )
 foreach ($asset in $octivisAssets) {
-    Export-Jpeg (Join-Path $projectRoot $asset.Source) (Join-Path $octivisDir $asset.Destination) 1600 1000 82
+    Export-Jpeg (Join-Path $projectRoot $asset.Source) (Join-Path $octivisDir $asset.Destination) 1600 1600 86
 }
 
 Write-Output 'Optimized hero, project, Octivis, and Life in Frames assets.'

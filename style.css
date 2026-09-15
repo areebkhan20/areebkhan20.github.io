@@ -1188,6 +1188,16 @@ form input, textarea{
    The JS fallback passes behavior: 'smooth' per call where it's wanted. */
 html {
     scroll-behavior: auto;
+    /* A sideways trackpad/touch swipe used to peel the page aside and expose
+       the white page behind it (the browser's history-back gesture and the
+       horizontal rubber band). Nothing here scrolls horizontally, so refuse
+       both, and paint the canvas dark so any overscroll gap stays black. */
+    overscroll-behavior-x: none;
+    background-color: #0a0714;
+}
+
+body {
+    overscroll-behavior-x: none;
 }
 
 /* Lenis smooth scroll (native anchor smoothing must yield to it) */
@@ -4221,18 +4231,16 @@ html.is-loading body {
    An editorial case-study sequence inspired by founder-led success stories.
    ============================================================ */
 .octivis.octivis-case {
-    --octivis-red: #ff3131;
-    --octivis-red-soft: #ff7770;
-    --octivis-navy: #003366;
+    --octivis-accent: var(--brand);
+    --octivis-accent-soft: var(--brand-soft);
     width: 100%;
     max-width: none;
     margin: 0;
     padding: clamp(6rem, 10vw, 10rem) 0 clamp(5rem, 9vw, 9rem);
     overflow: hidden;
-    color: #f7f4ef;
-    background:
-        radial-gradient(circle at 84% 10%, rgba(255, 49, 49, 0.1), transparent 30rem),
-        #101419;
+    color: var(--text-1);
+    /* Sits on the site gradient — only the brand accent is local to the section. */
+    background: linear-gradient(180deg, #100c15 0%, #100c15 8%, #130e1c 45%, #0a0810 100%);
 }
 
 .octivis-case__header,
@@ -4258,30 +4266,19 @@ html.is-loading body {
     align-content: center;
 }
 
-.octivis-case__identity::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    height: 1px;
-    background: linear-gradient(90deg, rgba(255, 49, 49, 0.08), rgba(255, 49, 49, 0.55), rgba(255, 49, 49, 0.08));
-}
-
 .octivis-case__logo {
     position: relative;
     z-index: 1;
     width: min(245px, 100%);
     height: auto;
     display: block;
-    padding-inline: 1.25rem;
-    background: #101419;
+    background: transparent;
     filter: none;
 }
 
 .octivis-case__intro .octivis-case__eyebrow {
     margin: 0 0 1rem;
-    color: var(--octivis-red-soft);
+    color: var(--brand-soft);
     font-size: 0.74rem;
     font-weight: 600;
     letter-spacing: 0.18em;
@@ -4291,7 +4288,7 @@ html.is-loading body {
 .octivis-case__intro h2 {
     max-width: 900px;
     margin-bottom: 1.4rem;
-    color: #f4f1ec;
+    color: var(--text-1);
     font-size: clamp(2.5rem, 5.4vw, 5.5rem);
     font-weight: 630;
     line-height: 0.91;
@@ -4300,7 +4297,7 @@ html.is-loading body {
 
 .octivis-case__intro p {
     max-width: 680px;
-    color: rgba(244, 241, 236, 0.62);
+    color: rgba(255, 255, 255, 0.68);
     font-size: clamp(0.95rem, 1.4vw, 1.1rem);
     line-height: 1.7;
 }
@@ -4319,42 +4316,35 @@ html.is-loading body {
     border-bottom: 1px dashed rgba(244, 241, 236, 0.24);
 }
 
+/* Matching cropped frames provide room for scroll-driven image movement. */
 .octivis-story__media {
     width: min(100%, 650px);
     min-width: 0;
     margin: 0;
     overflow: hidden;
-    border-radius: 6px;
-    aspect-ratio: 16 / 10;
-    background: #171b20;
+    border-radius: 8px;
+    background: #f4f1ec;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.32);
+    transition: transform 0.6s cubic-bezier(.16, 1, .3, 1), box-shadow 0.6s cubic-bezier(.16, 1, .3, 1);
 }
 
 .octivis-story__media img {
     width: 100%;
-    height: 100%;
+    height: auto;
     display: block;
-    object-fit: cover;
-    transition: transform 0.8s cubic-bezier(.16, 1, .3, 1);
 }
 
-.octivis-story:hover .octivis-story__media img {
-    transform: scale(1.025);
+.octivis-story:hover .octivis-story__media {
+    transform: translateY(-4px);
+    box-shadow: 0 24px 54px rgba(0, 0, 0, 0.4);
 }
 
-/* Scroll parallax mode: JS drives the transform, so no transition or hover zoom. */
-.octivis-parallax .octivis-story__media img {
-    transition: none;
-    will-change: transform;
-    transform: scale(1.4);
-}
-
-.octivis-story__media--light {
-    background: #ece9e2;
-}
-
-.octivis-story__media--light img {
-    object-fit: contain;
-    padding: clamp(1rem, 3vw, 3rem);
+@media (prefers-reduced-motion: reduce) {
+    .octivis-story__media,
+    .octivis-story:hover .octivis-story__media {
+        transition: none;
+        transform: none;
+    }
 }
 
 .octivis-story__body {
@@ -4364,7 +4354,7 @@ html.is-loading body {
 }
 
 .octivis-story__body > span {
-    color: rgba(244, 241, 236, 0.44);
+    color: var(--text-3);
     font-size: 0.66rem;
     font-weight: 600;
     letter-spacing: 0.12em;
@@ -4373,7 +4363,7 @@ html.is-loading body {
 
 .octivis-story__body h3 {
     margin: 1rem 0 1rem;
-    color: #f4f1ec;
+    color: var(--text-1);
     font-size: clamp(1.8rem, 2.6vw, 2.7rem);
     font-weight: 620;
     line-height: 1.02;
@@ -4381,7 +4371,7 @@ html.is-loading body {
 }
 
 .octivis-story__body p {
-    color: rgba(244, 241, 236, 0.62);
+    color: rgba(255, 255, 255, 0.68);
     font-size: 0.9rem;
     line-height: 1.65;
 }
@@ -4391,8 +4381,8 @@ html.is-loading body {
     margin-top: auto;
     padding: 0.6rem 0.85rem;
     border-radius: 5px;
-    background: rgba(255, 49, 49, 0.11);
-    color: var(--octivis-red-soft);
+    background: rgba(178, 60, 230, 0.10);
+    color: var(--octivis-accent-soft);
     font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.04em;
@@ -4403,8 +4393,8 @@ html.is-loading body {
     justify-content: space-between;
     margin-top: clamp(2.5rem, 5vw, 4.5rem);
     padding: 1.25rem 0;
-    border-block: 1px solid rgba(255, 49, 49, 0.28);
-    color: #f4f1ec;
+    border-block: 1px solid rgba(189, 162, 214, 0.28);
+    color: var(--text-1);
     font-size: clamp(1rem, 1.7vw, 1.25rem);
     text-decoration: none;
 }
@@ -4418,7 +4408,7 @@ html.is-loading body {
 }
 
 .octivis-case__link:hover {
-    color: var(--octivis-red-soft);
+    color: var(--octivis-accent-soft);
 }
 
 @media (max-width: 900px) {
@@ -4433,12 +4423,6 @@ html.is-loading body {
 
     .octivis-case__logo {
         width: min(220px, 70vw);
-        padding-inline: 0;
-        background: transparent;
-    }
-
-    .octivis-case__identity::before {
-        display: none;
     }
 
     .octivis-story {
@@ -4612,4 +4596,52 @@ picture {
    sweep has to finish in that window instead of crawling. */
 .site-loader__progress span {
     transition-duration: 0.85s;
+}
+
+/* Keep the exposed parallax canvas black, including mist outside the skyline. */
+html { background-color: #000; }
+body { width: 100%; }
+main { background: #000; }
+main::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    pointer-events: none;
+    background:
+        linear-gradient(#000, #000) left / var(--hero-gap-left, 0px) 100% no-repeat,
+        linear-gradient(#000, #000) right / var(--hero-gap-right, 0px) 100% no-repeat;
+}
+.hero-btn--primary {
+    background: #554063;
+    border: 1px solid rgba(203, 181, 223, 0.4);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+.hero-btn--primary:hover,
+.hero-btn--primary:focus-visible {
+    background: #665075;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+.octivis-story { align-items: center; }
+.octivis-story__media {
+    aspect-ratio: 16 / 9;
+    background: #171026;
+}
+.octivis-story__media picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.octivis-story__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+.octivis-parallax .octivis-story__media img {
+    will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+    .octivis-story__media img { transform: none !important; will-change: auto; }
 }

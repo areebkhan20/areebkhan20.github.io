@@ -433,8 +433,10 @@ function setupOctivisParallax() {
             // -1..1 progress of the frame's centre through the viewport
             const rawProgress = ((rect.top + rect.height / 2) - viewHeight / 2) / ((viewHeight + rect.height) / 2);
             const progressY = Math.max(-1, Math.min(1, rawProgress));
-            const speed = Number(image.dataset.parallaxSpeed || 13);
-            image.style.transform = `translate3d(0, ${progressY * -speed}%, 0) scale(1.4)`;
+            // Keep travel inside the headroom the scale(1.34) leaves,
+            // or the diagram labels drift out of the frame.
+            const speed = 15;
+            image.style.transform = `translate3d(0, ${progressY * -speed}%, 0) scale(1.34)`;
         });
     };
 
@@ -530,6 +532,16 @@ function setupHeroParallax() {
             element.style.transform = `translate3d(calc(-50% + ${x}px), calc(-50% + ${y}px), ${z}px) rotateY(${r}deg)`;
         });
 
+        // Mist layers can extend beyond the moving skyline. Paint that exposed
+        // strip black without changing the movement of the city or the name.
+        const backdrop = hero.querySelector('.bg-img');
+        if (backdrop) {
+            const bounds = hero.getBoundingClientRect();
+            const scene = backdrop.getBoundingClientRect();
+            const scale = bounds.width / hero.clientWidth || 1;
+            hero.style.setProperty('--hero-gap-left', `${Math.max(0, (scene.left - bounds.left) / scale)}px`);
+            hero.style.setProperty('--hero-gap-right', `${Math.max(0, (bounds.right - scene.right) / scale)}px`);
+        }
         if (Math.abs(targetX - currentX) > 0.15 || Math.abs(targetY - currentY) > 0.15) {
             frame = requestAnimationFrame(render);
         } else {
