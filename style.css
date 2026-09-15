@@ -4645,3 +4645,15 @@ main::after {
 @media (prefers-reduced-motion: reduce) {
     .octivis-story__media img { transform: none !important; will-change: auto; }
 }
+/* Native keyboard control and a comfortable touch target for the mobile menu. */
+button.hamburger {
+    width: 44px;
+    height: 44px;
+    padding: 12px;
+    border: 0;
+    background: transparent;
+    color: var(--text-1);
+    transform: none;
+}
+.hamburger svg { display: block; }
+.hamburger:focus-visible { outline: 2px solid var(--brand-soft); outline-offset: 3px; }

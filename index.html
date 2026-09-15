@@ -11,7 +11,7 @@
     <!-- The four icons this page uses are inlined as SVG further down. A whole
          icon font from a second origin was render-blocking the first paint. -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-    <link rel="stylesheet" href="style.css?v=20260830-9">
+    <link rel="stylesheet" href="style.css?v=20260915-1">
     <!-- The hero backdrop is the largest contentful paint: start it in parallel
          with the stylesheet instead of waiting for layout to discover it. -->
     <link rel="preload" as="image" type="image/avif" href="media/hero/avif/bg.avif" media="(min-width: 901px)" fetchpriority="high">
@@ -19,8 +19,15 @@
     <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
-    <script defer src="js/app.js?v=20260830-8"></script>
-    <script>document.documentElement.classList.add('has-js', 'is-loading');</script>
+    <script defer src="js/app.js?v=20260915-1"></script>
+    <script>
+        document.documentElement.classList.add('has-js', 'is-loading');
+        // Keep the page usable if an animation CDN or the app script fails to load.
+        window.loaderFallback = setTimeout(() => {
+            document.documentElement.classList.remove('is-loading');
+            document.querySelector('.site-loader')?.remove();
+        }, 6000);
+    </script>
 
 </head>
 <body>
@@ -36,8 +43,8 @@
 
     <header>
         <nav>
-            <img src="img2/Hamburger.png" alt="menu" class="hamburger">
-            <ul class="menu">
+            <button type="button" class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+            <ul class="menu" id="site-menu">
                 <li>
                     <a href="#home">Home</a>
                 </li>

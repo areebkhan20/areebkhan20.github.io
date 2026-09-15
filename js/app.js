@@ -43,7 +43,9 @@ const saveScrollPosition = () => {
 };
 
 window.addEventListener('pagehide', saveScrollPosition);
-window.addEventListener('beforeunload', saveScrollPosition);
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) saveScrollPosition();
+});
 window.addEventListener('pageshow', event => {
     if (!event.persisted) {
         window.scrollTo(0, 0);
@@ -73,6 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     await setupLoader();
+    clearTimeout(window.loaderFallback);
 
     setupSmoothScroll();
     window.ScrollTrigger?.refresh();
@@ -136,7 +139,7 @@ function getInitialScrollDestination() {
     }
 
     if (initialHash) {
-        const target = document.querySelector(initialHash);
+        const target = document.getElementById(initialHash.slice(1));
         if (target) {
             const targetY = target.getBoundingClientRect().top + window.scrollY;
             return Math.max(0, Math.min(maxScroll, targetY));
@@ -203,7 +206,7 @@ function setupLoader() {
     // curtain for a long minimum makes a fast connection feel slow, and a long
     // maximum makes a slow one feel broken, so keep both short and let the
     // hero fade in behind the curtain instead.
-    const minimumDisplay = reduceMotion.matches || saveData() ? 350 : 700;
+    const minimumDisplay = reduceMotion.matches || saveData() ? 0 : 250;
     const maximumDisplay = reduceMotion.matches || saveData() ? 1600 : 2600;
 
     // Only the hero is on screen when the curtain lifts. Everything below it
@@ -253,19 +256,25 @@ function setupNavigation() {
     let ticking = false;
 
     if (hamburger && menu) {
-        hamburger.addEventListener('click', () => menu.classList.toggle('active'));
+        const setMenuOpen = open => {
+            menu.classList.toggle('active', open);
+            hamburger.setAttribute('aria-expanded', String(open));
+            hamburger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+        };
+        hamburger.addEventListener('click', () => setMenuOpen(!menu.classList.contains('active')));
         menu.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                menu.classList.remove('active');
-            });
+            link.addEventListener('click', () => setMenuOpen(false));
         });
         document.addEventListener('click', event => {
-            if (!menu.contains(event.target) && !hamburger.contains(event.target)) {
-                menu.classList.remove('active');
+            if (!menu.contains(event.target) && !hamburger.contains(event.target)) setMenuOpen(false);
+        });
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && menu.classList.contains('active')) {
+                setMenuOpen(false);
+                hamburger.focus();
             }
         });
     }
-
     document.querySelectorAll('a[href^="#"]').forEach(link => {
         link.addEventListener('click', event => {
             const hash = link.getAttribute('href');
@@ -288,7 +297,7 @@ function setupNavigation() {
                 }
             }
 
-            const target = document.querySelector(hash);
+            const target = document.getElementById(hash.slice(1));
             if (!target) return;
             event.preventDefault();
             smoothScrollTo(target);
@@ -372,8 +381,16 @@ function setupMarqueeDrag() {
             track.style.transform = `translate3d(${offset}px, 0, 0)`;
         };
 
+        let visible = !('IntersectionObserver' in window);
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver(entries => {
+                visible = entries[0].isIntersecting;
+                track.style.willChange = visible ? 'transform' : 'auto';
+            }, { rootMargin: '120px' });
+            observer.observe(marquee);
+        }
         gsap.ticker.add((_, deltaTime) => {
-            if (dragging) return;
+            if (dragging || !visible || document.hidden || (reduceMotion.matches && velocity === 0)) return;
             const dt = Math.min(deltaTime / 1000, 0.1);
             const base = reduceMotion.matches ? 0 : direction * (half / 45);
             offset = wrap(offset + (base + velocity) * dt);
@@ -410,45 +427,50 @@ function setupMarqueeDrag() {
 
 function setupOctivisParallax() {
     if (reduceMotion.matches) return;
-
     const section = document.querySelector('.octivis-case');
-    const images = section ? [...section.querySelectorAll('.octivis-story__media img')] : [];
-    if (!section || !images.length) return;
-
+    if (!section) return;
+    const items = [...section.querySelectorAll('.octivis-story__media img')]
+        .map(image => ({ image, media: image.closest('.octivis-story__media') }))
+        .filter(item => item.media);
+    if (!items.length) return;
     section.classList.add('octivis-parallax');
     let frame = 0;
-
+    const active = new Set('IntersectionObserver' in window ? [] : items);
     const render = () => {
         frame = 0;
+        if (document.hidden || reduceMotion.matches) return;
         const viewHeight = window.innerHeight;
-
-        images.forEach(image => {
-            // The image is wrapped in a display:contents <picture>, whose box
-            // has no geometry. Measure the visible clipped media frame instead.
-            const media = image.closest('.octivis-story__media');
-            if (!media) return;
+        // Read all visible geometry before writing transforms to avoid repeated layout.
+        const updates = [...active].map(({ image, media }) => {
             const rect = media.getBoundingClientRect();
-            if (rect.bottom < -120 || rect.top > viewHeight + 120) return;
-
-            // -1..1 progress of the frame's centre through the viewport
-            const rawProgress = ((rect.top + rect.height / 2) - viewHeight / 2) / ((viewHeight + rect.height) / 2);
-            const progressY = Math.max(-1, Math.min(1, rawProgress));
-            // Keep travel inside the headroom the scale(1.34) leaves,
-            // or the diagram labels drift out of the frame.
-            const speed = 15;
-            image.style.transform = `translate3d(0, ${progressY * -speed}%, 0) scale(1.34)`;
+            const raw = (rect.top + rect.height / 2 - viewHeight / 2) / ((viewHeight + rect.height) / 2);
+            return { image, progress: Math.max(-1, Math.min(1, raw)) };
+        });
+        updates.forEach(({ image, progress }) => {
+            image.style.transform = `translate3d(0, ${progress * -15}%, 0) scale(1.34)`;
         });
     };
-
     const requestRender = () => {
-        if (!frame) frame = requestAnimationFrame(render);
+        if (active.size && !frame) frame = requestAnimationFrame(render);
     };
-
+    if ('IntersectionObserver' in window) {
+        const byMedia = new Map(items.map(item => [item.media, item]));
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                const item = byMedia.get(entry.target);
+                if (entry.isIntersecting) active.add(item);
+                else active.delete(item);
+                item.image.style.willChange = entry.isIntersecting ? 'transform' : 'auto';
+            });
+            requestRender();
+        }, { rootMargin: '120px' });
+        items.forEach(({ media }) => observer.observe(media));
+    }
     window.addEventListener('scroll', requestRender, { passive: true });
     window.addEventListener('resize', requestRender, { passive: true });
-    render();
+    document.addEventListener('visibilitychange', requestRender);
+    requestRender();
 }
-
 function setupHeroEntrance() {
     gsap.from('.hero-intro > *', {
         y: 22,
@@ -513,6 +535,11 @@ function setupHeroParallax() {
         rotation: Number(element.dataset.rotation || 0)
     }));
 
+    const backdrop = hero.querySelector('.bg-img');
+    let heroWidth = hero.clientWidth;
+    let backdropWidth = backdrop?.offsetWidth || 0;
+    let backdropLeft = backdrop?.offsetLeft || 0;
+    const backdropSpeed = Number(backdrop?.dataset.speedx || 0);
     let targetX = 0;
     let targetY = 0;
     let currentX = 0;
@@ -522,7 +549,7 @@ function setupHeroParallax() {
         const ease = 0.16;
         currentX += (targetX - currentX) * ease;
         currentY += (targetY - currentY) * ease;
-        const rotationDegree = (currentX / Math.max(hero.clientWidth / 2, 1)) * 20;
+        const rotationDegree = (currentX / Math.max(heroWidth / 2, 1)) * 20;
 
         layers.forEach(({ element, speedX, speedY, speedZ, rotation }) => {
             const x = -currentX * speedX;
@@ -534,13 +561,10 @@ function setupHeroParallax() {
 
         // Mist layers can extend beyond the moving skyline. Paint that exposed
         // strip black without changing the movement of the city or the name.
-        const backdrop = hero.querySelector('.bg-img');
         if (backdrop) {
-            const bounds = hero.getBoundingClientRect();
-            const scene = backdrop.getBoundingClientRect();
-            const scale = bounds.width / hero.clientWidth || 1;
-            hero.style.setProperty('--hero-gap-left', `${Math.max(0, (scene.left - bounds.left) / scale)}px`);
-            hero.style.setProperty('--hero-gap-right', `${Math.max(0, (bounds.right - scene.right) / scale)}px`);
+            const left = backdropLeft - backdropWidth / 2 - currentX * backdropSpeed;
+            hero.style.setProperty('--hero-gap-left', `${Math.max(0, left)}px`);
+            hero.style.setProperty('--hero-gap-right', `${Math.max(0, heroWidth - left - backdropWidth)}px`);
         }
         if (Math.abs(targetX - currentX) > 0.15 || Math.abs(targetY - currentY) > 0.15) {
             frame = requestAnimationFrame(render);
@@ -575,6 +599,13 @@ function setupHeroParallax() {
         targetY = event.clientY - rect.top - rect.height / 2;
         requestRender();
     });
+
+    window.addEventListener('resize', () => {
+        heroWidth = hero.clientWidth;
+        backdropWidth = backdrop?.offsetWidth || 0;
+        backdropLeft = backdrop?.offsetLeft || 0;
+        if (window.innerWidth > 900) requestRender();
+    }, { passive: true });
 
     // Apply the neutral transform immediately so the layered hero is correct
     // before the first pointer event. When the pointer leaves, the last target
